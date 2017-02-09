@@ -4,6 +4,9 @@ import nl.dke.pursuitevasion.map.AbstractObject;
 import nl.dke.pursuitevasion.map.ObjectType;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -17,32 +20,72 @@ public class Floor extends AbstractObject
     /**
      * Obstacles can be placed on the floor to obstruct vision
      */
-    private List<Obstacle> obstacles;
+    private final Collection<Obstacle> obstacles;
 
     /**
      * Gates can be placed on the floor to go to another floor
      */
-    private List<Gate> gates;
+    private final Collection<Gate> gates;
 
-    public Floor(Polygon polygon)
+    /**
+     * Create a floor object
+     *
+     * @param polygon the polygon of this floor
+     * @param floodID the id of this floor
+     * @param obstacles a list of obstacles placed on this floor
+     * @param gates a list of gates placed on this floor
+     */
+    public Floor(Polygon polygon, int floodID, Collection<Obstacle> obstacles, Collection<Gate> gates)
+        throws IllegalArgumentException
     {
-        super(polygon);
+        super(polygon, floodID);
+        verifyInisdeFloor(obstacles);
+        verifyInisdeFloor(gates);
+        this.obstacles = Collections.unmodifiableCollection(obstacles);
+        this.gates = Collections.unmodifiableCollection(gates);
     }
 
-    public void addObstacle(Obstacle obstacle)
-            throws IllegalArgumentException
+    /**
+     * Verify that the given polygons are inside the floor
+     *
+     * @param collection the collections containing the polygons
+     */
+    private void verifyInisdeFloor(Collection<? extends AbstractObject> collection)
+        throws IllegalArgumentException
     {
-        if(obstacle.)
-        if(obstacles.contains(obstacle))
+        for(AbstractObject o : collection)
         {
-            throw new IllegalArgumentException("given obstacle is already in the floor");
+            if(super.getPolygon().contains(o.getPolygon().getBounds2D()))
+            {
+                throw new IllegalArgumentException(
+                        String.format("given polygon with id %d is not inside the floor", o.getID()));
+            }
+            if(o instanceof Obstacle && super.getID() != ((Obstacle) o).getFloorID())
+            {
+                throw new IllegalArgumentException(
+                        String.format("given plygon with id %d should not be placed on this floor", o.getID()));
+            }
         }
-        obstacles.add(obstacle);
     }
 
-    public void addGate()
-    {
+    /**
+     * A read-only list of the obstacles on the floor
 
+     * @return the list of the obstacles on the floor
+     */
+    public Collection<Obstacle> getObstacles()
+    {
+        return obstacles;
+    }
+
+    /**
+     * A read-only list of all the gates on the floor
+     *
+     * @return the list of gates on the floor
+     */
+    public Collection<Gate> getGates()
+    {
+        return gates;
     }
 
     @Override

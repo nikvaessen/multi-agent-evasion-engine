@@ -12,26 +12,21 @@ import java.awt.*;
 public abstract class AbstractObject
 {
     /**
-     * The id register to get unique id's for every object
+     * The unique id of this object
      */
-    private final static IDRegister idRegister = IDRegister.getInstance();
-
-    /**
-     * The id of this object
-     */
-    private int id;
+    private final int id;
 
     /**
      * The polygon of this object
      */
-    private Polygon polygon;
+    private final Polygon polygon;
 
     /**
-     * general constructor which registers the object and gets a unique idea
+     * General constructor which registers the object and gets a unique idea
      */
-    public AbstractObject(Polygon polygon)
+    public AbstractObject(Polygon polygon, int id)
     {
-        id = idRegister.register(this);
+        this.id = id;
         this.polygon = polygon;
     }
 
@@ -57,15 +52,6 @@ public abstract class AbstractObject
     public Polygon getPolygon()
     {
         return polygon;
-    }
-
-    /**
-     * Get the singleton id register
-     * @return the ID register
-     */
-    public IDRegister getIdRegister()
-    {
-        return idRegister;
     }
 
     @Override

@@ -2,6 +2,7 @@ package nl.dke.pursuitevasion.map.impl;
 
 import nl.dke.pursuitevasion.map.AbstractObject;
 import nl.dke.pursuitevasion.map.ObjectType;
+import nl.dke.pursuitevasion.map.builders.IDRegister;
 
 import java.awt.*;
 
@@ -13,18 +14,29 @@ public class Obstacle extends AbstractObject
     /**
      * The id of the floor this obstacle is placed on
      */
-    public int floorID;
+    private final int floorID;
 
+    /**
+     * Create an obstacle
 
-    public Obstacle(Polygon polygon, int floorID)
+     * @param polygon the polygon of this obstacle
+     * @param id the id of this obstacle
+     * @param floorID the id of the floor this obstacle is placed on
+     */
+    public Obstacle(Polygon polygon, int id, int floorID)
     {
-        super(polygon);
-        if(!super.getIdRegister().contains(floorID))
-        {
-            throw new IllegalArgumentException(
-                    String.format("Cannot construct obstacle as there is no floor with id %d", floorID));
-        }
-        getIdRegister().getObject(floorID);
+        super(polygon, id);
+        this.floorID = floorID;
+    }
+
+    /**
+     * Get the id of the floor this obstacle belongs to
+
+     * @return the id of the floor
+     */
+    public int getFloorID()
+    {
+        return floorID;
     }
 
     @Override
