@@ -102,14 +102,6 @@ public class MapBuilder
     }
 
     /**
-     * Verify that all polygons are correct
-     */
-    public void verify()
-    {
-        //todo do the verification
-    }
-
-    /**
      * Builds the map given the created floors
      * @return
      */
