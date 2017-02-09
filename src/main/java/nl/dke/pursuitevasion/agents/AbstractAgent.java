@@ -5,4 +5,5 @@ package nl.dke.pursuitevasion.agents;
  */
 public abstract class AbstractAgent
 {
+
 }

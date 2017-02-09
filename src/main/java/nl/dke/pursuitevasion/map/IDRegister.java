@@ -4,26 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A singleton class which is used to get unique ID's for every Object being loaded into memory
+ * A class which is used to get unique ID's for every Object being loaded into memory
+ *
+ * A IDregister should be unique for every map
  *
  * Created by nik on 2/8/17.
  */
 public class IDRegister
 {
-    /**
-     * The singleton instance of this object
-     */
-    private static IDRegister ourInstance = new IDRegister();
-
-    /**
-     * Get the Singleton object
-     * @return the only IDRegister
-     */
-    public static IDRegister getInstance()
-    {
-        return ourInstance;
-    }
-
     /**
      * Store all the pairs
      */
@@ -32,7 +20,7 @@ public class IDRegister
     /**
      * Construct an empty IDRegister
      */
-    private IDRegister()
+    public IDRegister()
     {
         pairs = new ArrayList<Pair>();
     }

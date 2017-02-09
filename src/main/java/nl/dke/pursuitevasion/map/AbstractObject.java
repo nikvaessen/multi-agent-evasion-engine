@@ -59,4 +59,24 @@ public abstract class AbstractObject
         return polygon;
     }
 
+    /**
+     * Get the singleton id register
+     * @return the ID register
+     */
+    public IDRegister getIdRegister()
+    {
+        return idRegister;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return id;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        return (o instanceof AbstractObject) && ((AbstractObject) o).getID() == this.id;
+    }
 }

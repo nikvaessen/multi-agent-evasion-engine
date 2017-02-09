@@ -10,10 +10,21 @@ import java.awt.*;
  */
 public class Obstacle extends AbstractObject
 {
+    /**
+     * The id of the floor this obstacle is placed on
+     */
+    public int floorID;
 
-    public Obstacle(Polygon polygon)
+
+    public Obstacle(Polygon polygon, int floorID)
     {
         super(polygon);
+        if(!super.getIdRegister().contains(floorID))
+        {
+            throw new IllegalArgumentException(
+                    String.format("Cannot construct obstacle as there is no floor with id %d", floorID));
+        }
+        getIdRegister().getObject(floorID);
     }
 
     @Override

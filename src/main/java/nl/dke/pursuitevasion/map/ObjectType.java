@@ -7,7 +7,7 @@ package nl.dke.pursuitevasion.map;
  *
  * A floor can contain a gate towards another floor
  *
- * A floor can contain a obstacle
+ * A floor can contain an obstacle
  *
  * Created by nik on 2/8/17.
  */
