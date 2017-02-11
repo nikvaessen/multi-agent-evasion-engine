@@ -23,8 +23,8 @@ public class MapBuilderTest
                     .finish(new Polygon())
                 .makeFloor()
                     .finish(new Polygon())
-                .makeGate()
-                .verify()
+                //.makeGate()
+                //.verify()
                 .build();
     }
 }

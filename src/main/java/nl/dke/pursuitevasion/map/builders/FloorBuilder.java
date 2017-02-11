@@ -35,7 +35,7 @@ public class FloorBuilder
         return this;
     }
 
-    public MapBuilder finish(Polygon polygon)
+    public MapBuilder  finish(Polygon polygon)
     {
         this.polygon = polygon;
         return builder;
