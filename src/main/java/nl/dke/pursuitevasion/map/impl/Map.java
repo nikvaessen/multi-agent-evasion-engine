@@ -41,4 +41,13 @@ public class Map
     {
         return floors;
     }
+
+    public static Map loadFile() {
+        //todo implement loadFile and file chooser
+        return null;
+    }
+
+    public static void saveToFile(Map map) {
+        //todo implementlo saveFile and file chooser
+    }
 }
