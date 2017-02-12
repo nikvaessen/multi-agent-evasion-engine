@@ -55,7 +55,7 @@ public class Floor extends AbstractObject
     {
         for(AbstractObject o : collection)
         {
-            if(super.getPolygon().contains(o.getPolygon().getBounds2D()))
+            if(!super.getPolygon().contains(o.getPolygon().getBounds2D()))
             {
                 throw new IllegalArgumentException(
                         String.format("given polygon with id %d is not inside the floor", o.getID()));

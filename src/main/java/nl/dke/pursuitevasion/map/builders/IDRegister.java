@@ -28,10 +28,20 @@ public class IDRegister
         count = 0;
     }
 
+    /**
+     * Get a unique ID which has been returned yet
+     *
+     * @return an integer value not returned previously
+     */
     public synchronized int getUniqueID()
     {
-        int id = count + 1;
+        int id = count;
         count++;
+        if(count == 0)
+        {
+            count = -1;
+            throw new IllegalStateException("IDRegister ran out of unique ID's");
+        }
         return id;
     }
 
