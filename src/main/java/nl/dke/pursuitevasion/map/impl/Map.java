@@ -5,6 +5,7 @@ import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Gate;
 import nl.dke.pursuitevasion.map.impl.Obstacle;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -17,8 +18,13 @@ import java.util.Collections;
  *
  * Created by nik on 2/8/17.
  */
-public class Map
+public class Map implements Serializable
 {
+    /**
+     * Every map needs a name
+     */
+    private String name = "";
+
     /**
      * Floors in the map
      */
