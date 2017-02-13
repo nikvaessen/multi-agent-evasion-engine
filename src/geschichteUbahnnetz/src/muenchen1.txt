@@ -1,0 +1,8 @@
+#Die Rahmendaten des Hintergrundbildes
+#Es wird von einer Flachenwelt ausgegangen. 
+LOLong=11.0153029471293
+LOLat=48.6040376236079
+RULong=12.2123029471293
+RULat=47.6140376236079
+
+			
