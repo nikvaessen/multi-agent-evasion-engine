@@ -1,5 +1,6 @@
 package nl.dke.pursuitevasion.map.builders;
 
+import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.impl.Map;
 import nl.dke.pursuitevasion.map.impl.Floor;
 
@@ -51,7 +52,7 @@ public class MapBuilder
      * @param polygon the polygon of the floor being made
      * @return the FloorBuilder object to make the floor with
      */
-    public FloorBuilder makeFloor(Polygon polygon)
+    public FloorBuilder makeFloor(MapPolygon polygon)
     {
         FloorBuilder floorBuilder = new FloorBuilder(polygon, this, register);
         floorBuilders.add(floorBuilder);

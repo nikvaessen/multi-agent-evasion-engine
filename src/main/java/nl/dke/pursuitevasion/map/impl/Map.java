@@ -1,10 +1,8 @@
 package nl.dke.pursuitevasion.map.impl;
 
 import nl.dke.pursuitevasion.map.AbstractObject;
+import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.builders.MapBuilder;
-import nl.dke.pursuitevasion.map.impl.Floor;
-import nl.dke.pursuitevasion.map.impl.Gate;
-import nl.dke.pursuitevasion.map.impl.Obstacle;
 
 import java.io.Serializable;
 import java.awt.*;
@@ -67,9 +65,9 @@ public class Map implements Serializable
      *
      * @return An ArrayList of Polygons making up this map
      */
-    public Collection<Polygon> getPolygons()
+    public Collection<MapPolygon> getPolygons()
     {
-        ArrayList<Polygon> polygons = new ArrayList<>();
+        ArrayList<MapPolygon> polygons = new ArrayList<>();
         fillPolygonList(polygons);
         polygons.trimToSize();
         return polygons;
@@ -80,7 +78,7 @@ public class Map implements Serializable
      *
      * @param polygons the list of polygons to fill
      */
-    private void fillPolygonList(Collection<Polygon> polygons)
+    private void fillPolygonList(Collection<MapPolygon> polygons)
     {
         fillObjectList(floors, polygons);
         for(Floor floor : floors)
@@ -96,7 +94,7 @@ public class Map implements Serializable
      * @param collection the collection of AbstractObjects
      * @param polygons the collection of polygons to fill
      */
-    private void fillObjectList(Collection<? extends AbstractObject> collection, Collection<Polygon> polygons)
+    private void fillObjectList(Collection<? extends AbstractObject> collection, Collection<MapPolygon> polygons)
     {
         for(AbstractObject object : collection)
         {
@@ -111,16 +109,18 @@ public class Map implements Serializable
      */
     public static Map getSimpleMap()
     {
-        Polygon mainFloor = new Polygon(
-                new int[] {   0, 100, 100,   0},
-                new int[] {   0,   0, 100, 100},
-                4
+        MapPolygon mainFloor = new MapPolygon(
+                new int[] {   0, 600, 600,   0},
+                new int[] {   0,   0, 600, 600},
+                4,
+                false
         );
 
-        Polygon obstacle = new Polygon(
-                new int[] {40, 60, 60, 40},
-                new int[] {40, 40, 60, 60},
-                4
+        MapPolygon obstacle = new MapPolygon(
+                new int[] {240, 360, 360, 240},
+                new int[] {240, 240, 360, 360},
+                4,
+                true
         );
 
         return MapBuilder.create()

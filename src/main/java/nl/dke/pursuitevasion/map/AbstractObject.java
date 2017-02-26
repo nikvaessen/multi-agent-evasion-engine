@@ -1,7 +1,5 @@
 package nl.dke.pursuitevasion.map;
 
-import java.awt.*;
-
 /**
  * A general object, which can be placed in the map.
  *
@@ -19,12 +17,12 @@ public abstract class AbstractObject
     /**
      * The polygon of this object
      */
-    private final Polygon polygon;
+    private final MapPolygon polygon;
 
     /**
      * General constructor which registers the object and gets a unique idea
      */
-    public AbstractObject(Polygon polygon, int id)
+    public AbstractObject(MapPolygon polygon, int id)
     {
         this.id = id;
         this.polygon = polygon;
@@ -49,7 +47,7 @@ public abstract class AbstractObject
      * The polygon which this object is made of
      * @return the polygon of this object
      */
-    public Polygon getPolygon()
+    public MapPolygon getPolygon()
     {
         return polygon;
     }

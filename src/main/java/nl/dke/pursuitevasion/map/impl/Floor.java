@@ -2,12 +2,10 @@ package nl.dke.pursuitevasion.map.impl;
 
 import nl.dke.pursuitevasion.map.AbstractObject;
 import nl.dke.pursuitevasion.map.ObjectType;
+import nl.dke.pursuitevasion.map.MapPolygon;
 
-import java.awt.*;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * A floor is a 2d level in which agents can walk
@@ -35,12 +33,12 @@ public class Floor extends AbstractObject
      * @param obstacles a list of obstacles placed on this floor
      * @param gates a list of gates placed on this floor
      */
-    public Floor(Polygon polygon, int floodID, Collection<Obstacle> obstacles, Collection<Gate> gates)
+    public Floor(MapPolygon polygon, int floodID, Collection<Obstacle> obstacles, Collection<Gate> gates)
         throws IllegalArgumentException
     {
         super(polygon, floodID);
-        verifyInisdeFloor(obstacles);
-        verifyInisdeFloor(gates);
+        verifyInsideFloor(obstacles);
+        verifyInsideFloor(gates);
         this.obstacles = Collections.unmodifiableCollection(obstacles);
         this.gates = Collections.unmodifiableCollection(gates);
     }
@@ -50,7 +48,7 @@ public class Floor extends AbstractObject
      *
      * @param collection the collections containing the polygons
      */
-    private void verifyInisdeFloor(Collection<? extends AbstractObject> collection)
+    private void verifyInsideFloor(Collection<? extends AbstractObject> collection)
         throws IllegalArgumentException
     {
         for(AbstractObject o : collection)

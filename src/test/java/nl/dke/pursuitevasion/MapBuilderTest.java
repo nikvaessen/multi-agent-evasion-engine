@@ -1,5 +1,6 @@
 package nl.dke.pursuitevasion;
 
+import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.builders.MapBuilder;
 import org.junit.Assert;
 import org.junit.Test;
@@ -15,16 +16,18 @@ public class MapBuilderTest
     @Test
     public void constructAMap()
     {
-        Polygon mainFloor = new Polygon(
+        MapPolygon mainFloor = new MapPolygon(
                 new int[]{0, 100, 100, 0},
                 new int[]{0, 0, 100, 100},
-                4
+                4,
+                false
         );
 
-        Polygon obstacle = new Polygon(
+        MapPolygon obstacle = new MapPolygon(
                 new int[]{40, 60, 60, 40},
                 new int[]{40, 40, 60, 60},
-                4
+                4,
+                true
         );
 
         Assert.assertNotNull(

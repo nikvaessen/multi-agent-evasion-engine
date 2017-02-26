@@ -1,10 +1,10 @@
 package nl.dke.pursuitevasion.map.builders;
 
+import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Gate;
 import nl.dke.pursuitevasion.map.impl.Obstacle;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -37,7 +37,7 @@ public class FloorBuilder
     /**
      * The polygon of this floor
      */
-    private Polygon polygon;
+    private MapPolygon polygon;
 
     /**
      * Boolean flag to make sure this floor is only built once
@@ -55,7 +55,7 @@ public class FloorBuilder
      * @param builder the MapBuilder which the floor being built is placed on
      * @param register the IDRegister to give every object an unique ID
      */
-    protected FloorBuilder(Polygon polygon, MapBuilder builder, IDRegister register)
+    protected FloorBuilder(MapPolygon polygon, MapBuilder builder, IDRegister register)
     {
         this.obstacles = new ArrayList<Obstacle>();
         this.gates = new ArrayList<Gate>();
@@ -73,7 +73,7 @@ public class FloorBuilder
      * @return the same FloorBuilder object
      * @throws IllegalArgumentException when the given polygon is outside the floor
      */
-    public FloorBuilder addObstacle(Polygon polygon)
+    public FloorBuilder addObstacle(MapPolygon polygon)
     {
         checkPolygonIsInside(polygon);
         obstacles.add(new Obstacle(polygon, register.getUniqueID(), floorID));
@@ -122,9 +122,9 @@ public class FloorBuilder
     /**
      * Check if a given polygon p is inside the polygon of the floor object being created
      * @param p the polygon to checl
-     * @throws IllegalArgumentException when the given Polygon is not inside the polygon of the floor
+     * @throws IllegalArgumentException when the given MapPolygon is not inside the polygon of the floor
      */
-    private void checkPolygonIsInside(Polygon p)
+    private void checkPolygonIsInside(MapPolygon p)
     {
         if(!this.polygon.contains(p.getBounds2D()))
         {
@@ -138,7 +138,7 @@ public class FloorBuilder
      * @param p the polygon to get the string from
      * @return the string representation including coordinates of vertexes of the given polygon
      */
-    public static String polygonToString(Polygon p)
+    public static String polygonToString(MapPolygon p)
     {
         int[] xpoints = p.xpoints;
         int[] ypoints = p.ypoints;

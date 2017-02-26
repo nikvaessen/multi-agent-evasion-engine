@@ -1,10 +1,8 @@
 package nl.dke.pursuitevasion.map.impl;
 
 import nl.dke.pursuitevasion.map.AbstractObject;
+import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.ObjectType;
-import nl.dke.pursuitevasion.map.builders.IDRegister;
-
-import java.awt.*;
 
 /**
  * Created by nik on 2/8/17.
@@ -23,7 +21,7 @@ public class Obstacle extends AbstractObject
      * @param id the id of this obstacle
      * @param floorID the id of the floor this obstacle is placed on
      */
-    public Obstacle(Polygon polygon, int id, int floorID)
+    public Obstacle(MapPolygon polygon, int id, int floorID)
     {
         super(polygon, id);
         this.floorID = floorID;

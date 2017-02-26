@@ -1,9 +1,7 @@
 package nl.dke.pursuitevasion.map.impl;
 
-import nl.dke.pursuitevasion.map.AbstractObject;
 import nl.dke.pursuitevasion.map.ObjectType;
-
-import java.awt.*;
+import nl.dke.pursuitevasion.map.MapPolygon;
 
 /**
  * Created by nik on 2/8/17.
@@ -23,7 +21,7 @@ public class Gate extends Obstacle
      * @param floorID the floorID of the floor this object is on
      * @param otherGateID the id of the gate this object connects to
      */
-    public Gate(Polygon polygon, int id, int floorID, int otherGateID)
+    public Gate(MapPolygon polygon, int id, int floorID, int otherGateID)
     {
         super(polygon, id, floorID);
         this.otherGateID = otherGateID;
