@@ -1,8 +1,6 @@
 package nl.dke.pursuitevasion.gui.simulator;
 
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
-import nl.dke.pursuitevasion.game.agents.Direction;
-import nl.dke.pursuitevasion.game.agents.SimpleAgent;
 import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.impl.Map;
 import org.slf4j.Logger;

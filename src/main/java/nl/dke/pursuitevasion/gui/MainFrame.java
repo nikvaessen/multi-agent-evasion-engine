@@ -3,15 +3,12 @@ package nl.dke.pursuitevasion.gui;
 import nl.dke.pursuitevasion.game.Engine;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.Direction;
-import nl.dke.pursuitevasion.game.agents.SimpleAgent;
-import nl.dke.pursuitevasion.game.agents.UserAgent;
+import nl.dke.pursuitevasion.game.agents.impl.UserAgent;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
 import nl.dke.pursuitevasion.map.impl.Map;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -34,8 +31,8 @@ public class MainFrame extends JFrame
         this.getContentPane().add(panel);
         this.pack();
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        this.setVisible(true);
         this.addKeyListener(keyboardInputListener);
+        this.setVisible(true);
 
         engine.start();
     }

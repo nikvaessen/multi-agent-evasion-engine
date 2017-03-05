@@ -1,5 +1,7 @@
-package nl.dke.pursuitevasion.game.agents;
+package nl.dke.pursuitevasion.game.agents.impl;
 
+import nl.dke.pursuitevasion.game.agents.AbstractAgent;
+import nl.dke.pursuitevasion.game.agents.Direction;
 import nl.dke.pursuitevasion.gui.KeyboardInputListener;
 import nl.dke.pursuitevasion.gui.Receiver;
 

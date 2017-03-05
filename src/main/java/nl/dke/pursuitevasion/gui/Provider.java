@@ -1,7 +1,5 @@
 package nl.dke.pursuitevasion.gui;
 
-import java.util.Queue;
-
 /**
  * Created by nik on 26/02/17.
  */

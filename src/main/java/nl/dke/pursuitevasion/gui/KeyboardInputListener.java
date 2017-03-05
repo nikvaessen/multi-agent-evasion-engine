@@ -19,13 +19,6 @@ public class KeyboardInputListener
         notifySubscribers(e);
     }
 
-    /**
-     * Invoked when a key has been pressed.
-     * See the class description for {@link KeyEvent} for a definition of
-     * a key pressed event.
-     *
-     * @param e The keyevent which took place
-     */
     @Override
     public void keyPressed(KeyEvent e)
     {
