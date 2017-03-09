@@ -5,4 +5,5 @@ package nl.dke.pursuitevasion.game.agents.tasks;
  */
 public class SpinTask
 {
+
 }

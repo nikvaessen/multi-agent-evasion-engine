@@ -19,6 +19,11 @@ public class Angle
         angle = degrees;
     }
 
+    public Angle(double degrees)
+    {
+        angle = degrees;
+    }
+
     public Angle(Direction direction)
     {
         rotateTo(direction);
@@ -63,6 +68,21 @@ public class Angle
                 angle = 315;
                 break;
         }
+    }
+
+    public double distance(Angle otherAngle)
+    {
+        return Math.abs(angle  - otherAngle.getAngle());
+    }
+
+    public double distance(int otherAngle)
+    {
+        return Math.abs(angle - (otherAngle % 360));
+    }
+
+    public double distance(double otherAngle)
+    {
+        return Math.abs(angle - (otherAngle % 360));
     }
 
 }

@@ -5,6 +5,7 @@ import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.Direction;
 import nl.dke.pursuitevasion.game.agents.impl.UserAgent;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
+import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 
 import javax.swing.*;
@@ -20,13 +21,20 @@ public class MainFrame extends JFrame
     public MainFrame()
     {
         Map map = Map.getSimpleMap();
-        Collection<AbstractAgent> agents = new ArrayList<>();
+        ArrayList<AbstractAgent> agents = new ArrayList<>();
         MapViewPanel panel = new MapViewPanel(map, agents);
-        Engine engine = new Engine(agents, panel, 60);
+        Engine engine = new Engine(map, agents, panel, 60);
         KeyboardInputListener keyboardInputListener = new KeyboardInputListener();
 
+        Floor floor = null;
+        for(Floor f : map.getFloors())
+        {
+            floor = f;
+            break;
+        }
+
         //agents.add(new SimpleAgent(new Point(5,5), Direction.SOUTH, 5));
-        agents.add(new UserAgent(new Point(10, 10), Direction.SOUTH, 5, keyboardInputListener));
+        agents.add(new UserAgent(map, floor, new Point(10, 10), Direction.SOUTH, 5, keyboardInputListener));
 
         this.getContentPane().add(panel);
         this.pack();

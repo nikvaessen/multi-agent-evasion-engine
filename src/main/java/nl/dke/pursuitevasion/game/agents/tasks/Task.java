@@ -9,5 +9,4 @@ public enum Task
     rotate,
     patrol,
     spin,
-
 }

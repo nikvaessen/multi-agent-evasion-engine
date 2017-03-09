@@ -63,7 +63,7 @@ public class MapViewPanel
         {
             Point location = agent.getLocation();
             int radius = agent.getRadius();
-            g.fillOval(location.x = radius, location.y + radius,radius * 2, radius * 2);
+            g.fillOval(location.x - radius, location.y - radius,radius * 2, radius * 2);
             logger.trace("painting agent at {}", location);
         }
     }
