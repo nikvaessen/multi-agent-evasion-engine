@@ -1,14 +1,20 @@
 package nl.dke.pursuitevasion.gui.editor;
 
+import javafx.scene.shape.*;
 import nl.dke.pursuitevasion.gui.ModelView;
 import nl.dke.pursuitevasion.map.impl.Map;
 
 import javax.swing.*;
-import javax.swing.colorchooser.AbstractColorChooserPanel;
+import javax.swing.Box;
 import java.awt.*;
+import java.awt.Polygon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Random;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.Console;
+import java.util.*;
+import java.util.List;
 
 /**
  * Created by nik on 2/8/17.
@@ -25,13 +31,15 @@ public class MapEditor extends JPanel
     private ModelView modelView;
     private Map map;
 
-    public MapEditor(int prefaredWidht, int prefaredHeight) {
-        this.setPreferredSize(new Dimension(prefaredWidht,prefaredHeight));
-        this.setLayout(new BorderLayout(5,5));
 
+    public MapEditor(int prefaredWidht, int prefaredHeight) {
+        this.setPreferredSize(new Dimension(prefaredWidht, prefaredHeight));
+        this.setLayout(new BorderLayout(5, 5));
 
         this.modelView = new ModelView(prefaredWidht*4/5,prefaredHeight);
+
         this.add(modelView,BorderLayout.CENTER);
+
 
 
 
