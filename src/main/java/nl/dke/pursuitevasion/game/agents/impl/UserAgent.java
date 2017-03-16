@@ -66,19 +66,31 @@ public class UserAgent
             logger.trace("Character of the key event: " + keyEvent.getKeyChar());
         }
 
-        switch(keyEvent.getKeyChar())
+        switch(keyEvent.getKeyCode())
         {
-            case 'w':
+            case KeyEvent.VK_W:
                 north = setTo;
                 break;
-            case 's':
+            case KeyEvent.VK_UP:
+                north = setTo;
+                break;
+            case KeyEvent.VK_S:
                 south = setTo;
                 break;
-            case 'a':
+            case KeyEvent.VK_DOWN:
+                south = setTo;
+                break;
+            case KeyEvent.VK_A:
                 west  = setTo;
                 break;
-            case 'd':
+            case KeyEvent.VK_LEFT:
+                west = setTo;
+                break;
+            case KeyEvent.VK_D:
                 east  = setTo;
+                break;
+            case KeyEvent.VK_RIGHT:
+                east = setTo;
                 break;
             default: // other characters not interesting
                 break;
