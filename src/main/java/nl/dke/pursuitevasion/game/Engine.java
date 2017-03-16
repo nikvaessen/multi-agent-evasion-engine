@@ -103,11 +103,14 @@ public class Engine
                 //update housekeeping variables and log
                 iterationStartTime = System.currentTimeMillis();
                 count++;
-                logger.trace("Starting game loop iteration {} at {} ms", count, iterationStartTime);
+                if(logger.isDebugEnabled())
+                {
+                    logger.debug("Starting game loop iteration {} at {} ms", count, iterationStartTime);
+                }
 
                 // 1. Check if game is over
                 //todo implement game over checking
-                if(System.currentTimeMillis() - startTime > 10000) //10 seconds
+                if(System.currentTimeMillis() - startTime > 1000000) //1000 seconds
                 {
                     break;
                 }
@@ -115,20 +118,40 @@ public class Engine
                 // 2. Check agents
                 for(AbstractAgent agent : agents)
                 {
-                    if(agent.hasRequest())
-                    {
-                        requests.add(agent.getRequest());
+                    if(agent.hasRequest()) {
+                        AgentRequest request = agent.getRequest();
+                        requests.add(request);
+
+                        if (logger.isTraceEnabled())
+                        {
+                            logger.trace("Added new Request to list. Request: {} Size: {}", request, requests.size());
+                        }
                     }
                 }
 
                 // 3. Validate legality of moves
 
                 //first filter out any invalidated/completed requests
-                requests.removeIf(AgentRequest::isCompleted);
+                if(logger.isDebugEnabled())
+                {
+                    logger.debug("Handling {} requests", requests.size());
+                }
+                requests.removeIf(new Predicate<AgentRequest>() {
+                    @Override
+                    public boolean test(AgentRequest agentRequest) {
+                        return agentRequest.isCompleted();
+                    }
+                });
 
                 //go over all requests and get the agent commands
+                if(logger.isDebugEnabled())
+                {
+                    logger.debug("{} requests left after deleting all completed requests", requests.size());
+                }
+
                 for(AgentRequest request : requests)
                 {
+                    logger.trace("is completed: {}", request.isCompleted());
                     handleRequest(request);
                 }
 
@@ -136,14 +159,20 @@ public class Engine
                 validateCommands();
 
                 // 4. Make the moves
+                if(logger.isDebugEnabled())
+                {
+                    logger.debug("Applying {} commands", commands.size());
+                }
                 commands.forEach(AgentCommand::apply);
                 commands.clear();
 
                 // 5. Update the view
-                if(mapViewPanel != null)
-                {
+                if(mapViewPanel != null) {
                     mapViewPanel.repaint();
-                    logger.trace("Updated MapViewPanel");
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Updated MapViewPanel");
+                    }
                 }
 
                 // 6. wait
@@ -152,7 +181,10 @@ public class Engine
                 {
                     try
                     {
-                        logger.trace("waiting for {} ms", desiredIterationLength - msPassed);
+                        if(logger.isDebugEnabled())
+                        {
+                            logger.debug("waiting for {} ms", desiredIterationLength - msPassed);
+                        }
                         Thread.sleep(desiredIterationLength - msPassed);
                     }
                     catch(InterruptedException e)
@@ -172,18 +204,36 @@ public class Engine
 
         private void handleRequest(AgentRequest request)
         {
+            if(logger.isTraceEnabled())
+            {
+                logger.trace("Resolving request {}", request);
+            }
+
             double allowedMeters = metersPerIteration;
             double allowedRotation = rotationPerIteration;
-            AbstractAgentTask task;
-            do
-            {
-                task = request.peek();
-                AgentCommand command = task.handle(request.getAgent(), allowedMeters, allowedRotation);
-                commands.add(command);
-                allowedMeters   -= command.getMovedDistance();
-                allowedRotation -= command.getRotatedDistance();
+            AbstractAgentTask task = null;
+            do {
+                try
+                {
+                    task = request.peek();
+                    AgentCommand command = task.handle(request.getAgent(), allowedMeters, allowedRotation);
+                    commands.add(command);
+                    allowedMeters -= command.getMovedDistance();
+                    allowedRotation -= command.getRotatedDistance();
+
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("Added to commands: {} ", command);
+                        logger.trace("allowed meters left: {}", allowedMeters);
+                        logger.trace("allowed rotation left: {}", allowedRotation);
+                    }
+                }
+                catch (IllegalStateException e)
+                {
+                    logger.error("Cannot resolve new task", e);
+                    break;
+                }
             }
-            while(task.completed());
+            while(!request.isCompleted() && allowedMeters > 0 && allowedRotation > 0);
         }
 
         private void validateCommands()
@@ -193,12 +243,14 @@ public class Engine
 
         private void outOfBoundCorrection(AgentCommand command)
         {
-            Point p = command.getLocation();
-            Floor floor = command.getAgent().getFloor();
-            if(!floor.getPolygon().contains(p))
+            if(command.isLocationChanged())
             {
-                //todo fix it
-                logger.error("Currently agent is going out of bounds");
+                Point p = command.getLocation();
+                Floor floor = command.getAgent().getFloor();
+                if (!floor.getPolygon().contains(p)) {
+                    //todo fix it
+                    logger.error("Currently agent is going out of bounds");
+                }
             }
         }
 

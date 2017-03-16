@@ -1,6 +1,8 @@
 package nl.dke.pursuitevasion.game.agents;
 
 import nl.dke.pursuitevasion.game.agents.tasks.AbstractAgentTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 
@@ -19,7 +21,8 @@ import java.util.LinkedList;
  * Created by nik on 03/03/17.
  */
 public class AgentRequest
-{
+{;;
+    private static final Logger logger = LoggerFactory.getLogger(AbstractAgent.class);
 
     /**
      * The agent which requests the tasks
@@ -57,10 +60,14 @@ public class AgentRequest
      *
      * @return whether al Tasks have been accomplished
      */
-    public boolean isCompleted()
-    {
-        checkIfCompleted();
-        return completed;
+    public boolean isCompleted() {
+        if(!completed)
+        {
+            calculateIfCompleted();
+            logger.trace("returning {} is completed: {}", this.toString(), completed);
+            return completed;
+        }
+        return true;
     }
 
     /**
@@ -104,7 +111,7 @@ public class AgentRequest
     /**
      * Checks if all tasks have been completed. If they have, the Request will enter the "completed" state
      */
-    private void checkIfCompleted()
+    private boolean calculateIfCompleted()
     {
         AbstractAgentTask task;
         while((task = tasks.peek()) != null)
@@ -118,7 +125,7 @@ public class AgentRequest
                 break;
             }
         }
-        completed = tasks.isEmpty();
+        return completed = tasks.isEmpty();
     }
 
     /**
@@ -142,7 +149,7 @@ public class AgentRequest
     public AbstractAgentTask peek()
     {
         checkConfirmed();
-        checkNotCompleted();
+        checkCompleted();
         return tasks.peekFirst();
     }
 
@@ -160,13 +167,22 @@ public class AgentRequest
     /**
      * Check if this Request has been completed. If it is, throw an IllegalStateException
      */
-    private void checkNotCompleted()
+    private void checkCompleted()
     {
-        checkIfCompleted();
+        calculateIfCompleted();
         if(completed)
         {
-           throw new IllegalStateException("Cannot access new task as the request has been completed");
+           throw new IllegalStateException("Cannot peek new task as the request has been completed");
         }
     }
 
+    @Override
+    public String toString() {
+        String tasksString = "";
+        for(AbstractAgentTask task : tasks)
+        {
+            tasksString += task.toString();
+        }
+        return String.format("AgenRequest[tasks:{%s}]", tasksString);
+    }
 }

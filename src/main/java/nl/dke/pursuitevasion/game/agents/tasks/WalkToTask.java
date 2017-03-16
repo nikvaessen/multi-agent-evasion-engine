@@ -12,10 +12,8 @@ public class WalkToTask
     extends AbstractAgentTask
 {
 
-
     private Point walkToLocation;
     private boolean pathFind;
-
 
     public WalkToTask(Point walkToLocation, boolean pathFind)
     {
@@ -42,11 +40,11 @@ public class WalkToTask
     {
         if(pathFind)
         {
-            throw new IllegalStateException("Pathfinding walking to not implemented");
+            throw new IllegalStateException("Pathfinding walking is not implemented");
         }
         else
         {
-            if(agent.getLocation().distance(walkToLocation) < maxDistance)
+            if(agent.getLocation().distance(walkToLocation) > maxDistance)
             {
                 return new AgentCommand(agent, walkToLocation);
             }
@@ -71,5 +69,10 @@ public class WalkToTask
     protected boolean completesTask(AgentCommand command)
     {
         return command.getLocation().equals(walkToLocation);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("WalkToTask[point:%s,pathfind:%b]", walkToLocation, pathFind);
     }
 }

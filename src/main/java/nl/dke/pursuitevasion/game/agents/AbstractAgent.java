@@ -2,6 +2,8 @@ package nl.dke.pursuitevasion.game.agents;
 
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 
@@ -14,6 +16,8 @@ import java.awt.*;
  */
 public abstract class AbstractAgent
 {
+    private final static Logger logger = LoggerFactory.getLogger(AbstractAgent.class);
+
     /**
      * The radius of the agent.
      */
@@ -80,6 +84,11 @@ public abstract class AbstractAgent
      */
     public void update(AgentCommand command)
     {
+        if(logger.isTraceEnabled())
+        {
+            logger.trace("updating agent with command: {}", command);
+        }
+
         if(command.isLocationChanged())
         {
             this.location = command.getLocation();

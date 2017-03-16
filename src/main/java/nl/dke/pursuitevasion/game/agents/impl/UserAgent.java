@@ -41,9 +41,15 @@ public class UserAgent
     @Override
     public void notify(KeyEvent keyEvent)
     {
-        logger.trace("received keyevent: {}", keyEvent);
+        if(logger.isTraceEnabled())
+        {
+            logger.trace("received keyevent: {}", keyEvent);
+            logger.trace("number: {}, pressed: {}, released: {}, typed: {}",
+                    keyEvent.getID(),
+                    KeyEvent.KEY_PRESSED, KeyEvent.KEY_RELEASED, KeyEvent.KEY_TYPED);
+        }
         boolean setTo;
-        switch(keyEvent.getKeyCode())
+        switch(keyEvent.getID())
         {
             case KeyEvent.KEY_PRESSED:
                 setTo = true;
@@ -54,6 +60,12 @@ public class UserAgent
             default: // key typed events not interesting
                 return;
         }
+
+        if(logger.isTraceEnabled())
+        {
+            logger.trace("Character of the key event: " + keyEvent.getKeyChar());
+        }
+
         switch(keyEvent.getKeyChar())
         {
             case 'w':
@@ -70,6 +82,12 @@ public class UserAgent
                 break;
             default: // other characters not interesting
                 break;
+        }
+
+        if(logger.isTraceEnabled())
+        {
+            logger.trace("Set UserAgent to north:{},south:{}, west:{}, east:{}",
+                    north, south, west, east);
         }
     }
 
@@ -99,9 +117,18 @@ public class UserAgent
     @Override
     protected void completeRequest(AgentRequest request)
     {
+        if(logger.isTraceEnabled())
+        {
+            logger.trace("UserAgent:[north:{},south:{}, west:{}, east:{}",
+                    north, south, west, east);
+        }
         if(north || south || west || east)
         {
-            logger.debug("Making a request");
+            if(logger.isDebugEnabled())
+            {
+                logger.debug("Making a request");
+            }
+
             Direction direction = Direction.getDirection(north, south, east, west);
             request.add(new RotateTask(Direction.getAngle(direction)));
             request.add(new WalkToTask(getLocation(request.getAgent().getLocation(), direction)));

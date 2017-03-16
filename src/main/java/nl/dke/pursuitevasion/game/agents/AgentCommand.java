@@ -70,13 +70,26 @@ public class AgentCommand
         return angleChanged;
     }
 
-    public double getMovedDistance()
-    {
-        return location.distance(agent.getLocation());
+    public double getMovedDistance() {
+        if (isLocationChanged())
+        {
+            return location.distance(agent.getLocation());
+        }
+        return 0;
     }
 
-    public double getRotatedDistance()
-    {
-        return angle.distance(agent.getFacingAngle());
+    public double getRotatedDistance() {
+        if (isAngleChanged()) {
+
+            return angle.distance(agent.getFacingAngle());
+        }
+        return 0;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("AgentCommand[location{%b, %s},angle{%b, %s}]",
+                locationChanged, location,
+                angleChanged, angle);
     }
 }

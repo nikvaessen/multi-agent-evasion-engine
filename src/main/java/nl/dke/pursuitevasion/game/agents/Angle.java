@@ -85,4 +85,8 @@ public class Angle
         return Math.abs(angle - (otherAngle % 360));
     }
 
+    @Override
+    public String toString() {
+        return Double.toString(angle);
+    }
 }
