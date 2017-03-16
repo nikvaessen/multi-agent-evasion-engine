@@ -34,6 +34,16 @@ public class Angle
         return angle;
     }
 
+    public double getRadians()
+    {
+        return toRadians(angle);
+    }
+
+    public static double toRadians(double degree)
+    {
+        return (degree % 360) * (Math.PI / 180);
+    }
+
     public void rotate(int degree)
     {
         angle = (angle + degree) % 360;
@@ -90,3 +100,5 @@ public class Angle
         return Double.toString(angle);
     }
 }
+
+

@@ -256,4 +256,80 @@ public abstract class AbstractAgent
     {
         this.visionAngle = visionAngle;
     }
+
+    public VisionArea getVisionArea()
+    {
+        return new VisionArea();
+    }
+
+    public class VisionArea
+    {
+        private Point base;
+        private Point right;
+        private Point left;
+        private Point center;
+
+        private VisionArea()
+        {
+            calculateBase();
+            calculateLeftAndRight();
+        }
+
+        public Point getBasePoint() {
+
+            return base;
+        }
+
+        public Point geCenterPoint()
+        {
+            return center;
+        }
+
+        public Point getRightPoint() {
+            return right;
+        }
+
+        public Point getLeftPoint() {
+            return left;
+        }
+
+        /**
+         * Compute point A,
+         * the line from the centre of the circle to the point A has an angle of "facing",
+         * the coordinates of point A need to be calculted.
+         * the shift in x = cos(angle) * radius
+         * the shift in y = sin(angle) * radius
+         */
+        private void calculateBase()
+        {
+            int dx = new Long(Math.round(Math.cos(facing.getRadians()) * radius)).intValue();
+            //change sign of y because y works reversed from normal cartesian plane
+            int dy = - new Long(Math.round(Math.sin(facing.getRadians()) * radius)).intValue();
+
+            if(logger.isTraceEnabled())
+            {
+                logger.trace("base {} before changing with dx {} and dy {} facing {}, {}", base, dx, dy, facing.getAngle(),
+                        facing.getRadians());
+            }
+
+            base = new Point(location.x + Math.round(dx), location.y + Math.round(dy));
+        }
+
+        private void calculateCenter()
+        {
+            double direction = facing.getRadians();
+            int dx =   new Long(Math.round(Math.cos(direction) * radius)).intValue();
+            //y plane is reversed
+            int dy = - new Long(Math.round(Math.sin(direction) * radius)).intValue();
+            center = new Point(base.x + dx, base.y + dy );
+        }
+
+        private void calculateLeftAndRight()
+        {
+            int dividedAngle = new Long(Math.round(facing.getAngle())).intValue();
+
+        }
+
+    }
+
 }

@@ -66,6 +66,29 @@ public class MapViewPanel
             g.fillOval(location.x - radius, location.y - radius,radius * 2, radius * 2);
             logger.trace("painting agent at {}", location);
 
+            AbstractAgent.VisionArea visionArea = agent.getVisionArea();
+            Point base = visionArea.getBasePoint();
+            logger.trace("the eyes of the agent are at {}",base);
+
+            Color color = Color.RED;
+            //color = new Color(color.getRed(), color.getBlue(), color.getGreen(), 20);
+            g.setColor(color);
+
+            double facingAngle = agent.getFacingAngle();
+            double visionAngle = agent.getVisionAngle();
+            int startingAngle = new Double(facingAngle - Math.round((visionAngle / 2))).intValue() % 360;
+
+            int  visionRadius = new Double(agent.getVisionRange()).intValue();
+
+            logger.trace("drawing arc with radius {}, start angle {} and viewing angle {}",
+                    visionRadius, startingAngle, new Double(visionAngle).intValue());
+            g.fillArc(base.x - visionRadius, base.y - visionRadius, visionRadius * 2, visionRadius * 2,
+                    startingAngle, new Double(visionAngle).intValue());
+            //g.fillOval(base.x - 2, base.y - 2, 4, 4 );
+
+
+//            Point left = visionArea.getLeftPoint();
+//            g.drawLine(left.x, left.y, base.x, base.y);
         }
     }
 
