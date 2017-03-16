@@ -69,28 +69,28 @@ public class UserAgent
         switch(keyEvent.getKeyCode())
         {
             case KeyEvent.VK_W:
-                north = setTo;
+                handleNorthCommand(setTo);
                 break;
             case KeyEvent.VK_UP:
-                north = setTo;
+                handleNorthCommand(setTo);
                 break;
             case KeyEvent.VK_S:
-                south = setTo;
+                handleSouthCommand(setTo);
                 break;
             case KeyEvent.VK_DOWN:
-                south = setTo;
+                handleSouthCommand(setTo);
                 break;
             case KeyEvent.VK_A:
-                west  = setTo;
+                handleWestCommand(setTo);
                 break;
             case KeyEvent.VK_LEFT:
-                west = setTo;
+                handleWestCommand(setTo);
                 break;
             case KeyEvent.VK_D:
-                east  = setTo;
+                handlEastCommand(setTo);
                 break;
             case KeyEvent.VK_RIGHT:
-                east = setTo;
+                handlEastCommand(setTo);
                 break;
             default: // other characters not interesting
                 break;
@@ -101,6 +101,42 @@ public class UserAgent
             logger.trace("Set UserAgent to north:{},south:{}, west:{}, east:{}",
                     north, south, west, east);
         }
+    }
+
+    private void handleNorthCommand(boolean setTo)
+    {
+        if(south && setTo)
+        {
+            south = false;
+        }
+        north = setTo;
+    }
+
+    private void handleSouthCommand(boolean setTo)
+    {
+        if(north && setTo)
+        {
+            north = false;
+        }
+        south = setTo;
+    }
+
+    private void handleWestCommand(boolean setTo)
+    {
+        if(east && setTo)
+        {
+            east = false;
+        }
+        west = setTo;
+    }
+
+    private void handlEastCommand(boolean setTo)
+    {
+        if(west && setTo)
+        {
+            west = false;
+        }
+        east = setTo;
     }
 
     private Point getLocation(Point location, Direction direction)
