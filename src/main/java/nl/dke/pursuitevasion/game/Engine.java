@@ -45,6 +45,12 @@ public class Engine
         this.desiredIterationLength = Math.round(1000d / (double) desiredFPS);
         this.agents = agents;
         this.mapViewPanel = viewPanel;
+
+        //set all agents to the correct vision angle and degrees
+        agents.forEach(agent -> {
+            agent.setVisionRange(EngineConstants.VISION_RANGE);
+            agent.setVisionAngle(EngineConstants.VISION_ANGLE);
+        });
     }
 
     public Engine(Map map, Collection<AbstractAgent> agents, int desiredFPS)

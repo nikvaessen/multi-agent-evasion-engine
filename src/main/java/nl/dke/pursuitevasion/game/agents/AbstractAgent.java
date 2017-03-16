@@ -34,6 +34,16 @@ public abstract class AbstractAgent
     protected Angle facing;
 
     /**
+     * The amount of distance the agent can see something in
+     */
+    protected double visionRange;
+
+    /**
+     * The view angle of this agent
+     */
+    protected double visionAngle;
+
+    /**
      * The Map environment the Agent exists in.
      */
     private Map map;
@@ -70,13 +80,16 @@ public abstract class AbstractAgent
      * @param startsFacing  the direction the agent will start facing in
      * @param radius        the radius of the agent
      */
-    public AbstractAgent(Map map, Floor startingFloor, Point startLocation, Direction startsFacing, int radius)
+    public AbstractAgent(Map map, Floor startingFloor, Point startLocation, Direction startsFacing, int radius,
+                         double visionRange, double visionAngle)
     {
         this.map = map;
         this.floor = startingFloor;
         this.location = startLocation;
         this.facing = new Angle(startsFacing);
         this.radius = radius;
+        this.visionRange = visionRange;
+        this.visionAngle = visionAngle;
     }
 
     /**
@@ -206,5 +219,41 @@ public abstract class AbstractAgent
     public Floor getFloor()
     {
         return floor;
+    }
+
+    /**
+     * Get the vision range of the agent
+     * @return the vision range of the agent
+     */
+    public double getVisionRange()
+    {
+        return visionRange;
+    }
+
+    /**
+     * Set the vision range of the agent
+     * @param visionRange the vision range
+     */
+    public void setVisionRange(double visionRange)
+    {
+        this.visionRange = visionRange;
+    }
+
+    /**
+     * Get the visoon angle of the agent
+     * @return the vision angle in degrees
+     */
+    public double getVisionAngle()
+    {
+        return visionAngle;
+    }
+
+    /**
+     * Set the vision angle of the agent
+     * @param visionAngle the vision angle in degrees
+     */
+    public void setVisionAngle(double visionAngle)
+    {
+        this.visionAngle = visionAngle;
     }
 }

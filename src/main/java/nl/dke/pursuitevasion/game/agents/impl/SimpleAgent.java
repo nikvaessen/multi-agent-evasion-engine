@@ -14,9 +14,10 @@ import java.awt.*;
 public class SimpleAgent
     extends AbstractAgent
 {
-    public SimpleAgent(Map map, Floor startingFloor, Point startLocation, Direction startsFacing, int radius)
+    public SimpleAgent(Map map, Floor startingFloor, Point startLocation, Direction startsFacing, int radius,
+                       double visionRange, double visionAngle)
     {
-        super(map, startingFloor, startLocation, startsFacing, radius);
+        super(map, startingFloor, startLocation, startsFacing, radius, visionRange, visionRange);
     }
 
     /**

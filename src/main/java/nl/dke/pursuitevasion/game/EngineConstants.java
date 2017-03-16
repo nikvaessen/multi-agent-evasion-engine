@@ -6,6 +6,8 @@ package nl.dke.pursuitevasion.game;
 public class EngineConstants
 {
     //todo fix this shit to make it realistic
-    public final static double WALKING_SPEED = 2;  // 1500 millimeters per second
-    public final static double TURNING_SPEED =  350;  // 1 circle rotation per second
+    public final static double WALKING_SPEED =   2; // pixels
+    public final static double TURNING_SPEED = 360; // degrees (1 circle rotation per second)
+    public final static double VISION_RANGE  =  25; // pixels
+    public final static double VISION_ANGLE  = 120; // degrees
 }

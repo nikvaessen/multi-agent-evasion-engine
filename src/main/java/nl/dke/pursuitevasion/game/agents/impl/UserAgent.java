@@ -32,9 +32,9 @@ public class UserAgent
     private boolean east;
 
     public UserAgent(Map map, Floor startingFloor, Point startLocation, Direction startsFacing, int radius,
-                     KeyboardInputListener listener)
+                     double visionRange, double visionAngle, KeyboardInputListener listener)
     {
-        super(map, startingFloor, startLocation, startsFacing, radius);
+        super(map, startingFloor, startLocation, startsFacing, radius, visionRange, visionAngle);
         listener.subscribe(this);
     }
 
