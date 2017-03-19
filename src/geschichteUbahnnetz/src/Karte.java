@@ -123,6 +123,8 @@ public class Karte extends JPanel{
 		
 
 	}
+
+
 	public Point koordinateToScreenPointNeu(Koordinate k){
 		
 		double transPY;

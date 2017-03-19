@@ -2,6 +2,7 @@ package nl.dke.pursuitevasion.gui.editor;
 
 import javafx.scene.shape.*;
 import nl.dke.pursuitevasion.gui.ModelView;
+import nl.dke.pursuitevasion.gui.Voronoi;
 import nl.dke.pursuitevasion.map.impl.Map;
 
 import javax.swing.*;
@@ -12,6 +13,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
 import java.io.Console;
 import java.util.*;
 import java.util.List;
@@ -89,7 +93,7 @@ public class MapEditor extends JPanel
             optionView.add(text2);
 
             JLabel l1 = new JLabel("Max Number Nodes");
-            SpinnerModel sm1 = new SpinnerNumberModel(0, 0, 9, 1); //default value,lower bound,upper bound,increment by
+            SpinnerModel sm1 = new SpinnerNumberModel(48, 0, 1024, 12); //default value,lower bound,upper bound,increment by
             JSpinner spinner1 = new JSpinner(sm1);
             ((JSpinner.DefaultEditor)spinner1.getEditor()).getTextField().setColumns(10);
             spinner1.setMaximumSize(new Dimension(prefaredWidth,25));
@@ -99,8 +103,8 @@ public class MapEditor extends JPanel
 
 
 
-            JLabel l3 = new JLabel("Max Number Edges");
-            SpinnerModel sm3 = new SpinnerNumberModel(0, 0, 9, 1); //default value,lower bound,upper bound,increment by
+            JLabel l3 = new JLabel("Width");
+            SpinnerModel sm3 = new SpinnerNumberModel(0, 0, modelView.getWidth(), 1); //default value,lower bound,upper bound,increment by
             JSpinner spinner3 = new JSpinner(sm3);
             ((JSpinner.DefaultEditor)spinner3.getEditor()).getTextField().setColumns(10);
             spinner3.setMaximumSize(new Dimension(prefaredWidth,25));
@@ -108,15 +112,15 @@ public class MapEditor extends JPanel
             l1.setLabelFor(spinner3);
             optionView.add(spinner3);
 
-            JLabel l4 = new JLabel("Average Edge Length");
-            SpinnerModel sm4 = new SpinnerNumberModel(0, 0, 9, 1); //default value,lower bound,upper bound,increment by
+            JLabel l4 = new JLabel("Height");
+            SpinnerModel sm4 = new SpinnerNumberModel(600, 0, 1024, 9); //default value,lower bound,upper bound,increment by
             JSpinner spinner4 = new JSpinner(sm4);
             spinner4.setMaximumSize(new Dimension(prefaredWidth,25));
             optionView.add(l4); spinner4.setAlignmentX(Component.LEFT_ALIGNMENT);
             optionView.add(spinner4);
 
             JLabel l5 = new JLabel("Word5");
-            SpinnerModel sm5 = new SpinnerNumberModel(0, 0, 9, 1); //default value,lower bound,upper bound,increment by
+            SpinnerModel sm5 = new SpinnerNumberModel(400, 0, 800, 9); //default value,lower bound,upper bound,increment by
             JSpinner spinner5 = new JSpinner(sm5); spinner5.setPreferredSize(new Dimension(200,50));
             spinner5.setMaximumSize(new Dimension(prefaredWidth,25));
             spinner5.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -127,13 +131,39 @@ public class MapEditor extends JPanel
           // optionView.add(new Swing.)
 
             JButton generate = new JButton("Generate Map");
+            generate.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    generateVronoiWorld((int) sm1.getValue(),(int)sm4.getValue(),(int)sm5.getValue());
+
+                }
+            });
             optionView.add(generate,Component.LEFT_ALIGNMENT); optionView.setPreferredSize(new Dimension(200,50));
             optionView.add(Box.createHorizontalGlue());
 
 
 
         }
+
     }
+
+    private void generateVronoiWorld(int numNodes, int width,int height) {
+        ArrayList<Point> cp = new ArrayList<>(numNodes);
+
+        for (int i = 0; i < numNodes; i++) {
+            int x = (int) (width * Math.random());
+            int y = (int) (height * Math.random());
+
+            Point p = new Point(x,y);
+            cp.add(p);
+        }
+
+
+        modelView.centerPoints =  cp;
+        modelView.areas =  Voronoi.listOfCentresToPolygon(cp,new Dimension(width,height));;
+        modelView.repaint();
+    }
+
 
     private class ObjectSelectionView extends JPanel{
         public ObjectSelectionView(int prefaredWidth, int prefaredHeight) {
@@ -193,4 +223,6 @@ public class MapEditor extends JPanel
 
         }
     }
+
+
 }
