@@ -289,11 +289,12 @@ public class ModelView extends JPanel {
         }
 
         for(Point p : centerPoints){
-            g2d.setColor(Color.BLACK);
-            g2d.drawOval(p.x-2,p.y-2,4,4);
+
             g2d.setColor(new Color((float)Math.random(),(float)Math.random(),(float)Math.random()));
             Polygon poly = areas.get(p);
             g2d.fillPolygon(poly);
+            g2d.setColor(Color.BLACK);
+            g2d.fillOval(p.x-2,p.y-2,4,4);
         }
 /*
         if (map == null){
