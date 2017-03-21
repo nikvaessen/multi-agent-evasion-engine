@@ -1,5 +1,6 @@
 package nl.dke.pursuitevasion.gui;
 
+import nl.dke.pursuitevasion.gui.editor.MapEditor;
 import nl.dke.pursuitevasion.map.impl.Map;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Obstacle;
@@ -13,7 +14,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.List;
@@ -26,8 +26,57 @@ import java.util.List;
  */
 public class ModelView extends JPanel {
 
+    private final MapEditor mapEditor;
+
+    //variables for the voronoi generation
     public ArrayList<Point> centerPoints = new ArrayList<>();
     public HashMap<Point,Polygon> areas = new HashMap<>(0);
+    public HashMap<Polygon,SelectionState> selectionStates = new HashMap<>(0);
+    public boolean vronoiGeneration;
+    private Dimension dimension;
+
+
+    private Map map;
+    private AffineTransform affineTransform;
+    private Point2D lastClickedPoint;
+    private java.util.List<EditorObject> objects = new ArrayList<>();
+    private EditorObject selectedObject;
+    private int LastID = 0;
+
+
+    public void finalizeVoronoi() {
+        vronoiGeneration = false;
+        //convert wall and such to real polygones
+        //untoggle voronoi mapbilder
+
+        for (Polygon polygon: areas.values()){
+            if (selectionStates.get(polygon) == SelectionState.floor){
+                //EditorObject ep = new EditorObject();
+
+            }
+            if (selectionStates.get(polygon) == SelectionState.waal){
+                //EditorObject ep = new EditorObject();
+
+            }
+
+
+
+        }
+
+        areas.clear();
+        centerPoints.clear();
+
+
+    }
+
+    public void setAreas(ArrayList<Point> cp, HashMap<Point, Polygon> areas, Dimension d) {
+        this.dimension = d;
+        centerPoints =  cp;
+        this.areas = areas;
+        for(Polygon p : areas.values()){
+            selectionStates.put(p,SelectionState.empty);
+        }
+    }
 
     // everything in the editor is an abstractobject
     // It is the same as the objects in the map, but
@@ -52,21 +101,19 @@ public class ModelView extends JPanel {
 
     }
 
-    private Map map;
-    private AffineTransform affineTransform;
-    private Point2D lastClickedPoint;
-    private java.util.List<EditorObject> objects = new ArrayList<>();
-    private EditorObject selectedObject;
-    private int LastID = 0;
 
 
-    public ModelView(int prefaredWidht, int prefaredHeight) {
+
+    public ModelView(int prefaredWidht, int prefaredHeight, MapEditor mapEditor) {
         this.setPreferredSize(new Dimension(prefaredWidht,prefaredHeight));
         this.affineTransform = new AffineTransform();
+        this.mapEditor = mapEditor;
 
         mouseListenerFunction();
         addKeyboardListener();
         this.addMouseMotionListener(new MouseMotionListener() {
+
+
             @Override
             public void mouseDragged(MouseEvent e) {
                 if(selectedObject != null){
@@ -196,19 +243,34 @@ public class ModelView extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 System.out.print("got mouse event");
                 Point click = new Point(e.getX(), e.getY());
+
+                //middle mouse button event
+                if (e.getButton() == MouseEvent.BUTTON2) {
+                    if (vronoiGeneration == true) {
+                        removePointFromVoronoi(e.getPoint());
+
+                    }
+                }
+
+
                 // Right mouse button event
                 // Adds point to selected polygon
                 if (e.getButton() == MouseEvent.BUTTON3) {
-                    System.out.print("button 2");
-                    if (selectedObject == null) {
-                        Polygon poly = new Polygon();
-                        poly.addPoint(click.x, click.y);
-                        EditorObject p = new EditorObject(poly, LastID++);
-                        selectedObject = p;
-                        objects.add(p);
-                    }
-                    selectedObject.getPolygon().addPoint(click.x, click.y);
+                    if (vronoiGeneration == true){
+                        addPointToVoronoi(e.getPoint());
+                    }else {
 
+
+                        System.out.print("button 2");
+                        if (selectedObject == null) {
+                            Polygon poly = new Polygon();
+                            poly.addPoint(click.x, click.y);
+                            EditorObject p = new EditorObject(poly, LastID++);
+                            selectedObject = p;
+                            objects.add(p);
+                        }
+                        selectedObject.getPolygon().addPoint(click.x, click.y);
+                    }
                 }
                 // Left mouse button event
                 // Select polygon
@@ -223,7 +285,22 @@ public class ModelView extends JPanel {
                             selectedObject = o;
                         }
                     }
+
+
+
+                    //check predrawn
+                    for (Polygon p : areas.values()){
+                        if (p.contains(e.getPoint())){
+                            SelectionState selState = selectionStates.get(p);
+                           if (selState == SelectionState.empty) selectionStates.put(p,SelectionState.floor);
+                           else if (selState == SelectionState.floor)  selectionStates.put(p,SelectionState.waal);
+                           else if (selState == SelectionState.waal)  selectionStates.put(p,SelectionState.empty);
+
+                        }
+                    }
                 }
+
+
 
                 repaint();
             }
@@ -249,13 +326,35 @@ public class ModelView extends JPanel {
 
 
 
+
     public void setMap(Map m){
         this.map  = m;
 
         repaint();
     }
 
+    private void removePointFromVoronoi(Point point) {
+        for(Point c : centerPoints){
+            if (areas.get(c).contains(point)){
+                centerPoints.remove(c);
+                //recalc
+                HashMap<Point, Polygon> areas = Voronoi.listOfCentresToPolygon(centerPoints, dimension);
+                setAreas(centerPoints,areas, dimension);
+               repaint();
+                break;
+            }
+        }
 
+
+
+    }
+
+    private void addPointToVoronoi(Point point) {
+        centerPoints.add(point);
+        HashMap<Point, Polygon> areas = Voronoi.listOfCentresToPolygon(centerPoints, dimension);
+        setAreas(centerPoints,areas, dimension);
+        repaint();
+    }
     @Override
     protected void paintComponent(Graphics g1d) {
         super.paintComponent(g1d);
@@ -266,7 +365,7 @@ public class ModelView extends JPanel {
         Graphics2D g2d = (Graphics2D) g1d;
         AffineTransform saveXform = g2d.getTransform();
         Stroke saveStroke = g2d.getStroke();
-
+        g2d.setColor(new Color((float)0.8,(float)0.8,(float)0.8));
         g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
 
         g2d.transform(affineTransform);
@@ -290,9 +389,32 @@ public class ModelView extends JPanel {
 
         for(Point p : centerPoints){
 
-            g2d.setColor(new Color((float)Math.random(),(float)Math.random(),(float)Math.random()));
+
             Polygon poly = areas.get(p);
-            g2d.fillPolygon(poly);
+            SelectionState ss = selectionStates.get(poly);
+            Stroke oldStrocke = g2d.getStroke();
+           // g2d.setStroke(new BasicStroke(2));
+            switch (ss) {
+                case floor:
+                    g2d.setColor(Color.ORANGE);
+                    g2d.fillPolygon(poly);
+                    g2d.setColor(Color.BLACK);
+                    g2d.drawPolygon(poly);
+                    break;
+                case waal:
+                    g2d.setColor(Color.GREEN);
+                    g2d.fillPolygon(poly);
+                    g2d.setColor(Color.BLACK);
+                    g2d.drawPolygon(poly);
+                    break;
+                case empty:
+                    g2d.setColor(Color.BLACK);
+                    g2d.drawPolygon(poly);
+                    break;
+            }
+
+          //  g2d.setColor(new Color((float)Math.random(),(float)Math.random(),(float)Math.random()));
+          //  g2d.fillPolygon(poly);
             g2d.setColor(Color.BLACK);
             g2d.fillOval(p.x-2,p.y-2,4,4);
         }
@@ -317,6 +439,11 @@ public class ModelView extends JPanel {
         affineTransform.setToIdentity();
     }
 
+
+    private enum SelectionState{
+        floor,waal,empty;
+
+    }
 /*
 
 

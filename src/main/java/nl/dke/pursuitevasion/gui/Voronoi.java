@@ -70,6 +70,54 @@ public class Voronoi implements DrawListener,MouseListener {
             Polygon poly = new Polygon(xs2,ys2,p.size());
             polyPoint.put(centers.get(j),poly);
         }
+        /*
+        //fill the gaps. every corner within another corner within 2 pixel will be merged.
+        for (Polygon p : polyPoint.values()){
+            for (Polygon pe : polyPoint.values()){
+                if (pe.equals(p))continue;
+
+                for (int i = 0; i < p.npoints; i++) {
+                    for (int j = 0; j < pe.npoints; j++) {
+                        int x1 = p.xpoints[i];
+                        int y1 =p.ypoints[i];
+                        int x2 = pe.xpoints[j];
+                        int y2 = pe.ypoints[j];
+                        double dist = DistanceFromToSqrt(x1,y1,x2,y2);
+                        System.out.println("dist" + dist);
+                        if (dist<=9) {
+                            //merge;
+                             pe.xpoints[j] = x1;
+                             pe.ypoints[j] = y1;
+
+                            System.out.println("adjust");
+                        }
+                    }
+                }
+            }
+        }*/
+      /**  for (Point c : centers) {
+            Polygon poly = polyPoint.get(c);
+
+            for (int i = 0; i < poly.npoints; i++) {
+                int x1 = poly.xpoints[i];
+                int y1 = poly.ypoints[i];
+                double dcx = x1- c.getX();
+                double dcy = y1- c.getY();
+
+                //calculate length
+                double length = Math.sqrt(dcx*dcx + dcy*dcy);
+                dcx = dcx /length;
+                dcy /= length;
+                double min = Math.min(dcx,dcy);
+                dcx = dcx / min+0.01;
+                dcy = dcy / min+0.01;
+                poly.xpoints[i] += dcx;
+                poly.ypoints[i] += dcy;
+            }
+       }
+       */
+
+
 
         return polyPoint;
     }
@@ -149,6 +197,16 @@ public class Voronoi implements DrawListener,MouseListener {
        // if (Double.isNaN(d)){
         //    System.out.println("ere");
        // }
+        //System.out.println("Distance from " + q  + " to p: " + p + ": " + d);
+        return e;
+    }
+    private static double DistanceFromToSqrt(int x1, int y1, int x2, int y2) {
+        //double d = Math.sqrt((q.x-p.x)*(q.x-p.x)+(q.y-p.y)*(q.y-p.y));
+
+        double e = (x1-x2)*(x1-x2)+(y1-y2)*(y1-y2);
+        // if (Double.isNaN(d)){
+        //    System.out.println("ere");
+        // }
         //System.out.println("Distance from " + q  + " to p: " + p + ": " + d);
         return e;
     }

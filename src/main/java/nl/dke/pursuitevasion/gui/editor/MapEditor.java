@@ -40,7 +40,7 @@ public class MapEditor extends JPanel
         this.setPreferredSize(new Dimension(prefaredWidht, prefaredHeight));
         this.setLayout(new BorderLayout(5, 5));
 
-        this.modelView = new ModelView(prefaredWidht*4/5,prefaredHeight);
+        this.modelView = new ModelView(prefaredWidht*4/5,prefaredHeight,this);
 
         this.add(modelView,BorderLayout.CENTER);
 
@@ -93,7 +93,7 @@ public class MapEditor extends JPanel
             optionView.add(text2);
 
             JLabel l1 = new JLabel("Max Number Nodes");
-            SpinnerModel sm1 = new SpinnerNumberModel(48, 0, 1024, 12); //default value,lower bound,upper bound,increment by
+            final SpinnerModel sm1 = new SpinnerNumberModel(48, 0, 1024, 12); //default value,lower bound,upper bound,increment by
             JSpinner spinner1 = new JSpinner(sm1);
             ((JSpinner.DefaultEditor)spinner1.getEditor()).getTextField().setColumns(10);
             spinner1.setMaximumSize(new Dimension(prefaredWidth,25));
@@ -113,14 +113,14 @@ public class MapEditor extends JPanel
             optionView.add(spinner3);
 
             JLabel l4 = new JLabel("Height");
-            SpinnerModel sm4 = new SpinnerNumberModel(600, 0, 1024, 9); //default value,lower bound,upper bound,increment by
+            final SpinnerModel sm4 = new SpinnerNumberModel(600, 0, 1024, 9); //default value,lower bound,upper bound,increment by
             JSpinner spinner4 = new JSpinner(sm4);
             spinner4.setMaximumSize(new Dimension(prefaredWidth,25));
             optionView.add(l4); spinner4.setAlignmentX(Component.LEFT_ALIGNMENT);
             optionView.add(spinner4);
 
             JLabel l5 = new JLabel("Word5");
-            SpinnerModel sm5 = new SpinnerNumberModel(400, 0, 800, 9); //default value,lower bound,upper bound,increment by
+            final SpinnerModel sm5 = new SpinnerNumberModel(400, 0, 800, 9); //default value,lower bound,upper bound,increment by
             JSpinner spinner5 = new JSpinner(sm5); spinner5.setPreferredSize(new Dimension(200,50));
             spinner5.setMaximumSize(new Dimension(prefaredWidth,25));
             spinner5.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -134,11 +134,22 @@ public class MapEditor extends JPanel
             generate.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+
                     generateVronoiWorld((int) sm1.getValue(),(int)sm4.getValue(),(int)sm5.getValue());
 
                 }
             });
             optionView.add(generate,Component.LEFT_ALIGNMENT); optionView.setPreferredSize(new Dimension(200,50));
+            optionView.add(Box.createHorizontalGlue());
+
+            JButton Finalize = new JButton("Finalize");
+            generate.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    modelView.finalizeVoronoi();
+                }
+            });
+            optionView.add(Finalize,Component.LEFT_ALIGNMENT); optionView.setPreferredSize(new Dimension(200,50));
             optionView.add(Box.createHorizontalGlue());
 
 
@@ -148,6 +159,8 @@ public class MapEditor extends JPanel
     }
 
     private void generateVronoiWorld(int numNodes, int width,int height) {
+        modelView.vronoiGeneration = true;
+
         ArrayList<Point> cp = new ArrayList<>(numNodes);
 
         for (int i = 0; i < numNodes; i++) {
@@ -159,8 +172,10 @@ public class MapEditor extends JPanel
         }
 
 
-        modelView.centerPoints =  cp;
-        modelView.areas =  Voronoi.listOfCentresToPolygon(cp,new Dimension(width,height));;
+Dimension d = new Dimension(width, height);
+        HashMap<Point, Polygon> areas = Voronoi.listOfCentresToPolygon(cp, d);
+
+        modelView.setAreas(cp,areas,d);
         modelView.repaint();
     }
 
