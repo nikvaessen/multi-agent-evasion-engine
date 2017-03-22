@@ -36,12 +36,17 @@ public class ModelView extends JPanel {
     private Dimension dimension;
 
 
+
     private Map map;
     private AffineTransform affineTransform;
     private Point2D lastClickedPoint;
     private java.util.List<EditorObject> objects = new ArrayList<>();
     private EditorObject selectedObject;
     private int LastID = 0;
+    private boolean movePointEnabled;
+
+    private ArrayList<MoveObject> selectedPoints = new ArrayList<>();
+    private Point pressed; //for moving purposes
 
 
     public void finalizeVoronoi() {
@@ -50,22 +55,23 @@ public class ModelView extends JPanel {
         //untoggle voronoi mapbilder
 
         for (Polygon polygon: areas.values()){
-            if (selectionStates.get(polygon) == SelectionState.floor){
-                //EditorObject ep = new EditorObject();
+            if (selectionStates.get(polygon) == SelectionState.empty)continue;
 
+            EditorObject ep = new EditorObject(polygon,LastID);
+            if (selectionStates.get(polygon) == SelectionState.floor){
+                ep.setType(ObjectType.FLOOR);
             }
             if (selectionStates.get(polygon) == SelectionState.waal){
-                //EditorObject ep = new EditorObject();
-
+                ep.setType(ObjectType.OBSTACLE);
             }
 
-
-
+            objects.add(ep);
+            LastID++;
         }
 
         areas.clear();
         centerPoints.clear();
-
+        repaint();
 
     }
 
@@ -76,6 +82,32 @@ public class ModelView extends JPanel {
         for(Polygon p : areas.values()){
             selectionStates.put(p,SelectionState.empty);
         }
+    }
+
+    public void setMovePointEnabled(boolean movePointEnabled) {
+        this.movePointEnabled = movePointEnabled;
+    }
+
+    public void univfy() {
+        if (selectedPoints.size() <=1) return;
+        int n = 0;
+        double x = 0;
+        double y = 0;
+        for (MoveObject selectedPoint :selectedPoints){
+            n++;
+            x += selectedPoint.poly.xpoints[selectedPoint.i];
+            y += selectedPoint.poly.ypoints[selectedPoint.i];
+        }
+        x/=n;
+        y/=n;
+
+        for (MoveObject selectedPoint :selectedPoints){
+
+            selectedPoint.poly.xpoints[selectedPoint.i] = (int)x;
+            selectedPoint.poly.ypoints[selectedPoint.i] = (int)y;
+        }
+
+        repaint();
     }
 
     // everything in the editor is an abstractobject
@@ -116,10 +148,18 @@ public class ModelView extends JPanel {
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                if(selectedObject != null){
+                if(selectedPoints.size() != 0){
+                    for (MoveObject selectedPoint :selectedPoints){
 
+                        selectedPoint.poly.xpoints[selectedPoint.i] +=  e.getX()-pressed.x;
+                        selectedPoint.poly.ypoints[selectedPoint.i] += e.getY()-pressed.y;
+                    }
+                    System.out.println((e.getX()-pressed.x)  +  "  " +   (e.getY()-pressed.y));
+                    pressed = e.getPoint();
+
+                    repaint();
                 }
-                System.out.println(e.getPoint());
+
 
             }
 
@@ -276,26 +316,33 @@ public class ModelView extends JPanel {
                 // Select polygon
                 if (e.getButton() == MouseEvent.BUTTON1) {
                     System.out.print("button 1");
-                    selectedObject = null;
-                    for (EditorObject o : objects) {
-                        // If the click is inside the polygon
-                        Polygon p = o.getPolygon();
-                        if (p.contains(click) && (selectedObject == null
-                                || !p.contains(selectedObject.getPolygon().getBounds()))) {
-                            selectedObject = o;
+
+
+                    if (movePointEnabled){
+                        selectPolygonPoints(e);
+                    }else {
+
+
+                        selectedObject = null;
+                        for (EditorObject o : objects) {
+                            // If the click is inside the polygon
+                            Polygon p = o.getPolygon();
+                            if (p.contains(click) && (selectedObject == null
+                                    || !p.contains(selectedObject.getPolygon().getBounds()))) {
+                                selectedObject = o;
+                            }
                         }
-                    }
 
 
+                        //check predrawn
+                        for (Polygon p : areas.values()) {
+                            if (p.contains(e.getPoint())) {
+                                SelectionState selState = selectionStates.get(p);
+                                if (selState == SelectionState.empty) selectionStates.put(p, SelectionState.floor);
+                                else if (selState == SelectionState.floor) selectionStates.put(p, SelectionState.waal);
+                                else if (selState == SelectionState.waal) selectionStates.put(p, SelectionState.empty);
 
-                    //check predrawn
-                    for (Polygon p : areas.values()){
-                        if (p.contains(e.getPoint())){
-                            SelectionState selState = selectionStates.get(p);
-                           if (selState == SelectionState.empty) selectionStates.put(p,SelectionState.floor);
-                           else if (selState == SelectionState.floor)  selectionStates.put(p,SelectionState.waal);
-                           else if (selState == SelectionState.waal)  selectionStates.put(p,SelectionState.empty);
-
+                            }
                         }
                     }
                 }
@@ -307,6 +354,11 @@ public class ModelView extends JPanel {
 
             @Override
             public void mousePressed(MouseEvent e) {
+                if (selectedPoints.size() != 0){
+                    pressed = e.getPoint();
+
+                }
+
             }
 
             @Override
@@ -324,7 +376,30 @@ public class ModelView extends JPanel {
         });
     }
 
+    private void selectPolygonPoints(MouseEvent e) {
+        if (!e.isShiftDown()) selectedPoints.clear();
+        Point mp = e.getPoint();
+        for (EditorObject object : objects){
+            Polygon poly = object.getPolygon();
 
+            for (int i = 0; i < object.getPolygon().npoints; i++) {
+                if (sqaredDistanceBetweenTwoPoints(mp,poly.xpoints[i],poly.ypoints[i])<64){ // distance smaller then 20
+                    MoveObject moveObject = new MoveObject(poly,i );
+                    if (selectedPoints.contains(moveObject)) selectedPoints.remove(moveObject);
+                        else selectedPoints.add(moveObject);
+                }
+
+            }
+
+        }
+
+
+    }
+
+    private double sqaredDistanceBetweenTwoPoints(Point mp, int xpoint, int ypoint) {
+         double d = (mp.x-xpoint)*(mp.x-xpoint) + (mp.y-ypoint)*(mp.y-ypoint);
+        return d;
+    }
 
 
     public void setMap(Map m){
@@ -376,12 +451,23 @@ public class ModelView extends JPanel {
 
             switch (o.getType()){
                 case FLOOR:
-                    c = Color.blue; break;
+                    c = new Color(153,204,255); break;
+
                 case OBSTACLE:
-                    c = Color.orange; break;
+                    c = new Color(255,204,153); break;
+
             }
             if(selectedObject == o){
                 c = Color.RED;
+            }
+            g2d.setColor(c);
+            g2d.fill(o.getPolygon());
+
+            switch (o.getType()){
+                case FLOOR:
+                    c = Color.blue; break;
+                case OBSTACLE:
+                    c = Color.orange; break;
             }
             g2d.setColor(c);
             g2d.draw(o.getPolygon());
@@ -418,6 +504,19 @@ public class ModelView extends JPanel {
             g2d.setColor(Color.BLACK);
             g2d.fillOval(p.x-2,p.y-2,4,4);
         }
+
+        g2d.setStroke(new BasicStroke(2));
+        for(MoveObject mo : selectedPoints){
+            int x = mo.poly.xpoints[mo.i];
+            int y = mo.poly.ypoints[mo.i];
+
+            g2d.setColor(Color.BLACK);
+            g2d.drawOval(x-8,y-8,16,16);
+
+        }
+
+
+
 /*
         if (map == null){
             int x = this.getWidth();
@@ -443,6 +542,22 @@ public class ModelView extends JPanel {
     private enum SelectionState{
         floor,waal,empty;
 
+    }
+
+    private class MoveObject {
+        Polygon poly; int i;
+        public MoveObject(Polygon poly, int i) {
+            this.poly = poly;
+            this.i = i;
+        }
+
+        public boolean equals(Object o){
+            if (!(o instanceof MoveObject))return false;
+            MoveObject object = (MoveObject) o;
+            if (object.poly == poly && object.i == i) return true;
+            return false;
+
+        }
     }
 /*
 

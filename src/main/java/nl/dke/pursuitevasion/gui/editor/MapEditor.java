@@ -103,7 +103,7 @@ public class MapEditor extends JPanel
 
 
 
-            JLabel l3 = new JLabel("Width");
+            JLabel l3 = new JLabel("Blank");
             SpinnerModel sm3 = new SpinnerNumberModel(0, 0, modelView.getWidth(), 1); //default value,lower bound,upper bound,increment by
             JSpinner spinner3 = new JSpinner(sm3);
             ((JSpinner.DefaultEditor)spinner3.getEditor()).getTextField().setColumns(10);
@@ -112,14 +112,14 @@ public class MapEditor extends JPanel
             l1.setLabelFor(spinner3);
             optionView.add(spinner3);
 
-            JLabel l4 = new JLabel("Height");
+            JLabel l4 = new JLabel("Width");
             final SpinnerModel sm4 = new SpinnerNumberModel(600, 0, 1024, 9); //default value,lower bound,upper bound,increment by
             JSpinner spinner4 = new JSpinner(sm4);
             spinner4.setMaximumSize(new Dimension(prefaredWidth,25));
             optionView.add(l4); spinner4.setAlignmentX(Component.LEFT_ALIGNMENT);
             optionView.add(spinner4);
 
-            JLabel l5 = new JLabel("Word5");
+            JLabel l5 = new JLabel("Height");
             final SpinnerModel sm5 = new SpinnerNumberModel(400, 0, 800, 9); //default value,lower bound,upper bound,increment by
             JSpinner spinner5 = new JSpinner(sm5); spinner5.setPreferredSize(new Dimension(200,50));
             spinner5.setMaximumSize(new Dimension(prefaredWidth,25));
@@ -143,7 +143,7 @@ public class MapEditor extends JPanel
             optionView.add(Box.createHorizontalGlue());
 
             JButton Finalize = new JButton("Finalize");
-            generate.addActionListener(new ActionListener() {
+            Finalize.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     modelView.finalizeVoronoi();
@@ -193,6 +193,9 @@ Dimension d = new Dimension(width, height);
                 JRadioButton square = new JRadioButton("square",true);
                 JRadioButton pentagon = new JRadioButton("pentagon",false);
 
+            triange.setAlignmentX(Component.LEFT_ALIGNMENT);
+            square.setAlignmentX(Component.LEFT_ALIGNMENT);
+            pentagon.setAlignmentX(Component.LEFT_ALIGNMENT);
                 ButtonGroup bg = new ButtonGroup();
                 bg.add(triange);
                 bg.add(square);
@@ -202,10 +205,29 @@ Dimension d = new Dimension(width, height);
                 objectSelectionView.add(square);
                 objectSelectionView.add(pentagon);
             //Set up color chooser for setting text color
-            JColorChooser tcc = new JColorChooser();
-            tcc.setVisible(true);
-            objectSelectionView.add(tcc);
+            //JColorChooser tcc = new JColorChooser();
+            //tcc.setVisible(true);
+            //objectSelectionView.add(tcc);
+
+            JToggleButton movePoint = new JToggleButton("Adjust Point");
+            objectSelectionView.add(movePoint);
+            movePoint.addActionListener(a ->  setMovePointJToggleButton(a,movePoint));
+
+            JButton unify = new JButton("Unify Points");
+            objectSelectionView.add(unify);
+            unify.addActionListener(a ->  unify());
         }
+    }
+
+    private void unify() {
+        if (modelView == null) return;
+        modelView.univfy();
+    }
+
+    private void setMovePointJToggleButton(ActionEvent a, JToggleButton movePoint) {
+        if (modelView == null) return;
+        modelView.setMovePointEnabled(movePoint.isSelected());
+
     }
 
     private class FileView extends JPanel{
