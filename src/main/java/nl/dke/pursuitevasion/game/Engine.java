@@ -7,10 +7,14 @@ import nl.dke.pursuitevasion.game.agents.tasks.AbstractAgentTask;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
+import nl.dke.pursuitevasion.map.impl.Obstacle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -253,13 +257,42 @@ public class Engine
             {
                 Point p = command.getLocation();
                 Floor floor = command.getAgent().getFloor();
-                if (!floor.getPolygon().contains(p)) {
-                    //todo fix it
-                    logger.error("Currently agent is going out of bounds");
+                int radius = command.getAgent().getRadius();
+
+                Ellipse2D.Double circle = new Ellipse2D.Double(p.x-radius, p.y-radius, radius*2, radius*2);
+
+                if (!containing(floor.getPolygon(), circle, false)) {
+                    int ind = commands.indexOf(command);
+                    commands.remove(ind);
                 }
+
+                for (Obstacle obs: floor.getObstacles()) {
+                    if (containing(obs.getPolygon(), circle, true)) {
+                        int ind = commands.indexOf(command);
+                        commands.remove(ind);
+                    }
+                }
+
             }
         }
-
+        private boolean containing(Polygon bb, Ellipse2D circle, boolean obstacle){
+            Point north = new Point((int)(circle.getX()+(circle.getHeight()/2)), (int) (circle.getY()));
+            Point south = new Point((int)(circle.getX()+(circle.getHeight()/2)), (int) (circle.getY()+circle.getHeight()));
+            Point east = new Point((int)(circle.getX()+(circle.getHeight())), (int) (circle.getY()+circle.getHeight()/2));
+            Point west = new Point((int)(circle.getX()), (int) (circle.getY()+circle.getHeight()/2));
+            Point southeast = new Point((int)( (circle.getX()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.cos(0.25*Math.PI)) ), (int) ( (circle.getY()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.sin(0.25*Math.PI)) ) );
+            Point southwest = new Point((int)( (circle.getX()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.cos(0.75*Math.PI)) ), (int) ( (circle.getY()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.sin(0.75*Math.PI)) ) );
+            Point northwest = new Point((int)( (circle.getX()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.cos(1.25*Math.PI)) ), (int) ( (circle.getY()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.sin(1.25*Math.PI)) ) );
+            Point northeast = new Point((int)( (circle.getX()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.cos(1.75*Math.PI)) ), (int) ( (circle.getY()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.sin(1.75*Math.PI)) ) );
+            if (obstacle){
+                if ( bb.contains(north) || bb.contains(south) || bb.contains(east) || bb.contains(west) || bb.contains(southeast) || bb.contains(southwest) || bb.contains(northeast) || bb.contains(northwest) ){
+                    return true;
+                }
+            } else if ( bb.contains(north) && bb.contains(south) && bb.contains(east) && bb.contains(west) && bb.contains(southeast) && bb.contains(southwest) && bb.contains(northeast) && bb.contains(northwest) ){
+                return true;
+            }
+            return false;
+        }
     }
 
 }
