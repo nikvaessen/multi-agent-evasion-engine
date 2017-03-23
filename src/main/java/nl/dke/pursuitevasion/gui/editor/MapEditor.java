@@ -1,24 +1,16 @@
 package nl.dke.pursuitevasion.gui.editor;
 
-import javafx.scene.shape.*;
 import nl.dke.pursuitevasion.gui.ModelView;
 import nl.dke.pursuitevasion.gui.Voronoi;
 import nl.dke.pursuitevasion.map.impl.Map;
 
 import javax.swing.*;
-import javax.swing.Box;
 import java.awt.*;
-import java.awt.Polygon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
-import java.awt.geom.Point2D;
-import java.io.Console;
-import java.util.*;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
 
 /**
  * Created by nik on 2/8/17.
