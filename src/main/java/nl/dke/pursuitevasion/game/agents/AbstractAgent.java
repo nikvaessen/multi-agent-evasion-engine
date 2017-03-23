@@ -257,6 +257,8 @@ public abstract class AbstractAgent
         this.visionAngle = visionAngle;
     }
 
+    public abstract boolean isEvader();
+
     public VisionArea getVisionArea()
     {
         return new VisionArea();
@@ -308,8 +310,8 @@ public abstract class AbstractAgent
 
             if(logger.isTraceEnabled())
             {
-                logger.trace("base {} before changing with dx {} and dy {} facing {}, {}", base, dx, dy, facing.getAngle(),
-                        facing.getRadians());
+                logger.trace("base {} before changing with dx {} and dy {} facing {}, {}",
+                        base, dx, dy, facing.getAngle(), facing.getRadians());
             }
 
             base = new Point(location.x + Math.round(dx), location.y + Math.round(dy));

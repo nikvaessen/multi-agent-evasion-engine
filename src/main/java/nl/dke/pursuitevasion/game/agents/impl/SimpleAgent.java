@@ -42,4 +42,9 @@ public class SimpleAgent
     {
         return false;
     }
+
+    @Override
+    public boolean isEvader() {
+        return false;
+    }
 }
