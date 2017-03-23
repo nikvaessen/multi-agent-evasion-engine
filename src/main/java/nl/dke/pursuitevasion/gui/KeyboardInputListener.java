@@ -11,7 +11,7 @@ public class KeyboardInputListener
     implements KeyListener, Provider<KeyEvent>
 {
 
-   private LinkedList<Receiver<KeyEvent>> receivers = new LinkedList<>();
+    private LinkedList<Receiver<KeyEvent>> receivers = new LinkedList<>();
 
     @Override
     public void keyTyped(KeyEvent e)

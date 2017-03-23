@@ -1,6 +1,7 @@
 package nl.dke.pursuitevasion.gui;
 
 import nl.dke.pursuitevasion.gui.editor.MapEditor;
+import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.impl.Map;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Obstacle;
@@ -118,7 +119,7 @@ public class ModelView extends JPanel {
         public AbstractObject parentObject;
 
         public EditorObject(Polygon p, int ID){
-            super(p, ID);
+            super(new MapPolygon(p, false), ID);
             type = ObjectType.OBSTACLE;
         };
 
