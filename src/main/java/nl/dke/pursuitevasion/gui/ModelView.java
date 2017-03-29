@@ -154,6 +154,8 @@ public class ModelView extends JPanel {
 
                         selectedPoint.poly.xpoints[selectedPoint.i] +=  e.getX()-pressed.x;
                         selectedPoint.poly.ypoints[selectedPoint.i] += e.getY()-pressed.y;
+
+                        selectedPoint.poly.invalidate();
                     }
                     System.out.println((e.getX()-pressed.x)  +  "  " +   (e.getY()-pressed.y));
                     pressed = e.getPoint();
@@ -291,6 +293,14 @@ public class ModelView extends JPanel {
                         removePointFromVoronoi(e.getPoint());
 
                     }
+
+                    if (selectedObject != null) {
+                        if (selectedObject.getPolygon().contains(e.getPoint())) {
+                            objects.remove(selectedObject);
+                            selectedObject = null;
+                        }
+
+                    }
                 }
 
 
@@ -307,6 +317,7 @@ public class ModelView extends JPanel {
                             Polygon poly = new Polygon();
                             poly.addPoint(click.x, click.y);
                             EditorObject p = new EditorObject(poly, LastID++);
+                            p.setType(ObjectType.FLOOR);
                             selectedObject = p;
                             objects.add(p);
                         }
@@ -322,29 +333,39 @@ public class ModelView extends JPanel {
                     if (movePointEnabled){
                         selectPolygonPoints(e);
                     }else {
-
-
-                        selectedObject = null;
-                        for (EditorObject o : objects) {
-                            // If the click is inside the polygon
-                            Polygon p = o.getPolygon();
-                            if (p.contains(click) && (selectedObject == null
-                                    || !p.contains(selectedObject.getPolygon().getBounds()))) {
-                                selectedObject = o;
-                            }
-                        }
-
-
-                        //check predrawn
-                        for (Polygon p : areas.values()) {
-                            if (p.contains(e.getPoint())) {
-                                SelectionState selState = selectionStates.get(p);
-                                if (selState == SelectionState.empty) selectionStates.put(p, SelectionState.floor);
-                                else if (selState == SelectionState.floor) selectionStates.put(p, SelectionState.waal);
-                                else if (selState == SelectionState.waal) selectionStates.put(p, SelectionState.empty);
+                        if (selectedObject != null) {
+                            if (selectedObject.getPolygon().contains(e.getPoint())) {
+                                if (selectedObject.getType()==ObjectType.FLOOR) selectedObject.setType(ObjectType.OBSTACLE);
+                                else if (selectedObject.getType()==ObjectType.OBSTACLE) selectedObject.setType(ObjectType.FLOOR);
+                               // objects.remove(selectedObject);
 
                             }
                         }
+
+                            selectedObject = null;
+                            for (EditorObject o : objects) {
+                                // If the click is inside the polygon
+                                Polygon p = o.getPolygon();
+                                if (p.contains(click) && (selectedObject == null
+                                        || !p.contains(selectedObject.getPolygon().getBounds()))) {
+                                    selectedObject = o;
+                                }
+                            }
+
+
+                            //check predrawn
+                            for (Polygon p : areas.values()) {
+                                if (p.contains(e.getPoint())) {
+                                    SelectionState selState = selectionStates.get(p);
+                                    if (selState == SelectionState.empty) selectionStates.put(p, SelectionState.floor);
+                                    else if (selState == SelectionState.floor)
+                                        selectionStates.put(p, SelectionState.waal);
+                                    else if (selState == SelectionState.waal)
+                                        selectionStates.put(p, SelectionState.empty);
+
+                                }
+                            }
+
                     }
                 }
 
@@ -379,6 +400,23 @@ public class ModelView extends JPanel {
 
     private void selectPolygonPoints(MouseEvent e) {
         if (!e.isShiftDown()) selectedPoints.clear();
+        if (e.getClickCount() == 2 && !e.isConsumed()) {
+            e.consume();
+            System.out.println("Double Click");
+            for (EditorObject object : objects) {
+                Polygon poly = object.getPolygon();
+
+                if (poly.contains(e.getPoint())){
+                    for (int i = 0; i < object.getPolygon().npoints; i++) {
+                        selectedPoints.add(new MoveObject(poly,i ));
+                    }
+
+
+                }
+            }
+            return;
+        }
+
         Point mp = e.getPoint();
         for (EditorObject object : objects){
             Polygon poly = object.getPolygon();
@@ -455,20 +493,23 @@ public class ModelView extends JPanel {
                     c = new Color(153,204,255); break;
 
                 case OBSTACLE:
-                    c = new Color(255,204,153); break;
+                    c = new Color(123,244,123); break;
 
             }
-            if(selectedObject == o){
-                c = Color.RED;
-            }
+
             g2d.setColor(c);
             g2d.fill(o.getPolygon());
-
+            if(selectedObject == o){
+                //c = Color.RED;
+                c = new Color(1f,0,0,0.6f);
+                g2d.setColor(c);
+                g2d.fill(o.getPolygon());
+            }
             switch (o.getType()){
                 case FLOOR:
                     c = Color.blue; break;
                 case OBSTACLE:
-                    c = Color.orange; break;
+                    c = Color.GREEN; break;
             }
             g2d.setColor(c);
             g2d.draw(o.getPolygon());
