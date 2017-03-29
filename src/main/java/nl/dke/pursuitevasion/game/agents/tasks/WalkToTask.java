@@ -4,6 +4,7 @@ import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.AgentCommand;
 
 import java.awt.*;
+import java.util.Collection;
 
 /**
  * Created by nik on 03/03/17.
@@ -13,6 +14,7 @@ public class WalkToTask
 {
 
     private Point walkToLocation;
+    private Collection<Point> pathFindingPoints;
     private boolean pathFind;
 
     public WalkToTask(Point walkToLocation, boolean pathFind)
