@@ -4,6 +4,9 @@ import nl.dke.pursuitevasion.map.AbstractObject;
 import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.builders.MapBuilder;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.awt.*;
 import java.util.ArrayList;
@@ -109,25 +112,34 @@ public class Map implements Serializable
      */
     public static Map getSimpleMap()
     {
-        MapPolygon mainFloor = new MapPolygon(
-                new int[] {   0, 600, 600,   0},
-                new int[] {   0,   0, 600, 600},
-                4,
-                false
-        );
+        try {
+            FileInputStream s = new FileInputStream("level.ser");
+            ObjectInputStream o = new ObjectInputStream(s);
+            Map m = (Map)o.readObject();
+            return m;
+        }
+        catch (IOException | ClassNotFoundException e){
+            MapPolygon mainFloor = new MapPolygon(
+                    new int[] {   0, 600, 600,   0},
+                    new int[] {   0,   0, 600, 600},
+                    4,
+                    false
+            );
 
-        MapPolygon obstacle = new MapPolygon(
-                new int[] {240, 360, 360, 240},
-                new int[] {240, 240, 360, 360},
-                4,
-                true
-        );
+            MapPolygon obstacle = new MapPolygon(
+                    new int[] {240, 360, 360, 240},
+                    new int[] {240, 240, 360, 360},
+                    4,
+                    true
+            );
 
-        return MapBuilder.create()
-                .makeFloor(mainFloor)
-                .addObstacle(obstacle)
-                .finish()
-                .build();
+            return MapBuilder.create()
+                    .makeFloor(mainFloor)
+                    .addObstacle(obstacle)
+                    .finish()
+                    .build();
+        }
+
     }
 
 }

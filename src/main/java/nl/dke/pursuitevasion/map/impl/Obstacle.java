@@ -4,6 +4,8 @@ import nl.dke.pursuitevasion.map.AbstractObject;
 import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.ObjectType;
 
+import java.io.Serializable;
+
 /**
  * Created by nik on 2/8/17.
  */
