@@ -1,5 +1,9 @@
 package nl.dke.pursuitevasion.game.agents;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Random;
+
 /**
  * Created by nik on 26/02/17.
  */
@@ -13,6 +17,8 @@ public enum Direction
     NORTH_WEST,
     SOUTH_EAST,
     SOUTH_WEST;
+
+    static Random random = new Random();
 
     public static int getAngle(Direction direction)
     {
@@ -37,6 +43,11 @@ public enum Direction
             default:
                 throw new IllegalArgumentException("You somehow gave a non-existing direction");
         }
+    }
+
+    public static Direction getRandomDirection(){
+        Direction[] dir = Direction.values();
+        return dir[random.nextInt(8)];
     }
 
     public static Direction getDirection(boolean north, boolean south, boolean east, boolean west)
