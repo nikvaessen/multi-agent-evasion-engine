@@ -1,5 +1,7 @@
 package nl.dke.pursuitevasion.map;
 
+import java.io.Serializable;
+
 /**
  * A general object, which can be placed in the map.
  *
@@ -7,7 +9,7 @@ package nl.dke.pursuitevasion.map;
  *
  * Created by nik on 2/8/17.
  */
-public abstract class AbstractObject
+public abstract class AbstractObject implements Serializable
 {
     /**
      * The unique id of this object

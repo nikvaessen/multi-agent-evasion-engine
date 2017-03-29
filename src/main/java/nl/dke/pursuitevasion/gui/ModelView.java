@@ -16,6 +16,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.*;
 import java.util.List;
 
@@ -179,15 +183,29 @@ public class ModelView extends JPanel {
         // Separate floors from objects
         for(EditorObject e : objects){
             if(e.getType() == ObjectType.FLOOR){
-                objects.remove(e);
                 List<Obstacle> obstacles = getObstacles(e, objects);
                 floors.add(new Floor(e.getPolygon(), e.getID(), obstacles, new ArrayList<Gate>()));
             }
         }
         Map m = new Map(floors);
+        saveMap(m);
         return m;
     }
 
+    private void saveMap(Map m){
+        FileOutputStream s;
+        try{
+            s = new FileOutputStream("level.ser");
+            ObjectOutputStream os = new ObjectOutputStream(s);
+            os.writeObject(m);
+            os.close();
+            s.close();
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+
+    }
     private List<Obstacle> getObstacles(EditorObject floor, List<EditorObject> obstacles){
         List<EditorObject> floorObstacles = new ArrayList<>();
         Polygon floorPolygon = floor.getPolygon();
@@ -206,7 +224,6 @@ public class ModelView extends JPanel {
                 floorObstacles.add(obstacle);
             }
         }
-        obstacles.removeAll(floorObstacles);
         List<Obstacle> os = new ArrayList<>();
         // Create floor objects
         for(EditorObject e : floorObstacles){
