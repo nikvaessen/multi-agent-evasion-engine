@@ -2,10 +2,16 @@ package nl.dke.pursuitevasion.game.agents;
 
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
+import nl.dke.pursuitevasion.map.impl.Obstacle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
+import java.awt.geom.Line2D;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * An agent in a Map environment. An agent can move about and rotate in the Map. It has a location (an x and y
@@ -90,6 +96,7 @@ public abstract class AbstractAgent
         this.radius = radius;
         this.visionRange = visionRange;
         this.visionAngle = visionAngle;
+        this.visionArc = new VisionArc();
     }
 
     /**
@@ -259,50 +266,127 @@ public abstract class AbstractAgent
 
     public abstract boolean isEvader();
 
-    public VisionArea getVisionArea()
+    public VisionArc getVisionArc()
     {
-        return new VisionArea();
+        return new VisionArc();
     }
 
-    public class VisionArea
-    {
-        private Point base;
-        private Point right;
-        private Point left;
-        private Point center;
+    private VisionArc visionArc;
 
-        private VisionArea()
-        {
-            calculateBase();
-            calculateLeftAndRight();
+    private Collection<AbstractAgent> visibleAgents = new ArrayList<>();
+
+    public Collection<AbstractAgent> getVisibleAgents(){
+        return visibleAgents;
+    }
+
+    public class VisionArc {
+
+        Angle lowerAngle;
+        Angle upperAngle;
+        private Collection<AbstractAgent> agents;
+
+
+        private VisionArc(){
+            updateAngles();
         }
 
-        public Point getBasePoint() {
-
-            return base;
+        private void updateAngles(){
+            double facingAngle = getFacingAngle();
+            upperAngle = new Angle( (facingAngle + visionAngle/2) % 360);
+            lowerAngle = new Angle( (360 + facingAngle - visionAngle/2) % 360 );
         }
 
-        public Point geCenterPoint()
-        {
-            return center;
+        public void update(Collection<AbstractAgent> agents){
+            updateAngles();
+            visibleAgents = getVisibleAgents(agents);
         }
 
-        public Point getRightPoint() {
-            return right;
+        private Collection<AbstractAgent> getVisibleAgents(Collection<AbstractAgent> agents){
+            // TODO: filter out own agent.
+
+            // TODO: filter out agent on other floors
+            Floor f = getFloor();
+            // pre-calculate all lines created by obstacles in the floor
+            Collection<Line2D> lines = getFloorLines(f);
+            // check which agents are within the area.
+            ArrayList<AbstractAgent> visibleAgents = new ArrayList<AbstractAgent>();
+            for(AbstractAgent agent : agents){
+                Point location = agent.getLocation();
+                if(agent.getFloor() == f && inArc(location) && !isObstructed(location, lines)){
+                    visibleAgents.add(agent);
+                }
+            }
+            return visibleAgents;
         }
 
-        public Point getLeftPoint() {
-            return left;
+        private boolean isObstructed(Point p, Collection<Line2D> lines){
+            // check for obstacles that may obstruct line of sight to an agent
+            // Check if a line from the agent to the other agent intersects an obstacle line
+            Line2D ray = new Line2D.Double(location, p);
+            for(Line2D line : lines){
+                if(ray.intersectsLine(line)){
+                    return true;
+                }
+            }
+            return false;
         }
 
-        /**
-         * Compute point A,
-         * the line from the centre of the circle to the point A has an angle of "facing",
-         * the coordinates of point A need to be calculted.
-         * the shift in x = cos(angle) * radius
-         * the shift in y = sin(angle) * radius
-         */
-        private void calculateBase()
+        private Collection<Line2D> getFloorLines(Floor floor){
+            ArrayList<Polygon> obstructions = new ArrayList<>();
+            obstructions.add(floor.getPolygon());
+            for (Obstacle obstacle:
+                    floor.getObstacles()) {
+                obstructions.add(obstacle.getPolygon());
+            }
+            // TODO maybe limit this to the closest polygons.
+            // get the lines for all objects in the Floor
+            ArrayList<Line2D> lines = new ArrayList<>();
+            for(Polygon polygon : obstructions){
+                lines.addAll(getLines(polygon));
+            }
+            return lines;
+        }
+
+        private ArrayList<Line2D> getLines(Polygon polygon){
+            ArrayList<java.awt.geom.Line2D> lines = new ArrayList<>();
+            Point2D start = null;
+            Point2D last = null;
+            for (PathIterator iter = polygon.getPathIterator(null); !iter.isDone(); iter.next()) {
+                double[] points = new double[6];
+                int type = iter.currentSegment(points);
+                if (type == PathIterator.SEG_MOVETO) {
+                    Point2D moveP = new Point2D.Double(points[0], points[1]);
+                    last = moveP;
+                    start = moveP;
+                } else if (type == PathIterator.SEG_LINETO) {
+                    Point2D newP = new Point2D.Double(points[0], points[1]);
+                    java.awt.geom.Line2D line = new java.awt.geom.Line2D.Double(last, newP);
+                    lines.add(line);
+                    last = newP;
+                } else if (type == PathIterator.SEG_CLOSE){
+                    java.awt.geom.Line2D line = new java.awt.geom.Line2D.Double(start, last);
+                    lines.add(line);
+                }
+            }
+            return lines;
+        }
+
+        private boolean inArc(Point p){
+            if(p.distance(location) > visionRange){
+                return false;
+            }
+            // calculate angle between the origin and the point
+            double adjacent = location.getX() - p.getX();
+            double opposite = location.getY() - p.getY();
+            double angle = Math.atan2(opposite, adjacent);
+            if(angle >= lowerAngle.getAngle() && angle <= upperAngle.getAngle()){
+                return true;
+            }
+            return false;
+
+        }
+
+        private Point calculateBase()
         {
             int dx = new Long(Math.round(Math.cos(facing.getRadians()) * radius)).intValue();
             //change sign of y because y works reversed from normal cartesian plane
@@ -310,28 +394,17 @@ public abstract class AbstractAgent
 
             if(logger.isTraceEnabled())
             {
-                logger.trace("base {} before changing with dx {} and dy {} facing {}, {}",
-                        base, dx, dy, facing.getAngle(), facing.getRadians());
+                logger.trace("changing base with dx {} and dy {} facing {}, {}",
+                        dx, dy, facing.getAngle(), facing.getRadians());
             }
 
-            base = new Point(location.x + Math.round(dx), location.y + Math.round(dy));
+            return new Point(location.x + Math.round(dx), location.y + Math.round(dy));
         }
 
-        private void calculateCenter()
-        {
-            double direction = facing.getRadians();
-            int dx =   new Long(Math.round(Math.cos(direction) * radius)).intValue();
-            //y plane is reversed
-            int dy = - new Long(Math.round(Math.sin(direction) * radius)).intValue();
-            center = new Point(base.x + dx, base.y + dy );
+        public Point getBasePoint() {
+            return calculateBase();
         }
-
-        private void calculateLeftAndRight()
-        {
-            int dividedAngle = new Long(Math.round(facing.getAngle())).intValue();
-
-        }
-
     }
+
 
 }

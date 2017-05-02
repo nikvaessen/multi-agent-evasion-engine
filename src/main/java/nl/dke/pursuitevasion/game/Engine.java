@@ -1,8 +1,7 @@
 package nl.dke.pursuitevasion.game;
 
-import nl.dke.pursuitevasion.game.agents.AbstractAgent;
-import nl.dke.pursuitevasion.game.agents.AgentCommand;
-import nl.dke.pursuitevasion.game.agents.AgentRequest;
+import com.sun.javafx.geom.Line2D;
+import nl.dke.pursuitevasion.game.agents.*;
 import nl.dke.pursuitevasion.game.agents.tasks.AbstractAgentTask;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
 import nl.dke.pursuitevasion.map.impl.Floor;
@@ -123,6 +122,16 @@ public class Engine
                 if(System.currentTimeMillis() - startTime > 1000000) //1000 seconds
                 {
                     break;
+                }
+
+
+                // Determine which agents are in the viewing range of other agents
+                for(AbstractAgent agent : agents){
+                    // make agents update their vision arcs
+                    agent.getVisionArc().update(agents);
+
+
+                    // make information available to agents
                 }
 
                 // 2. Check agents

@@ -66,8 +66,8 @@ public class MapViewPanel
             g.fillOval(location.x - radius, location.y - radius,radius * 2, radius * 2);
             logger.trace("painting agent at {}", location);
 
-            AbstractAgent.VisionArea visionArea = agent.getVisionArea();
-            Point base = visionArea.getBasePoint();
+            AbstractAgent.VisionArc visionArc = agent.getVisionArc();
+            Point base = visionArc.getBasePoint();
             logger.trace("the eyes of the agent are at {}",base);
 
             Color color = Color.RED;
