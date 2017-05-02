@@ -268,7 +268,7 @@ public abstract class AbstractAgent
 
     public VisionArc getVisionArc()
     {
-        return new VisionArc();
+        return visionArc;
     }
 
     private VisionArc visionArc;
@@ -376,9 +376,10 @@ public abstract class AbstractAgent
                 return false;
             }
             // calculate angle between the origin and the point
-            double adjacent = location.getX() - p.getX();
             double opposite = location.getY() - p.getY();
-            double angle = Math.atan2(opposite, adjacent);
+            double adjacent = p.getX() - location.getX();
+            double angle = Math.toDegrees(Math.atan2(opposite, adjacent));
+            if(angle < 0){angle += 360;}
             if(angle >= lowerAngle.getAngle() && angle <= upperAngle.getAngle()){
                 return true;
             }

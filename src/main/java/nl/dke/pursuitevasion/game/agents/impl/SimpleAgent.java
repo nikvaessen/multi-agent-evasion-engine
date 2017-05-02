@@ -17,7 +17,7 @@ public class SimpleAgent
     public SimpleAgent(Map map, Floor startingFloor, Point startLocation, Direction startsFacing, int radius,
                        double visionRange, double visionAngle)
     {
-        super(map, startingFloor, startLocation, startsFacing, radius, visionRange, visionRange);
+        super(map, startingFloor, startLocation, startsFacing, radius, visionRange, visionAngle);
     }
 
     /**
