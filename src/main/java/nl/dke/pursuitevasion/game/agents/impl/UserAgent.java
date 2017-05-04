@@ -1,6 +1,5 @@
 package nl.dke.pursuitevasion.game.agents.impl;
 
-import nl.dke.pursuitevasion.game.Engine;
 import nl.dke.pursuitevasion.game.EngineConstants;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.AgentRequest;
@@ -31,7 +30,7 @@ public class UserAgent
     private boolean west;
     private boolean east;
 
-    public UserAgent(Map map, Floor startingFloor, Point startLocation, Direction startsFacing, int radius,
+    public UserAgent(Map map, Floor startingFloor, Point.Double startLocation, Direction startsFacing, int radius,
                      double visionRange, double visionAngle, KeyboardInputListener listener)
     {
         super(map, startingFloor, startLocation, startsFacing, radius, visionRange, visionAngle);
@@ -139,10 +138,10 @@ public class UserAgent
         east = setTo;
     }
 
-    private Point getLocation(Point location, Direction direction)
+    private Point.Double getMoveToLocation(Point.Double location)
     {
-        int x = location.x;
-        int y = location.y;
+        double x = location.x;
+        double y = location.y;
         if(north)
         {
             y -= EngineConstants.WALKING_SPEED;
@@ -159,7 +158,7 @@ public class UserAgent
         {
             x += EngineConstants.WALKING_SPEED;
         }
-        return new Point(x, y);
+        return new Point.Double(x, y);
     }
 
     @Override
@@ -179,7 +178,7 @@ public class UserAgent
 
             Direction direction = Direction.getDirection(north, south, east, west);
             request.add(new RotateTask(Direction.getAngle(direction)));
-            request.add(new WalkToTask(getLocation(request.getAgent().getLocation(), direction)));
+            request.add(new WalkToTask(getMoveToLocation(request.getAgent().getLocation())));
         }
     }
 

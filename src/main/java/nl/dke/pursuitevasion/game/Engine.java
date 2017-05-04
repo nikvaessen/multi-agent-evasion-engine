@@ -171,7 +171,12 @@ public class Engine
                 // 4. Make the moves
                 if(logger.isDebugEnabled())
                 {
-                    logger.debug("Applying {} commands", commands.size());
+                    logger.debug("Applying {} commands!", commands.size());
+                    if(logger.isTraceEnabled()) {
+                        for (AgentCommand command : commands) {
+                            logger.trace("command: " + command);
+                        }
+                    }
                 }
                 commands.forEach(AgentCommand::apply);
                 commands.clear();
@@ -214,14 +219,16 @@ public class Engine
 
         private void handleRequest(AgentRequest request)
         {
-            if(logger.isTraceEnabled())
-            {
-                logger.trace("Resolving request {}", request);
-            }
-
             double allowedMeters = metersPerIteration;
             double allowedRotation = rotationPerIteration;
             AbstractAgentTask task = null;
+
+            if(logger.isTraceEnabled())
+            {
+                logger.trace("Resolving request {}", request);
+                logger.trace("Allowed meters: {} Allowed rotation: {}", allowedMeters, allowedRotation);
+            }
+
             do {
                 try
                 {
@@ -243,7 +250,7 @@ public class Engine
                     break;
                 }
             }
-            while(!request.isCompleted() && allowedMeters > 0 && allowedRotation > 0);
+            while(!request.isCompleted() && allowedMeters - 0  <  0.001 && allowedRotation - 0 < 0.001);
         }
 
         private void validateCommands()
@@ -255,7 +262,7 @@ public class Engine
         {
             if(command.isLocationChanged())
             {
-                Point p = command.getLocation();
+                Point.Double p = command.getLocation();
                 Floor floor = command.getAgent().getFloor();
                 int radius = command.getAgent().getRadius();
 

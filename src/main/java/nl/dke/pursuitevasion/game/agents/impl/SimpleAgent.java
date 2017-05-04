@@ -9,6 +9,8 @@ import nl.dke.pursuitevasion.game.agents.tasks.WalkToTask;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 import nl.dke.pursuitevasion.map.impl.Obstacle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
@@ -20,12 +22,16 @@ import java.util.Collection;
 public class SimpleAgent
     extends AbstractAgent
 {
-    Point goal = new Point(500,500);
+    private static Logger logger = LoggerFactory.getLogger(SimpleAgent.class);
 
-    public SimpleAgent(Map map, Floor startingFloor, Point startLocation, Direction startsFacing, int radius,
+    Point.Double goal = new Point.Double(500,500);
+    private boolean hasRequest;
+
+    public SimpleAgent(Map map, Floor startingFloor, Point.Double startLocation, Direction startsFacing, int radius,
                        double visionRange, double visionAngle)
     {
-        super(map, startingFloor, startLocation, startsFacing, radius, visionRange, visionRange);
+        super(map, startingFloor, startLocation, startsFacing, radius, visionRange, visionAngle);
+        hasRequest = true;
     }
 
     /**
@@ -43,13 +49,18 @@ public class SimpleAgent
                 Direction direction = Direction.getDirection(false, false, false, true);
                 request.add(new RotateTask(Direction.getAngle(direction)));
                 request.add(new WalkToTask(goal));
+                hasRequest = false;
+                return;
             }
             else if (super.location.x < goal.x) {
                 Direction direction = Direction.getDirection(false, false, true, false);
                 request.add(new RotateTask(Direction.getAngle(direction)));
                 request.add(new WalkToTask(goal));
+                hasRequest = false;
+                return;
             }
-        } else {
+        }
+        else {
 
         }
         if(super.location.y != goal.y){
@@ -57,16 +68,20 @@ public class SimpleAgent
                 Direction direction = Direction.getDirection(true, false, false, false);
                 request.add(new RotateTask(Direction.getAngle(direction)));
                 request.add(new WalkToTask(goal));
+                hasRequest = false;
+                return;
             }
             else if (super.location.y < goal.y){
                 Direction direction = Direction.getDirection(false, true, false, false);
                 request.add(new RotateTask(Direction.getAngle(direction)));
                 request.add(new WalkToTask(goal));
+                hasRequest = false;
+                return;
             }
         }
     }
 
-    private boolean contains(Collection<Obstacle> obstacles, Point p){
+    private boolean contains(Collection<Obstacle> obstacles, Point.Double p){
         Ellipse2D.Double circle = new Ellipse2D.Double(p.x-super.getRadius(), p.y-super.getRadius(), super.getRadius()*2, super.getRadius()*2);
         for (Obstacle obs: obstacles) {
             Point north = new Point((int)(circle.getX()+(circle.getHeight()/2)), (int) (circle.getY()));
@@ -92,7 +107,7 @@ public class SimpleAgent
     @Override
     protected boolean hasNewRequest()
     {
-        return true;
+        return hasRequest;
     }
 
     @Override

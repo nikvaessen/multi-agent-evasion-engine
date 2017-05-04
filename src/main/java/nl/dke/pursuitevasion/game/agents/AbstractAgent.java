@@ -16,6 +16,9 @@ import java.awt.*;
  */
 public abstract class AbstractAgent
 {
+    /**
+     * The logger of this class
+     */
     private final static Logger logger = LoggerFactory.getLogger(AbstractAgent.class);
 
     /**
@@ -26,7 +29,7 @@ public abstract class AbstractAgent
     /**
      * The location of the agent in the Map
      */
-    protected Point location;
+    protected Point.Double location;
 
     /**
      * The direction the Agent is facing
@@ -80,8 +83,8 @@ public abstract class AbstractAgent
      * @param startsFacing  the direction the agent will start facing in
      * @param radius        the radius of the agent
      */
-    public AbstractAgent(Map map, Floor startingFloor, Point startLocation, Direction startsFacing, int radius,
-                         double visionRange, double visionAngle)
+    public AbstractAgent(Map map, Floor startingFloor, Point.Double startLocation, Direction startsFacing,
+                         int radius, double visionRange, double visionAngle)
     {
         this.map = map;
         this.floor = startingFloor;
@@ -144,9 +147,9 @@ public abstract class AbstractAgent
      *
      * @return the current location of this agent
      */
-    public synchronized Point getLocation()
+    public synchronized Point.Double getLocation()
     {
-        return new Point(location);
+        return new Point.Double(location.getX(), location.getY());
     }
 
     /**
@@ -266,10 +269,10 @@ public abstract class AbstractAgent
 
     public class VisionArea
     {
-        private Point base;
-        private Point right;
-        private Point left;
-        private Point center;
+        private Point.Double base;
+        private Point.Double right;
+        private Point.Double left;
+        private Point.Double center;
 
         private VisionArea()
         {
@@ -277,21 +280,21 @@ public abstract class AbstractAgent
             calculateLeftAndRight();
         }
 
-        public Point getBasePoint() {
+        public Point.Double getBasePoint() {
 
             return base;
         }
 
-        public Point geCenterPoint()
+        public Point.Double geCenterPoint()
         {
             return center;
         }
 
-        public Point getRightPoint() {
+        public Point.Double getRightPoint() {
             return right;
         }
 
-        public Point getLeftPoint() {
+        public Point.Double getLeftPoint() {
             return left;
         }
 
@@ -304,6 +307,7 @@ public abstract class AbstractAgent
          */
         private void calculateBase()
         {
+            //todo fix integer rounding
             int dx = new Long(Math.round(Math.cos(facing.getRadians()) * radius)).intValue();
             //change sign of y because y works reversed from normal cartesian plane
             int dy = - new Long(Math.round(Math.sin(facing.getRadians()) * radius)).intValue();
@@ -314,16 +318,17 @@ public abstract class AbstractAgent
                         base, dx, dy, facing.getAngle(), facing.getRadians());
             }
 
-            base = new Point(location.x + Math.round(dx), location.y + Math.round(dy));
+            base = new Point.Double(location.x + Math.round(dx), location.y + Math.round(dy));
         }
 
         private void calculateCenter()
         {
+            //todo fix integer rounding
             double direction = facing.getRadians();
             int dx =   new Long(Math.round(Math.cos(direction) * radius)).intValue();
             //y plane is reversed
             int dy = - new Long(Math.round(Math.sin(direction) * radius)).intValue();
-            center = new Point(base.x + dx, base.y + dy );
+            center = new Point.Double(base.x + dx, base.y + dy );
         }
 
         private void calculateLeftAndRight()

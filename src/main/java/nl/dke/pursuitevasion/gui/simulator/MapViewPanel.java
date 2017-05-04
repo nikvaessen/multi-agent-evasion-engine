@@ -61,13 +61,23 @@ public class MapViewPanel
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         for(AbstractAgent agent : agents)
         {
-            Point location = agent.getLocation();
+            Point.Double doubleLocation = agent.getLocation();
+            Point location = new Point(
+                    new Long(Math.round(doubleLocation.getX())).intValue(),
+                    new Long(Math.round(doubleLocation.getY())).intValue()
+            );
+
             int radius = agent.getRadius();
             g.fillOval(location.x - radius, location.y - radius,radius * 2, radius * 2);
             logger.trace("painting agent at {}", location);
 
             AbstractAgent.VisionArea visionArea = agent.getVisionArea();
-            Point base = visionArea.getBasePoint();
+            Point.Double doubleBase = visionArea.getBasePoint();
+            Point base = new Point(
+                    new Long(Math.round(doubleBase.getX())).intValue(),
+                    new Long(Math.round(doubleBase.getY())).intValue()
+            );
+
             logger.trace("the eyes of the agent are at {}",base);
 
             Color color = Color.RED;
