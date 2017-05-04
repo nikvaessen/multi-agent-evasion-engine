@@ -64,7 +64,7 @@ public class AgentRequest
         if(!completed)
         {
             calculateIfCompleted();
-            logger.trace("returning {} is completed: {}", this.toString(), completed);
+            logger.trace("request {} completed: {}", this.toString(), completed);
             return completed;
         }
         return true;
@@ -113,6 +113,11 @@ public class AgentRequest
      */
     private boolean calculateIfCompleted()
     {
+        if(completed)
+        {
+            return true;
+        }
+
         AbstractAgentTask task;
         while((task = tasks.peek()) != null)
         {
@@ -181,8 +186,12 @@ public class AgentRequest
         String tasksString = "";
         for(AbstractAgentTask task : tasks)
         {
-            tasksString += task.toString();
+            tasksString += task.toString() + ",";
         }
-        return String.format("AgenRequest[tasks:{%s}]", tasksString);
+        if(!tasksString.isEmpty())
+        {
+            tasksString = tasksString.substring(0, tasksString.length() - 1);
+        }
+        return String.format("AgentRequest[tasks:{%s}]", tasksString);
     }
 }

@@ -12,12 +12,12 @@ public class AgentCommand
 {
     private AbstractAgent agent;
 
-    private Point location;
+    private Point.Double location;
     private Angle angle;
     private boolean locationChanged;
     private boolean angleChanged;
 
-    public AgentCommand(AbstractAgent agent, Point newLocation, Angle newAngle)
+    public AgentCommand(AbstractAgent agent, Point.Double newLocation, Angle newAngle)
     {
         this.agent = agent;
         this.location = newLocation;
@@ -26,7 +26,7 @@ public class AgentCommand
         angleChanged = true;
     }
 
-    public AgentCommand(AbstractAgent agent, Point location)
+    public AgentCommand(AbstractAgent agent, Point.Double location)
     {
         this.agent = agent;
         this.location = location;
@@ -45,7 +45,7 @@ public class AgentCommand
         agent.update(this);
     }
 
-    public Point getLocation()
+    public Point.Double getLocation()
     {
         return location;
     }

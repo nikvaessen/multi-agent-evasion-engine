@@ -2,8 +2,11 @@ package nl.dke.pursuitevasion.game.agents.tasks;
 
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.AgentCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.Collection;
 
 /**
@@ -13,17 +16,19 @@ public class WalkToTask
     extends AbstractAgentTask
 {
 
-    private Point walkToLocation;
+    private static Logger logger = LoggerFactory.getLogger(WalkToTask.class);
+
+    private Point.Double walkToLocation;
     private Collection<Point> pathFindingPoints;
     private boolean pathFind;
 
-    public WalkToTask(Point walkToLocation, boolean pathFind)
+    public WalkToTask(Point.Double walkToLocation, boolean pathFind)
     {
         this.pathFind = pathFind;
         this.walkToLocation = walkToLocation;
     }
 
-    public WalkToTask(Point walkToLocation)
+    public WalkToTask(Point.Double walkToLocation)
     {
         this.walkToLocation = walkToLocation;
         this.pathFind = false;
@@ -46,19 +51,41 @@ public class WalkToTask
         }
         else
         {
-            if(agent.getLocation().distance(walkToLocation) > maxDistance)
+            if(logger.isTraceEnabled()) {
+                logger.trace("Computing AgentCommand for {}. Agent is currently at {}. Allowewd to move {}",
+                        this, agent.getLocation(), maxDistance);
+            }
+
+            if(agent.getLocation().distance(walkToLocation) < maxDistance)
             {
+                logger.trace("Task {} can be completed in the allowed movable distance", this);
                 return new AgentCommand(agent, walkToLocation);
             }
             else
             {
-                Point location = new Point(agent.getLocation());
+                Point.Double location = agent.getLocation();
 
-                location.move(((int) (location.x < walkToLocation.x ? -maxDistance : maxDistance)),
-                        ((int) (location.y < walkToLocation.y ? -maxDistance : maxDistance)));
+                Point.Double movement = new Point.Double(walkToLocation.x - location.x,
+                        walkToLocation.y - location.y);
+
+                movement = setToLength(movement, maxDistance);
+
+                location.setLocation(
+                        location.x + movement.x,
+                         location.y + movement.y
+                );
+
+                logger.trace("{} can move to location {} in the allowed movable distance", this,
+                        location);
                 return new AgentCommand(agent, location);
             }
         }
+    }
+
+    private Point.Double setToLength(Point.Double v, double length)
+    {
+        double scale = length / Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.y, 2));
+        return new Point2D.Double(v.x * scale, v.y * scale);
     }
 
     /**
