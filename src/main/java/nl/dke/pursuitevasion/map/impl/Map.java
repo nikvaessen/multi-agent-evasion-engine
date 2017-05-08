@@ -4,10 +4,9 @@ import nl.dke.pursuitevasion.map.AbstractObject;
 import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.builders.MapBuilder;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -55,12 +54,86 @@ public class Map implements Serializable
     }
 
     public static Map loadFile() {
-        //todo implement loadFile and file chooser
+
+            JFileChooser fc = new JFileChooser("");
+            fc.setCurrentDirectory(new File( System.getProperty("user.dir")));
+            fc.setAcceptAllFileFilterUsed(true);
+            fc.setMultiSelectionEnabled(false);
+            fc.setFileFilter(new FileNameExtensionFilter("Serialized","ser"));
+           // fc.setLocation(parent.getLocation());
+            fc.setVisible(true);
+
+
+            int returnVal = fc.showOpenDialog(null);
+            if(returnVal == JFileChooser.APPROVE_OPTION) {
+                System.out.println("You chose to open this file: " +
+                        fc.getSelectedFile().getName());
+
+
+
+                File f = fc.getSelectedFile();
+
+
+            try {
+                FileInputStream s = new FileInputStream(f);
+                ObjectInputStream o = new ObjectInputStream(s);
+                Map m = (Map)o.readObject();
+                return m;
+            }
+            catch (IOException | ClassNotFoundException e){
+               e.printStackTrace();
+            }
+
+        }
         return null;
     }
 
+    /**
+     * @param fc the file chooser
+     * @param extension like ".txt"
+     * @return if
+     */
+    public static File addExtension(JFileChooser fc, String extension) {
+        File file = fc.getSelectedFile();
+        String path = file.getAbsolutePath();
+
+
+
+        if(!path.endsWith("." + extension))
+        {
+            file = new File(path +"."+ extension);
+        }
+        return file;
+    }
+
     public static void saveToFile(Map map) {
-        //todo implementlo saveFile and file chooser
+        JFileChooser fc = new JFileChooser("");
+        fc.setCurrentDirectory(new File( System.getProperty("user.dir")));
+        fc.setAcceptAllFileFilterUsed(true);
+        fc.setMultiSelectionEnabled(false);
+        fc.setFileFilter(new FileNameExtensionFilter("Serialized","ser"));
+        // fc.setLocation(parent.getLocation());
+        fc.setVisible(true);
+
+        int returnVal = fc.showSaveDialog(null);
+        if(returnVal == JFileChooser.APPROVE_OPTION) {
+            System.out.println("You chose to save this file: " +
+                    fc.getSelectedFile().getName());
+            File f = addExtension(fc,"ser");
+
+
+        FileOutputStream s;
+        try{
+            s = new FileOutputStream(f);
+            ObjectOutputStream os = new ObjectOutputStream(s);
+            os.writeObject(map);
+            os.close();
+            s.close();
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+         }
     }
 
     /**

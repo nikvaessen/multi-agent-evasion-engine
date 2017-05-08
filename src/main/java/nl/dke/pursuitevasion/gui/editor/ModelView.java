@@ -1,6 +1,6 @@
-package nl.dke.pursuitevasion.gui;
+package nl.dke.pursuitevasion.gui.editor;
 
-import nl.dke.pursuitevasion.gui.editor.MapEditor;
+import nl.dke.pursuitevasion.gui.Voronoi;
 import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.impl.Map;
 import nl.dke.pursuitevasion.map.impl.Floor;
@@ -19,7 +19,6 @@ import java.awt.geom.Point2D;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.*;
 import java.util.List;
 
@@ -188,24 +187,11 @@ public class ModelView extends JPanel {
             }
         }
         Map m = new Map(floors);
-        saveMap(m);
+        Map.saveToFile(m);
+
         return m;
     }
 
-    private void saveMap(Map m){
-        FileOutputStream s;
-        try{
-            s = new FileOutputStream("level.ser");
-            ObjectOutputStream os = new ObjectOutputStream(s);
-            os.writeObject(m);
-            os.close();
-            s.close();
-        }
-        catch (IOException e){
-            e.printStackTrace();
-        }
-
-    }
     private List<Obstacle> getObstacles(EditorObject floor, List<EditorObject> obstacles){
         List<EditorObject> floorObstacles = new ArrayList<>();
         Polygon floorPolygon = floor.getPolygon();
@@ -459,7 +445,36 @@ public class ModelView extends JPanel {
 
 
     public void setMap(Map m){
+
+
         this.map  = m;
+        objects.clear();
+        selectedObject = null;
+        LastID = 0;
+        selectedPoints.clear();
+
+
+        for (Floor f : m.getFloors()){
+            EditorObject eo = new EditorObject(f.getPolygon(),LastID++);
+            eo.setType(ObjectType.FLOOR);
+           objects.add(eo);
+
+
+            for (Obstacle o : f.getObstacles()){
+                EditorObject eo2 = new EditorObject(o.getPolygon(),LastID++);
+                eo2.setType(ObjectType.OBSTACLE);
+                objects.add(eo2);
+            };
+
+            for (Gate g : f.getGates()){
+                EditorObject eo2 = new EditorObject(g.getPolygon(),LastID++);
+                eo2.setType(ObjectType.GATE);
+                objects.add(eo2);
+            };
+
+
+        }
+
 
         repaint();
     }

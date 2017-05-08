@@ -1,6 +1,5 @@
 package nl.dke.pursuitevasion.gui.editor;
 
-import nl.dke.pursuitevasion.gui.ModelView;
 import nl.dke.pursuitevasion.gui.Voronoi;
 import nl.dke.pursuitevasion.map.impl.Map;
 
@@ -193,9 +192,9 @@ Dimension d = new Dimension(width, height);
                 bg.add(square);
                 bg.add(pentagon);
 
-                objectSelectionView.add(triange);
-                objectSelectionView.add(square);
-                objectSelectionView.add(pentagon);
+               // objectSelectionView.add(triange);
+               // objectSelectionView.add(square);
+               // objectSelectionView.add(pentagon);
             //Set up color chooser for setting text color
             //JColorChooser tcc = new JColorChooser();
             //tcc.setVisible(true);
@@ -237,7 +236,7 @@ Dimension d = new Dimension(width, height);
             saveModel.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    Map.saveToFile(map);
+                    modelView.buildMap();
                 }
             });
 
