@@ -6,13 +6,13 @@ import nl.dke.pursuitevasion.game.agents.Direction;
 import nl.dke.pursuitevasion.game.agents.impl.GeneticAgent;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 /**
  * Created by nibbla on 13.04.17.
@@ -21,7 +21,7 @@ import java.util.Vector;
  */
 public class GeneticAgentFactory
 {
-    private final static Logger logger = LoggerFactory.getLogger(GeneticAgentFactory.class);
+
 
     public static ArrayList<GeneticAgent> getAgents(Map map, Floor startingFloor, Point startLocation, Direction startsFacing, int radius, double visionRange, double visionAngle,Genome g){
         ArrayList<String>  codes = g.getCode();
@@ -53,10 +53,10 @@ public class GeneticAgentFactory
                     char old = b.charAt(j);
                     char new_ = Alphabet.getRandom();
                     b.setCharAt(j,new_);
-                    if(logger.isDebugEnabled())
-                    {
-                        logger.debug("Mutated in String {} at {} Position {} with {}", i, j, old , new_);
-                    }
+                   // if(logger.isDebugEnabled())
+                   // {
+                   //     logger.debug("Mutated in String {} at {} Position {} with {}", i, j, old , new_);
+                   // }
                 }
 
             }
@@ -99,7 +99,7 @@ public class GeneticAgentFactory
      * @return
      */
     private static Vector<int[]> createAdjancyMatrix(Genome p1) {
-        int s = p1.size;
+     /*   int s = p1.size;
         Vector<int[]> p1AdjancyMatrix  = new Vector<int[]>(s);
 
         int[]p1_1= {p1.getID(0),p1.getID(p1.getSize()-1),p1.getID(1)};
@@ -112,7 +112,7 @@ public class GeneticAgentFactory
 
         int[]p1_last= {p1.getID(s-1),p1.getID(0),p1.getID(s-2)};
         p1AdjancyMatrix.add(p1_last);
-        return p1AdjancyMatrix;
+        return p1AdjancyMatrix;*/ return null;
     }
 
     /**http://en.wikipedia.org/wiki/Edge_recombination_operator
