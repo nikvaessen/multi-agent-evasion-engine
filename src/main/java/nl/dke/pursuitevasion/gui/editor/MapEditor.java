@@ -207,7 +207,24 @@ Dimension d = new Dimension(width, height);
             JButton unify = new JButton("Unify Points");
             objectSelectionView.add(unify);
             unify.addActionListener(a ->  unify());
+            JButton simplify = new JButton("Simplyfy all");
+            objectSelectionView.add(simplify);
+            simplify.addActionListener(a ->  simplyfyAll());
+            JButton undoSimplify = new JButton("Undo Simplyfy");
+            objectSelectionView.add(undoSimplify);
+            undoSimplify.addActionListener(a ->  undoSimplify());
+
         }
+    }
+
+    private void undoSimplify() {
+        if (modelView == null) return;
+        modelView.undoSimplyfyAll();
+    }
+
+    private void simplyfyAll() {
+        if (modelView == null) return;
+        modelView.simplyfyAll();
     }
 
     private void unify() {

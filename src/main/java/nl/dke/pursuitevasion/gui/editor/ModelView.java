@@ -50,6 +50,9 @@ public class ModelView extends JPanel {
     private boolean movePointEnabled;
 
     private ArrayList<MoveObject> selectedPoints = new ArrayList<>();
+
+    private ArrayList<MoveObject> allPoints = new ArrayList<>();
+    private ArrayList<MoveObject> allPointsUndo = new ArrayList<>();
     private Point pressed; //for moving purposes
 
 
@@ -66,6 +69,10 @@ public class ModelView extends JPanel {
                 ep.setType(ObjectType.FLOOR);
             }
             if (selectionStates.get(polygon) == SelectionState.waal){
+                ep.setType(ObjectType.FLOOR);
+                objects.add(ep);
+                LastID++;
+                ep = new EditorObject(polygon,LastID);
                 ep.setType(ObjectType.OBSTACLE);
             }
 
@@ -110,8 +117,85 @@ public class ModelView extends JPanel {
             selectedPoint.poly.xpoints[selectedPoint.i] = (int)x;
             selectedPoint.poly.ypoints[selectedPoint.i] = (int)y;
         }
+        System.out.println("Unified " + selectedPoints.size() + " Points");
+        repaint();
+    }
+
+    public void simplyfyAll() {
+
+        //go through all points
+        //select all points in a 5 or 10 pixel radius
+        //use unify on them
+        //repeat for every non selected point
+        //store old data
+        //redundant point removal is send to converting to map object in the save feature
+        Point p = new Point(0,0);
+        selectedPoints.clear();
+        allPoints.clear();
+        allPointsUndo.clear();
+        for (EditorObject object : objects) {
+            Polygon poly = object.getPolygon();
+            for (int i = 0; i < object.getPolygon().npoints; i++) {
+                allPoints.add(new MoveObject(poly,i ));
+                allPointsUndo.add(new MoveObject(new Polygon(poly.xpoints,poly.ypoints,poly.npoints),i ));
+                //new Polygon(selectedTriangle.xpoints,selectedTriangle.ypoints,selectedTriangle.npoints);
+            }
+        }
+        for (int i = 0; i < allPoints.size(); i++) {
+            MoveObject movi = allPoints.get(i);
+            ArrayList<MoveObject> toRemove = new ArrayList<>();
+            selectedPoints.add(movi);
+            for (int j = 0; j < allPoints.size(); j++){
+                MoveObject movi2 = allPoints.get(j);
+                if (movi.equals(movi2))continue;
+
+                double d = (movi.getX()-movi2.getX())*(movi.getX()-movi2.getX()) + (movi.getY()-movi2.getY())*(movi.getY()-movi2.getY());
+
+                if (d<400) { // distance smaller then 20
+                    //unify 1 and two
+                    selectedPoints.add(movi2);
+                    //remove 2 from all points , remember to add all before deunify
+                    if (!toRemove.contains(movi2))toRemove.add(movi2);
+                }
+            }
+            univfy();
+            selectedPoints.clear();
+            for (int j = toRemove.size()-1; j >= 0 ; j--) {
+                MoveObject a = toRemove.get(j);
+                int  index = allPoints.indexOf(a);
+                allPoints.remove(a);
+                if (index<=i) i--;
+            }
+
+
+        }
+
+
+
+
+    }
+
+    public void undoSimplyfyAll() {
+        allPoints.clear();
+        for (EditorObject object : objects) {
+            Polygon poly = object.getPolygon();
+            for (int i = 0; i < object.getPolygon().npoints; i++) {
+                allPoints.add(new MoveObject(poly,i ));
+            }
+        }
+        System.out.println("Tries to undo: " + allPoints.size() + "points" );
+        for (int i = 0; i < allPoints.size(); i++) {
+            MoveObject mo = allPoints.get(i);
+            MoveObject old = allPointsUndo.get(i);
+            System.out.println( mo.poly.xpoints[mo.i] + " " +  old.poly.xpoints[old.i] + " " + mo.poly.ypoints[mo.i] + " " + old.poly.ypoints[old.i]);
+            mo.poly.xpoints[mo.i] = old.poly.xpoints[old.i];
+            mo.poly.ypoints[mo.i] = old.poly.ypoints[old.i];
+
+            System.out.println( mo.poly.xpoints[mo.i] + " " +  old.poly.xpoints[old.i] + " " + mo.poly.ypoints[mo.i] + " " + old.poly.ypoints[old.i]);
+        }
 
         repaint();
+
     }
 
     // everything in the editor is an abstractobject
@@ -623,6 +707,12 @@ public class ModelView extends JPanel {
         public MoveObject(Polygon poly, int i) {
             this.poly = poly;
             this.i = i;
+        }
+        public int getX(){
+            return poly.xpoints[i];
+        }
+        public int getY(){
+            return poly.ypoints[i];
         }
 
         public boolean equals(Object o){
