@@ -1,5 +1,6 @@
 package nl.dke.pursuitevasion.game.agents;
 
+import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 import org.slf4j.Logger;
@@ -29,7 +30,7 @@ public abstract class AbstractAgent
     /**
      * The location of the agent in the Map
      */
-    protected Point.Double location;
+    protected Vector2D location;
 
     /**
      * The direction the Agent is facing
@@ -83,7 +84,7 @@ public abstract class AbstractAgent
      * @param startsFacing  the direction the agent will start facing in
      * @param radius        the radius of the agent
      */
-    public AbstractAgent(Map map, Floor startingFloor, Point.Double startLocation, Direction startsFacing,
+    public AbstractAgent(Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing,
                          int radius, double visionRange, double visionAngle)
     {
         this.map = map;
@@ -107,11 +108,11 @@ public abstract class AbstractAgent
 
         if(command.isLocationChanged())
         {
-            this.location = command.getLocation();
+            this.location = command.getNewLocation();
         }
         if(command.isAngleChanged())
         {
-            this.facing = command.getAngle();
+            this.facing = command.getNewAngle();
         }
     }
 
@@ -147,9 +148,9 @@ public abstract class AbstractAgent
      *
      * @return the current location of this agent
      */
-    public synchronized Point.Double getLocation()
+    public synchronized Vector2D getLocation()
     {
-        return new Point.Double(location.getX(), location.getY());
+        return location;
     }
 
     /**
@@ -260,6 +261,11 @@ public abstract class AbstractAgent
         this.visionAngle = visionAngle;
     }
 
+    /**
+     * Get whether this agent can act as an evader or as an pursuer
+     *
+     * @return true is agent acts as an evader, false if agent acts as pursuer
+     */
     public abstract boolean isEvader();
 
     public VisionArea getVisionArea()
@@ -318,7 +324,7 @@ public abstract class AbstractAgent
                         base, dx, dy, facing.getAngle(), facing.getRadians());
             }
 
-            base = new Point.Double(location.x + Math.round(dx), location.y + Math.round(dy));
+            base = new Point.Double(location.getX() + Math.round(dx), location.getY() + Math.round(dy));
         }
 
         private void calculateCenter()

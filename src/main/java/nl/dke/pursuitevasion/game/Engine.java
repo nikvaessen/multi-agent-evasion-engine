@@ -5,21 +5,16 @@ import nl.dke.pursuitevasion.game.agents.AgentCommand;
 import nl.dke.pursuitevasion.game.agents.AgentRequest;
 import nl.dke.pursuitevasion.game.agents.tasks.AbstractAgentTask;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
-import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
-import nl.dke.pursuitevasion.map.impl.Obstacle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.function.Predicate;
+
 ;
 
 /**
@@ -51,10 +46,11 @@ public class Engine
         this.mapViewPanel = viewPanel;
 
         //set all agents to the correct vision angle and degrees
-        agents.forEach(agent -> {
-            agent.setVisionRange(EngineConstants.VISION_RANGE);
-            agent.setVisionAngle(EngineConstants.VISION_ANGLE);
-        });
+        agents.forEach(agent ->
+                       {
+                           agent.setVisionRange(EngineConstants.VISION_RANGE);
+                           agent.setVisionAngle(EngineConstants.VISION_ANGLE);
+                       });
     }
 
     public Engine(Map map, Collection<AbstractAgent> agents, int desiredFPS)
@@ -128,11 +124,12 @@ public class Engine
                 // 2. Check agents
                 for(AbstractAgent agent : agents)
                 {
-                    if(agent.hasRequest()) {
+                    if(agent.hasRequest())
+                    {
                         AgentRequest request = agent.getRequest();
                         requests.add(request);
 
-                        if (logger.isTraceEnabled())
+                        if(logger.isTraceEnabled())
                         {
                             logger.trace("Added new Request to list. Request: {} Size: {}", request, requests.size());
                         }
@@ -146,9 +143,11 @@ public class Engine
                 {
                     logger.debug("Handling {} requests", requests.size());
                 }
-                requests.removeIf(new Predicate<AgentRequest>() {
+                requests.removeIf(new Predicate<AgentRequest>()
+                {
                     @Override
-                    public boolean test(AgentRequest agentRequest) {
+                    public boolean test(AgentRequest agentRequest)
+                    {
                         return agentRequest.isCompleted();
                     }
                 });
@@ -172,8 +171,10 @@ public class Engine
                 if(logger.isDebugEnabled())
                 {
                     logger.debug("Applying {} commands!", commands.size());
-                    if(logger.isTraceEnabled()) {
-                        for (AgentCommand command : commands) {
+                    if(logger.isTraceEnabled())
+                    {
+                        for(AgentCommand command : commands)
+                        {
                             logger.trace("command: " + command);
                         }
                     }
@@ -182,9 +183,10 @@ public class Engine
                 commands.clear();
 
                 // 5. Update the view
-                if(mapViewPanel != null) {
+                if(mapViewPanel != null)
+                {
                     mapViewPanel.repaint();
-                    if (logger.isDebugEnabled())
+                    if(logger.isDebugEnabled())
                     {
                         logger.debug("Updated MapViewPanel");
                     }
@@ -210,7 +212,7 @@ public class Engine
                 else
                 {
                     logger.warn("GameLoop took {} ms while only allowed to take {} ms. Exceeded: {} ms",
-                            msPassed, desiredIterationLength, msPassed - desiredIterationLength);
+                                msPassed, desiredIterationLength, msPassed - desiredIterationLength);
                 }
             }
 
@@ -229,7 +231,8 @@ public class Engine
                 logger.trace("Allowed meters: {} Allowed rotation: {}", allowedMeters, allowedRotation);
             }
 
-            do {
+            do
+            {
                 try
                 {
                     task = request.peek();
@@ -238,19 +241,20 @@ public class Engine
                     allowedMeters -= command.getMovedDistance();
                     allowedRotation -= command.getRotatedDistance();
 
-                    if (logger.isTraceEnabled()) {
+                    if(logger.isTraceEnabled())
+                    {
                         logger.trace("Added to commands: {} ", command);
                         logger.trace("allowed meters left: {}", allowedMeters);
                         logger.trace("allowed rotation left: {}", allowedRotation);
                     }
                 }
-                catch (IllegalStateException e)
+                catch(IllegalStateException e)
                 {
                     logger.error("Cannot resolve new task", e);
                     break;
                 }
             }
-            while(!request.isCompleted() && allowedMeters - 0  <  0.001 && allowedRotation - 0 < 0.001);
+            while(!request.isCompleted() && allowedMeters - 0 < 0.001 && allowedRotation - 0 < 0.001);
         }
 
         private void validateCommands()
@@ -258,44 +262,74 @@ public class Engine
             commands.forEach(this::outOfBoundCorrection);
         }
 
+        //todo fix
         private void outOfBoundCorrection(AgentCommand command)
         {
-            if(command.isLocationChanged())
-            {
-                Point.Double p = command.getLocation();
-                Floor floor = command.getAgent().getFloor();
-                int radius = command.getAgent().getRadius();
-
-                Ellipse2D.Double circle = new Ellipse2D.Double(p.x-radius, p.y-radius, radius*2, radius*2);
-
-                if (!containing(floor.getPolygon(), circle, false)) {
-                    int ind = commands.indexOf(command);
-                    commands.remove(ind);
-                }
-
-                for (Obstacle obs: floor.getObstacles()) {
-                    if (containing(obs.getPolygon(), circle, true)) {
-                        int ind = commands.indexOf(command);
-                        commands.remove(ind);
-                    }
-                }
-
-            }
+//            if(command.isLocationChanged())
+//            {
+//                Point.Double p = command.getNewLocation();
+//                Floor floor = command.getAgent().getFloor();
+//                int radius = command.getAgent().getRadius();
+//
+//                Ellipse2D.Double circle = new Ellipse2D.Double(p.x - radius, p.y - radius, radius * 2, radius * 2);
+//
+//                if(!containing(floor.getPolygon(), circle, false))
+//                {
+//                    int ind = commands.indexOf(command);
+//                    commands.remove(ind);
+//                }
+//
+//                for(Obstacle obs : floor.getObstacles())
+//                {
+//                    if(containing(obs.getPolygon(), circle, true))
+//                    {
+//                        int ind = commands.indexOf(command);
+//                        commands.remove(ind);
+//                    }
+//                }
+//
+//            }
         }
-        private boolean containing(Polygon bb, Ellipse2D circle, boolean obstacle){
-            Point north = new Point((int)(circle.getX()+(circle.getHeight()/2)), (int) (circle.getY()));
-            Point south = new Point((int)(circle.getX()+(circle.getHeight()/2)), (int) (circle.getY()+circle.getHeight()));
-            Point east = new Point((int)(circle.getX()+(circle.getHeight())), (int) (circle.getY()+circle.getHeight()/2));
-            Point west = new Point((int)(circle.getX()), (int) (circle.getY()+circle.getHeight()/2));
-            Point southeast = new Point((int)( (circle.getX()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.cos(0.25*Math.PI)) ), (int) ( (circle.getY()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.sin(0.25*Math.PI)) ) );
-            Point southwest = new Point((int)( (circle.getX()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.cos(0.75*Math.PI)) ), (int) ( (circle.getY()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.sin(0.75*Math.PI)) ) );
-            Point northwest = new Point((int)( (circle.getX()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.cos(1.25*Math.PI)) ), (int) ( (circle.getY()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.sin(1.25*Math.PI)) ) );
-            Point northeast = new Point((int)( (circle.getX()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.cos(1.75*Math.PI)) ), (int) ( (circle.getY()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.sin(1.75*Math.PI)) ) );
-            if (obstacle){
-                if ( bb.contains(north) || bb.contains(south) || bb.contains(east) || bb.contains(west) || bb.contains(southeast) || bb.contains(southwest) || bb.contains(northeast) || bb.contains(northwest) ){
+
+        private boolean containing(Polygon bb, Ellipse2D circle, boolean obstacle)
+        {
+            Point north = new Point((int) (circle.getX() + (circle.getHeight() / 2)), (int) (circle.getY()));
+            Point south = new Point((int) (circle.getX() + (circle.getHeight() / 2)),
+                                    (int) (circle.getY() + circle.getHeight()));
+            Point east = new Point((int) (circle.getX() + (circle.getHeight())),
+                                   (int) (circle.getY() + circle.getHeight() / 2));
+            Point west = new Point((int) (circle.getX()), (int) (circle.getY() + circle.getHeight() / 2));
+            Point southeast = new Point(
+                (int) ((circle.getX() + (circle.getHeight() / 2)) + ((circle.getHeight() / 2) * Math.cos(
+                    0.25 * Math.PI))),
+                (int) ((circle.getY() + (circle.getHeight() / 2)) + ((circle.getHeight() / 2) * Math.sin(
+                    0.25 * Math.PI))));
+            Point southwest = new Point(
+                (int) ((circle.getX() + (circle.getHeight() / 2)) + ((circle.getHeight() / 2) * Math.cos(
+                    0.75 * Math.PI))),
+                (int) ((circle.getY() + (circle.getHeight() / 2)) + ((circle.getHeight() / 2) * Math.sin(
+                    0.75 * Math.PI))));
+            Point northwest = new Point(
+                (int) ((circle.getX() + (circle.getHeight() / 2)) + ((circle.getHeight() / 2) * Math.cos(
+                    1.25 * Math.PI))),
+                (int) ((circle.getY() + (circle.getHeight() / 2)) + ((circle.getHeight() / 2) * Math.sin(
+                    1.25 * Math.PI))));
+            Point northeast = new Point(
+                (int) ((circle.getX() + (circle.getHeight() / 2)) + ((circle.getHeight() / 2) * Math.cos(
+                    1.75 * Math.PI))),
+                (int) ((circle.getY() + (circle.getHeight() / 2)) + ((circle.getHeight() / 2) * Math.sin(
+                    1.75 * Math.PI))));
+            if(obstacle)
+            {
+                if(bb.contains(north) || bb.contains(south) || bb.contains(east) || bb.contains(west) || bb.contains(
+                    southeast) || bb.contains(southwest) || bb.contains(northeast) || bb.contains(northwest))
+                {
                     return true;
                 }
-            } else if ( bb.contains(north) && bb.contains(south) && bb.contains(east) && bb.contains(west) && bb.contains(southeast) && bb.contains(southwest) && bb.contains(northeast) && bb.contains(northwest) ){
+            }
+            else if(bb.contains(north) && bb.contains(south) && bb.contains(east) && bb.contains(west) && bb.contains(
+                southeast) && bb.contains(southwest) && bb.contains(northeast) && bb.contains(northwest))
+            {
                 return true;
             }
             return false;
