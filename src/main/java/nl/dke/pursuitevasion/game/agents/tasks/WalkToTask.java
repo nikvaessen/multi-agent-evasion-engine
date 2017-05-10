@@ -1,5 +1,6 @@
 package nl.dke.pursuitevasion.game.agents.tasks;
 
+import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.AgentCommand;
 import org.slf4j.Logger;
@@ -18,17 +19,17 @@ public class WalkToTask
 
     private static Logger logger = LoggerFactory.getLogger(WalkToTask.class);
 
-    private Point.Double walkToLocation;
+    private Vector2D walkToLocation;
     private Collection<Point> pathFindingPoints;
     private boolean pathFind;
 
-    public WalkToTask(Point.Double walkToLocation, boolean pathFind)
+    public WalkToTask(Vector2D walkToLocation, boolean pathFind)
     {
         this.pathFind = pathFind;
         this.walkToLocation = walkToLocation;
     }
 
-    public WalkToTask(Point.Double walkToLocation)
+    public WalkToTask(Vector2D walkToLocation)
     {
         this.walkToLocation = walkToLocation;
         this.pathFind = false;
@@ -51,9 +52,10 @@ public class WalkToTask
         }
         else
         {
-            if(logger.isTraceEnabled()) {
+            if(logger.isTraceEnabled())
+            {
                 logger.trace("Computing AgentCommand for {}. Agent is currently at {}. Allowewd to move {}",
-                        this, agent.getLocation(), maxDistance);
+                             this, agent.getLocation(), maxDistance);
             }
 
             if(agent.getLocation().distance(walkToLocation) < maxDistance)
@@ -63,20 +65,18 @@ public class WalkToTask
             }
             else
             {
-                Point.Double location = agent.getLocation();
+                Vector2D location = agent.getLocation();
 
-                Point.Double movement = new Point.Double(walkToLocation.x - location.x,
-                        walkToLocation.y - location.y);
+                Vector2D movement = ;
 
-                movement = setToLength(movement, maxDistance);
+                setToLength(movement, maxDistance);
 
                 location.setLocation(
-                        location.x + movement.x,
-                         location.y + movement.y
+                    location.x + movement.x,
+                    location.y + movement.y
                 );
 
-                logger.trace("{} can move to location {} in the allowed movable distance", this,
-                        location);
+                logger.trace("{} can move to location {} in the allowed movable distance", this, location);
                 return new AgentCommand(agent, location);
             }
         }
@@ -97,11 +97,12 @@ public class WalkToTask
     @Override
     protected boolean completesTask(AgentCommand command)
     {
-        return command.getLocation().equals(walkToLocation);
+        return command.getNewLocation().equals(walkToLocation);
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return String.format("WalkToTask[point:%s,pathfind:%b]", walkToLocation, pathFind);
     }
 }

@@ -77,6 +77,6 @@ public class RotateTask
     @Override
     protected boolean completesTask(AgentCommand command)
     {
-        return Math.abs(command.getAngle().getAngle() - rotateToAngle) < 0.0001;
+        return Math.abs(command.getNewAngle().getAngle() - rotateToAngle) < 0.0001;
     }
 }
