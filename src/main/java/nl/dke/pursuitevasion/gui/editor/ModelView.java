@@ -15,6 +15,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -184,6 +186,7 @@ public class ModelView extends JPanel {
             }
         }
         System.out.println("Tries to undo: " + allPoints.size() + "points" );
+        System.out.println("Within: " + objects.size() + "Objects" );
         for (int i = 0; i < allPoints.size(); i++) {
             MoveObject mo = allPoints.get(i);
             MoveObject old = allPointsUndo.get(i);
@@ -196,6 +199,37 @@ public class ModelView extends JPanel {
 
         repaint();
 
+    }
+
+    public void combinePolygones(){
+            Area allArea = new Area();
+        for (int i = objects.size()-1; i >= 0 ; i--) {
+            EditorObject object = objects.get(i);
+
+            if (object.getType() == ObjectType.FLOOR) {
+                allArea.add(new Area((Polygon) object.getPolygon()));
+                objects.remove(i);
+            }
+        }
+
+
+    PathIterator iterator = allArea.getPathIterator(null);
+    float[] floats = new float[6];
+    Polygon polygon = new Polygon();
+    while (!iterator.isDone()) {
+        int type = iterator.currentSegment(floats);
+        int x = (int) floats[0];
+        int y = (int) floats[1];
+        if(type != PathIterator.SEG_CLOSE) {
+            polygon.addPoint(x, y);
+            System.out.println("adding x = " + x + ", y = " + y);
+        }
+        iterator.next();
+    }
+
+        objects.add(0,new EditorObject(polygon,LastID));
+        objects.get(0).setType(ObjectType.FLOOR);
+        repaint();
     }
 
     // everything in the editor is an abstractobject

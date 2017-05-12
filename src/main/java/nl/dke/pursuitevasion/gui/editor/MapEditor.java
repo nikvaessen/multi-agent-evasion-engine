@@ -202,7 +202,7 @@ Dimension d = new Dimension(width, height);
 
             JToggleButton movePoint = new JToggleButton("Adjust Point");
             objectSelectionView.add(movePoint);
-            movePoint.addActionListener(a ->  setMovePointJToggleButton(a,movePoint));
+            movePoint.addActionListener(a -> setMovePointJToggleButton(a, movePoint));
 
             JButton unify = new JButton("Unify Points");
             objectSelectionView.add(unify);
@@ -213,8 +213,17 @@ Dimension d = new Dimension(width, height);
             JButton undoSimplify = new JButton("Undo Simplyfy");
             objectSelectionView.add(undoSimplify);
             undoSimplify.addActionListener(a ->  undoSimplify());
+            JButton kombinePolygones = new JButton("combine Polygones");
+            objectSelectionView.add(kombinePolygones);
+            kombinePolygones.addActionListener(a ->  kombinePolygones());
+
 
         }
+    }
+
+    private void kombinePolygones() {
+        if (modelView == null) return;
+        modelView.combinePolygones();
     }
 
     private void undoSimplify() {
