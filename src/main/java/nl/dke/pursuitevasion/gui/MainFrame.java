@@ -21,7 +21,8 @@ public class MainFrame extends JFrame
 {
     public MainFrame()
     {
-        Map map = Map.getSimpleMap();
+        //Map map = Map.getSimpleMap();
+        Map map = Map.getMap("balbul.ser");
         ArrayList<AbstractAgent> agents = new ArrayList<>();
         MapViewPanel panel = new MapViewPanel(map, agents);
         Engine engine = new Engine(map, agents, panel, 60);

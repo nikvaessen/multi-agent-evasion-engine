@@ -185,8 +185,14 @@ public class Map implements Serializable
      */
     public static Map getSimpleMap()
     {
+        return getMap("level.ser");
+
+    }
+
+    public static Map getMap(String path) {
+
         try {
-            FileInputStream s = new FileInputStream("level.ser");
+            FileInputStream s = new FileInputStream(path);
             ObjectInputStream o = new ObjectInputStream(s);
             Map m = (Map)o.readObject();
             return m;
@@ -212,7 +218,5 @@ public class Map implements Serializable
                     .finish()
                     .build();
         }
-
     }
-
 }

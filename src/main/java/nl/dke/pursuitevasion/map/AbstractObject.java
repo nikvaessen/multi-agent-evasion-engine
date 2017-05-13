@@ -1,5 +1,6 @@
 package nl.dke.pursuitevasion.map;
 
+import java.awt.*;
 import java.io.Serializable;
 
 /**
@@ -64,5 +65,14 @@ public abstract class AbstractObject implements Serializable
     public boolean equals(Object o)
     {
         return (o instanceof AbstractObject) && ((AbstractObject) o).getID() == this.id;
+    }
+
+    public boolean contains(Point p) {
+        if (polygon.contains(p)) return true;
+        for (int i = 0; i < polygon.npoints; i++) {
+            if (polygon.xpoints[i] == p.x &&polygon.ypoints[i] == p.y) return true;
+
+        }
+        return false;
     }
 }

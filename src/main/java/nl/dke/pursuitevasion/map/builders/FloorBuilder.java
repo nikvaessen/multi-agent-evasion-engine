@@ -1,9 +1,8 @@
 package nl.dke.pursuitevasion.map.builders;
 
+import nl.dke.pursuitevasion.map.AbstractObject;
 import nl.dke.pursuitevasion.map.MapPolygon;
-import nl.dke.pursuitevasion.map.impl.Floor;
-import nl.dke.pursuitevasion.map.impl.Gate;
-import nl.dke.pursuitevasion.map.impl.Obstacle;
+import nl.dke.pursuitevasion.map.impl.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,6 +21,10 @@ public class FloorBuilder
      * Collection of gates which will be placed on the floor
      */
     private Collection<Gate> gates;
+
+    private Collection<Exit> exits;
+    private Collection<EntryPursuer> entryPursuer;
+    private Collection<EntryEvader> entryEvader;
 
     /**
      * The MapBuilder which is using this FloorBuilder to create a floor
@@ -103,6 +106,27 @@ public class FloorBuilder
         gates.add(gate);
     }
 
+    protected void addExit(Exit exit)
+            throws IllegalArgumentException
+    {
+        checkPolygonIsInside(exit.getPolygon());
+        exits.add(exit);
+    }
+
+    protected void addEntryPursuer(EntryPursuer entry)
+            throws IllegalArgumentException
+    {
+        checkPolygonIsInside(entry.getPolygon());
+        entryPursuer.add(entry);
+    }
+
+    protected void addEntryEvader(EntryEvader evader)
+            throws IllegalArgumentException
+    {
+        checkPolygonIsInside(evader.getPolygon());
+        entryEvader.add(evader);
+    }
+
     /**
      * Get the floor object which has been constructed by this builder. This can only be done once
      *
@@ -116,7 +140,7 @@ public class FloorBuilder
             throw new IllegalStateException("Floor has already been constructed once");
         }
         constructed = true;
-        return new Floor(polygon, floorID, obstacles, gates);
+        return new Floor(polygon, floorID, obstacles, gates,exits,entryPursuer,entryEvader);
     }
 
     /**

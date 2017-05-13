@@ -15,5 +15,8 @@ public enum ObjectType
 {
     FLOOR,
     GATE,
-    OBSTACLE
+    OBSTACLE,
+    EXIT,
+    ENTRY_PURSUER,
+    ENTRY_EVADER
 }

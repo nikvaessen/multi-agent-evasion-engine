@@ -25,6 +25,10 @@ public class Floor extends AbstractObject
      * Gates can be placed on the floor to go to another floor
      */
     private final Collection<Gate> gates;
+    private final Collection<Exit> exits;
+    private final Collection<EntryPursuer> entryPursuer;
+    private final Collection<EntryEvader> entryEvader;
+
 
     /**
      * Create a floor object
@@ -34,14 +38,19 @@ public class Floor extends AbstractObject
      * @param obstacles a list of obstacles placed on this floor
      * @param gates a list of gates placed on this floor
      */
-    public Floor(MapPolygon polygon, int floodID, Collection<Obstacle> obstacles, Collection<Gate> gates)
+    public Floor(MapPolygon polygon, int floodID, Collection<Obstacle> obstacles,
+                 Collection<Gate> gates, Collection<Exit> exits,Collection<EntryPursuer> entryPursuer,
+                 Collection<EntryEvader> entryEvader)
         throws IllegalArgumentException
     {
         super(polygon, floodID);
-        verifyInsideFloor(obstacles);
-        verifyInsideFloor(gates);
+        //verifyInsideFloor(obstacles);
+        //verifyInsideFloor(gates);
         this.obstacles = Collections.unmodifiableCollection(obstacles);
         this.gates = Collections.unmodifiableCollection(gates);
+        this.exits = Collections.unmodifiableCollection(exits);
+        this.entryEvader = Collections.unmodifiableCollection(entryEvader);
+        this.entryPursuer = Collections.unmodifiableCollection(entryPursuer);
     }
 
     /**
@@ -92,4 +101,17 @@ public class Floor extends AbstractObject
     {
         return ObjectType.FLOOR;
     }
+    public Collection<Exit> getExit()
+    {
+        return exits;
+    }
+    public Collection<EntryPursuer> getEntryPursuer()
+    {
+        return entryPursuer;
+    }
+    public Collection<EntryEvader> getEntryEvader()
+    {
+        return entryEvader;
+    }
+
 }

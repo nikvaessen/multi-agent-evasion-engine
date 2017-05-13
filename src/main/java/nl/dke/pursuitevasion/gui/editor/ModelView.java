@@ -1,14 +1,13 @@
 package nl.dke.pursuitevasion.gui.editor;
 
+import nl.dke.pursuitevasion.game.EngineConstants;
 import nl.dke.pursuitevasion.gui.Voronoi;
 import nl.dke.pursuitevasion.map.MapPolygon;
-import nl.dke.pursuitevasion.map.impl.Map;
-import nl.dke.pursuitevasion.map.impl.Floor;
-import nl.dke.pursuitevasion.map.impl.Obstacle;
-import nl.dke.pursuitevasion.map.impl.Gate;
+import nl.dke.pursuitevasion.map.impl.*;
 
 import nl.dke.pursuitevasion.map.AbstractObject;
 import nl.dke.pursuitevasion.map.ObjectType;
+import nl.dke.pursuitevasion.map.impl.Map;
 
 
 import javax.swing.*;
@@ -76,6 +75,27 @@ public class ModelView extends JPanel {
                 LastID++;
                 ep = new EditorObject(polygon,LastID);
                 ep.setType(ObjectType.OBSTACLE);
+            }
+            if (selectionStates.get(polygon) == SelectionState.exit){
+                ep.setType(ObjectType.FLOOR);
+                objects.add(ep);
+                LastID++;
+                ep = new EditorObject(polygon,LastID);
+                ep.setType(ObjectType.EXIT);
+            }
+            if (selectionStates.get(polygon) == SelectionState.entry_evader){
+                ep.setType(ObjectType.FLOOR);
+                objects.add(ep);
+                LastID++;
+                ep = new EditorObject(polygon,LastID);
+                ep.setType(ObjectType.ENTRY_EVADER);
+            }
+            if (selectionStates.get(polygon) == SelectionState.entry_pursuer){
+                ep.setType(ObjectType.FLOOR);
+                objects.add(ep);
+                LastID++;
+                ep = new EditorObject(polygon,LastID);
+                ep.setType(ObjectType.ENTRY_PURSUER);
             }
 
             objects.add(ep);
@@ -301,7 +321,11 @@ public class ModelView extends JPanel {
         for(EditorObject e : objects){
             if(e.getType() == ObjectType.FLOOR){
                 List<Obstacle> obstacles = getObstacles(e, objects);
-                floors.add(new Floor(e.getPolygon(), e.getID(), obstacles, new ArrayList<Gate>()));
+                List<Exit> exits = getExits(e, objects);
+                List<EntryEvader> entryEvader = getEntryEvader(e, objects);
+                List<EntryPursuer> entryPursuer = getEntryPursuer(e, objects);
+
+                floors.add(new Floor(e.getPolygon(), e.getID(), obstacles, new ArrayList<Gate>(), exits,entryPursuer,entryEvader));
             }
         }
         Map m = new Map(floors);
@@ -310,17 +334,72 @@ public class ModelView extends JPanel {
         return m;
     }
 
+    private List<EntryPursuer> getEntryPursuer(EditorObject floor, List<EditorObject> objects) {
+        List<EditorObject> floorObstacles;
+        floorObstacles = getObjectsInsideFloorObject(floor,objects);
+        List<EntryPursuer> os = new ArrayList<>();
+        // Create floor objects
+        for(EditorObject e : floorObstacles){
+            if (e.getType()!= ObjectType.ENTRY_PURSUER) continue;
+            EntryPursuer ep = new EntryPursuer(e.getPolygon(), e.getID(), floor.getID());
+            os.add(ep);
+        }
+        return os;
+    }
+
+    private List<EntryEvader> getEntryEvader(EditorObject floor, List<EditorObject> objects) {
+        List<EditorObject> floorObstacles;
+        floorObstacles = getObjectsInsideFloorObject(floor,objects);
+        List<EntryEvader> os = new ArrayList<>();
+        // Create floor objects
+        for(EditorObject e : floorObstacles){
+            if (e.getType()!= ObjectType.ENTRY_EVADER) continue;
+            EntryEvader obstacle = new EntryEvader(e.getPolygon(), e.getID(), floor.getID());
+            os.add(obstacle);
+        }
+        return os;
+    }
+    private List<Exit> getExits(EditorObject floor, List<EditorObject> objects){
+        List<EditorObject> floorObstacles;
+        floorObstacles = getObjectsInsideFloorObject(floor,objects);
+        List<Exit> os = new ArrayList<>();
+        // Create floor objects
+        for(EditorObject e : floorObstacles){
+            if (e.getType()!= ObjectType.EXIT) continue;
+            Exit obstacle = new Exit(e.getPolygon(), e.getID(), floor.getID());
+            os.add(obstacle);
+        }
+        return os;
+
+    }
     private List<Obstacle> getObstacles(EditorObject floor, List<EditorObject> obstacles){
+        List<EditorObject> floorObstacles;
+        floorObstacles = getObjectsInsideFloorObject(floor,obstacles);
+        List<Obstacle> os = new ArrayList<>();
+        // Create floor objects
+        for(EditorObject e : floorObstacles){
+            if (e.getType()!= ObjectType.OBSTACLE) continue;
+            Obstacle obstacle = new Obstacle(e.getPolygon(), e.getID(), floor.getID());
+            os.add(obstacle);
+        }
+        return os;
+
+    }
+
+
+
+    private  List<EditorObject> getObjectsInsideFloorObject(EditorObject floor, List<EditorObject> obstacles) {
         List<EditorObject> floorObstacles = new ArrayList<>();
         Polygon floorPolygon = floor.getPolygon();
 
         for(EditorObject obstacle : obstacles){
+            if (floor == obstacle) continue;
             boolean contains = true;
             // check if all point are within the floor
             Polygon obstaclePolygon = obstacle.getPolygon();
             for (int i = 0; i < obstaclePolygon.npoints; i++){
                 Point p = new Point(obstaclePolygon.xpoints[i], obstaclePolygon.ypoints[i]);
-                if(!floorPolygon.contains(p)){
+                if(!floor.contains(p)){
                     contains = false;
                 }
             }
@@ -328,15 +407,11 @@ public class ModelView extends JPanel {
                 floorObstacles.add(obstacle);
             }
         }
-        List<Obstacle> os = new ArrayList<>();
-        // Create floor objects
-        for(EditorObject e : floorObstacles){
-            Obstacle obstacle = new Obstacle(e.getPolygon(), e.getID(), floor.getID());
-            os.add(obstacle);
-        }
-        return os;
-
+        return floorObstacles;
     }
+
+
+
     private void addKeyboardListener(){
         System.out.println("adding keyboardlistener");
         Action undoAction = new AbstractAction() {
@@ -407,7 +482,7 @@ public class ModelView extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 System.out.print("got mouse event");
                 Point click = new Point(e.getX(), e.getY());
-
+                System.out.println(" " + click);
                 //middle mouse button event
                 if (e.getButton() == MouseEvent.BUTTON2) {
                     if (vronoiGeneration == true) {
@@ -482,6 +557,12 @@ public class ModelView extends JPanel {
                                     else if (selState == SelectionState.floor)
                                         selectionStates.put(p, SelectionState.waal);
                                     else if (selState == SelectionState.waal)
+                                        selectionStates.put(p, SelectionState.entry_evader);
+                                    else if (selState == SelectionState.entry_evader)
+                                        selectionStates.put(p, SelectionState.entry_pursuer);
+                                    else if (selState == SelectionState.entry_pursuer)
+                                        selectionStates.put(p, SelectionState.exit);
+                                    else if (selState == SelectionState.exit)
                                         selectionStates.put(p, SelectionState.empty);
 
                                 }
@@ -584,9 +665,27 @@ public class ModelView extends JPanel {
                 objects.add(eo2);
             };
 
+
             for (Gate g : f.getGates()){
                 EditorObject eo2 = new EditorObject(g.getPolygon(),LastID++);
                 eo2.setType(ObjectType.GATE);
+                objects.add(eo2);
+            };
+
+            for (AbstractObject g : f.getExit()){
+                EditorObject eo2 = new EditorObject(g.getPolygon(),LastID++);
+                eo2.setType(ObjectType.EXIT);
+                objects.add(eo2);
+            };
+
+            for (AbstractObject g : f.getEntryPursuer()){
+                EditorObject eo2 = new EditorObject(g.getPolygon(),LastID++);
+                eo2.setType(ObjectType.ENTRY_PURSUER);
+                objects.add(eo2);
+            };
+            for (AbstractObject g : f.getEntryEvader()){
+                EditorObject eo2 = new EditorObject(g.getPolygon(),LastID++);
+                eo2.setType(ObjectType.ENTRY_EVADER);
                 objects.add(eo2);
             };
 
@@ -640,10 +739,16 @@ public class ModelView extends JPanel {
 
             switch (o.getType()){
                 case FLOOR:
-                    c = new Color(153,204,255); break;
+                    c = EngineConstants.FLOOR_ALT_COLOR; break;
 
                 case OBSTACLE:
-                    c = new Color(123,244,123); break;
+                    c = EngineConstants.OBSTACLE_ALT_COLOR; break;
+                case EXIT:
+                    c = EngineConstants.EXIT_COLOR; break;
+                case ENTRY_EVADER:
+                    c = EngineConstants.ENTRY_EVADER_COLOR; break;
+                case ENTRY_PURSUER:
+                    c = EngineConstants.ENTRY_PURSUER_COLOR; break;
 
             }
 
@@ -655,13 +760,9 @@ public class ModelView extends JPanel {
                 g2d.setColor(c);
                 g2d.fill(o.getPolygon());
             }
-            switch (o.getType()){
-                case FLOOR:
-                    c = Color.blue; break;
-                case OBSTACLE:
-                    c = Color.GREEN; break;
-            }
-            g2d.setColor(c);
+
+            System.out.println("Painting: " + o.getType());
+            g2d.setColor(Color.BLACK);
             g2d.draw(o.getPolygon());
         }
 
@@ -674,18 +775,36 @@ public class ModelView extends JPanel {
            // g2d.setStroke(new BasicStroke(2));
             switch (ss) {
                 case floor:
-                    g2d.setColor(Color.ORANGE);
+                    g2d.setColor(EngineConstants.FLOOR_ALT_COLOR);
                     g2d.fillPolygon(poly);
                     g2d.setColor(Color.BLACK);
                     g2d.drawPolygon(poly);
                     break;
                 case waal:
-                    g2d.setColor(Color.GREEN);
+                    g2d.setColor(EngineConstants.OBSTACLE_ALT_COLOR);
                     g2d.fillPolygon(poly);
                     g2d.setColor(Color.BLACK);
                     g2d.drawPolygon(poly);
                     break;
                 case empty:
+                    g2d.setColor(Color.BLACK);
+                    g2d.drawPolygon(poly);
+                    break;
+                case entry_evader:
+                    g2d.setColor(EngineConstants.ENTRY_EVADER_COLOR);
+                    g2d.fillPolygon(poly);
+                    g2d.setColor(Color.BLACK);
+                    g2d.drawPolygon(poly);
+                    break;
+                case entry_pursuer:
+                    g2d.setColor(EngineConstants.ENTRY_PURSUER_COLOR);
+                    g2d.fillPolygon(poly);
+                    g2d.setColor(Color.BLACK);
+                    g2d.drawPolygon(poly);
+                    break;
+                case exit:
+                    g2d.setColor(EngineConstants.EXIT_COLOR);
+                    g2d.fillPolygon(poly);
                     g2d.setColor(Color.BLACK);
                     g2d.drawPolygon(poly);
                     break;
@@ -732,7 +851,7 @@ public class ModelView extends JPanel {
 
 
     private enum SelectionState{
-        floor,waal,empty;
+        floor,waal,empty, exit,  entry_pursuer, entry_evader;
 
     }
 
