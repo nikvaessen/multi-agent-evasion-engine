@@ -1,5 +1,6 @@
 package nl.dke.pursuitevasion.gui.simulator;
 
+import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.impl.Map;
@@ -61,10 +62,10 @@ public class MapViewPanel
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         for(AbstractAgent agent : agents)
         {
-            Point.Double doubleLocation = agent.getLocation();
+            Vector2D vLocation = agent.getLocation();
             Point location = new Point(
-                    new Long(Math.round(doubleLocation.getX())).intValue(),
-                    new Long(Math.round(doubleLocation.getY())).intValue()
+                    new Long(Math.round(vLocation.getX())).intValue(),
+                    new Long(Math.round(vLocation.getY())).intValue()
             );
 
             int radius = agent.getRadius();

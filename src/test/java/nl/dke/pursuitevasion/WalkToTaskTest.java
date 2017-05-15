@@ -1,6 +1,7 @@
 package nl.dke.pursuitevasion;
 
 import nl.dke.pursuitevasion.game.EngineConstants;
+import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AgentCommand;
 import nl.dke.pursuitevasion.game.agents.Direction;
 import nl.dke.pursuitevasion.game.agents.impl.SimpleAgent;
@@ -21,8 +22,8 @@ public class WalkToTaskTest {
     {
         Map map = Map.getSimpleMap();
         Floor floor = null;
-        Point.Double startLocation = new Point.Double(15, 15);
-        Point.Double goalLocation = new Point.Double(500, 500);
+        Vector2D startLocation = new Vector2D(15, 15);
+        Vector2D goalLocation = new Vector2D(500, 500);
         for(Floor f : map.getFloors())
         {
             floor = f;

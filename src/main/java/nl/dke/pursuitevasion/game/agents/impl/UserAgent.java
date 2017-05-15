@@ -1,6 +1,7 @@
 package nl.dke.pursuitevasion.game.agents.impl;
 
 import nl.dke.pursuitevasion.game.EngineConstants;
+import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.AgentRequest;
 import nl.dke.pursuitevasion.game.agents.Direction;
@@ -30,7 +31,7 @@ public class UserAgent
     private boolean west;
     private boolean east;
 
-    public UserAgent(Map map, Floor startingFloor, Point.Double startLocation, Direction startsFacing, int radius,
+    public UserAgent(Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing, int radius,
                      double visionRange, double visionAngle, KeyboardInputListener listener)
     {
         super(map, startingFloor, startLocation, startsFacing, radius, visionRange, visionAngle);
@@ -138,10 +139,10 @@ public class UserAgent
         east = setTo;
     }
 
-    private Point.Double getMoveToLocation(Point.Double location)
+    private Vector2D getMoveToLocation(Vector2D location)
     {
-        double x = location.x;
-        double y = location.y;
+        double x = location.getX();
+        double y = location.getY();
         if(north)
         {
             y -= EngineConstants.WALKING_SPEED;
@@ -158,7 +159,7 @@ public class UserAgent
         {
             x += EngineConstants.WALKING_SPEED;
         }
-        return new Point.Double(x, y);
+        return new Vector2D(x, y);
     }
 
     @Override
