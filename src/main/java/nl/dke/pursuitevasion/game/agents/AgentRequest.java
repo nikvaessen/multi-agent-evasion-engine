@@ -21,7 +21,11 @@ import java.util.LinkedList;
  * Created by nik on 03/03/17.
  */
 public class AgentRequest
-{;;
+{
+
+    /**
+     * The logger of this class
+     */
     private static final Logger logger = LoggerFactory.getLogger(AbstractAgent.class);
 
     /**

@@ -138,7 +138,7 @@ public class Engine
 
                 // 3. Validate legality of moves
 
-                //first filter out any invalidated/completed requests
+                // first filter out any invalidated/completed requests
                 if(logger.isDebugEnabled())
                 {
                     logger.debug("Handling {} requests", requests.size());
@@ -152,7 +152,7 @@ public class Engine
                     }
                 });
 
-                //go over all requests and get the agent commands
+                // go over all requests and get the agent commands
                 if(logger.isDebugEnabled())
                 {
                     logger.debug("{} requests left after deleting all completed requests", requests.size());
@@ -160,11 +160,11 @@ public class Engine
 
                 for(AgentRequest request : requests)
                 {
-                    logger.trace("is completed: {}", request.isCompleted());
+                    logger.trace("Handling request {}, which is completed: {}", request, request.isCompleted());
                     handleRequest(request);
                 }
 
-                //check if all commands are valid
+                // check if all commands are valid
                 validateCommands();
 
                 // 4. Make the moves
@@ -228,6 +228,7 @@ public class Engine
             if(logger.isTraceEnabled())
             {
                 logger.trace("Resolving request {}", request);
+                logger.trace("Request for Agent {}", request.getAgent());
                 logger.trace("Allowed meters: {} Allowed rotation: {}", allowedMeters, allowedRotation);
             }
 
@@ -244,8 +245,10 @@ public class Engine
                     if(logger.isTraceEnabled())
                     {
                         logger.trace("Added to commands: {} ", command);
+                        logger.trace("peeked request: {}", task);
                         logger.trace("allowed meters left: {}", allowedMeters);
                         logger.trace("allowed rotation left: {}", allowedRotation);
+                        logger.trace("request is completed: {}", request.isCompleted());
                     }
                 }
                 catch(IllegalStateException e)
@@ -254,7 +257,13 @@ public class Engine
                     break;
                 }
             }
-            while(!request.isCompleted() && allowedMeters - 0 < 0.001 && allowedRotation - 0 < 0.001);
+            while(!request.isCompleted() && Math.abs(allowedMeters - 0) < 0.001
+                  && Math.abs(allowedRotation - 0) < 0.001);
+
+            if(logger.isTraceEnabled())
+            {
+                logger.trace("Broke out of while loop. The request {} has been handled", request);
+            }
         }
 
         private void validateCommands()
