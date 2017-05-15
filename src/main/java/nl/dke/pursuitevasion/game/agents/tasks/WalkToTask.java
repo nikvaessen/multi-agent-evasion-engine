@@ -65,19 +65,21 @@ public class WalkToTask
             }
             else
             {
-                Vector2D location = agent.getLocation();
+                // the old location
+                Vector2D oldLocation = agent.getLocation();
 
-                Vector2D movement = ;
+                // calculate the vector describing the movement from old to new location
+                Vector2D movement = oldLocation.subtract(walkToLocation);
 
-                setToLength(movement, maxDistance);
+                // scale the movement vector to the allowed moveable distance
+                double scalar = 1 / (movement.length() / maxDistance);
+                movement = movement.scale(scalar);
 
-                location.setLocation(
-                    location.x + movement.x,
-                    location.y + movement.y
-                );
+                // get the new location by adding the allowed movement to the new location
+                Vector2D newLocation = oldLocation.add(movement);
 
-                logger.trace("{} can move to location {} in the allowed movable distance", this, location);
-                return new AgentCommand(agent, location);
+                logger.trace("{} can move to location {} in the allowed movable distance", this, newLocation);
+                return new AgentCommand(agent, newLocation);
             }
         }
     }

@@ -2,6 +2,7 @@ package nl.dke.pursuitevasion.gui;
 
 import nl.dke.pursuitevasion.game.Engine;
 import nl.dke.pursuitevasion.game.EngineConstants;
+import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.Direction;
 import nl.dke.pursuitevasion.game.agents.impl.SimpleAgent;
@@ -36,8 +37,8 @@ public class MainFrame extends JFrame
         }
 
         //agents.add(new SimpleAgent(new Point(5,5), Direction.SOUTH, 5));
-        agents.add(new UserAgent(map, floor, new Point.Double(10, 10), Direction.SOUTH, 5,
-                   EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, keyboardInputListener));
+        agents.add(new UserAgent(map, floor, new Vector2D(10, 10), Direction.SOUTH, 5,
+                                 EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, keyboardInputListener));
 //        agents.add(new SimpleAgent(map, floor, new Point.Double(15,15), Direction.SOUTH, 5,
 //                EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
 
