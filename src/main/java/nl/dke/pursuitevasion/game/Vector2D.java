@@ -181,6 +181,6 @@ public class Vector2D
     @Override
     public String toString()
     {
-        return String.format("Vector2D[x:%f,y:%f", this.x, this.y);
+        return String.format("Vector2D[x:%f,y:%f]", this.x, this.y);
     }
 }
