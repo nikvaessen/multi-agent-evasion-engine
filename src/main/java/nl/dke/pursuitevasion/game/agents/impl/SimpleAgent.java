@@ -25,7 +25,7 @@ public class SimpleAgent
 {
     private static Logger logger = LoggerFactory.getLogger(SimpleAgent.class);
 
-    Vector2D goal = new Vector2D(15, 100);
+    Vector2D goal = new Vector2D(0, 0);
     private boolean hasRequest;
 
     public SimpleAgent(Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing, int radius,
