@@ -3,6 +3,8 @@ package nl.dke.pursuitevasion.game.agents.tasks;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.AgentCommand;
 import nl.dke.pursuitevasion.game.agents.Angle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by nik on 03/03/17.
@@ -10,6 +12,7 @@ import nl.dke.pursuitevasion.game.agents.Angle;
 public class RotateTask
     extends AbstractAgentTask
 {
+    private final static Logger logger = LoggerFactory.getLogger(RotateTask.class);
 
     private double rotateToAngle;
     private boolean clockwise;
@@ -77,6 +80,22 @@ public class RotateTask
     @Override
     protected boolean completesTask(AgentCommand command)
     {
+        if(logger.isTraceEnabled())
+        {
+            logger.trace("checking if command {} finishes RotateTask {}", command, this);
+            logger.trace("old angle: {}, new angle: {}, goal angle: {} finished: {}",
+                         command.getAgent().getFacingAngle(),
+                         command.getNewAngle().getAngle(),
+                         rotateToAngle,
+                         Math.abs(command.getNewAngle().getAngle() - rotateToAngle) < 0.0001
+                         );
+        }
         return Math.abs(command.getNewAngle().getAngle() - rotateToAngle) < 0.0001;
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.format("RotateTask[newAngle:%f]", rotateToAngle);
     }
 }

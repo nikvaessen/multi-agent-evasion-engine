@@ -14,7 +14,6 @@ import nl.dke.pursuitevasion.map.impl.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
 import java.awt.event.KeyEvent;
 
 /**
@@ -87,10 +86,10 @@ public class UserAgent
                 handleWestCommand(setTo);
                 break;
             case KeyEvent.VK_D:
-                handlEastCommand(setTo);
+                handleEastCommand(setTo);
                 break;
             case KeyEvent.VK_RIGHT:
-                handlEastCommand(setTo);
+                handleEastCommand(setTo);
                 break;
             default: // other characters not interesting
                 break;
@@ -130,7 +129,7 @@ public class UserAgent
         west = setTo;
     }
 
-    private void handlEastCommand(boolean setTo)
+    private void handleEastCommand(boolean setTo)
     {
         if(west && setTo)
         {

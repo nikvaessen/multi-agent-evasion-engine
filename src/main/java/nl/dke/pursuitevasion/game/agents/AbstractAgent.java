@@ -272,6 +272,12 @@ public abstract class AbstractAgent
      */
     public abstract boolean isEvader();
 
+    @Override
+    public String toString()
+    {
+        return String.format("Agent[location:%s, facing: %f", location.toString(), facing.getAngle());
+    }
+
     public VisionArc getVisionArc()
     {
         return visionArc;

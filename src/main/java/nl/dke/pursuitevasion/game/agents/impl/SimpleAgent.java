@@ -25,7 +25,7 @@ public class SimpleAgent
 {
     private static Logger logger = LoggerFactory.getLogger(SimpleAgent.class);
 
-    Vector2D goal = new Vector2D(500, 500);
+    Vector2D goal = new Vector2D(15, 100);
     private boolean hasRequest;
 
     public SimpleAgent(Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing, int radius,
@@ -50,39 +50,36 @@ public class SimpleAgent
             if(super.location.getX() > goal.getX())
             {
                 Direction direction = Direction.getDirection(false, false, false, true);
-                request.add(new RotateTask(Direction.getAngle(direction)));
                 request.add(new WalkToTask(goal));
+                request.add(new RotateTask(Direction.getAngle(direction)));
                 hasRequest = false;
                 return;
             }
             else if(super.location.getX() < goal.getX())
             {
                 Direction direction = Direction.getDirection(false, false, true, false);
-                request.add(new RotateTask(Direction.getAngle(direction)));
                 request.add(new WalkToTask(goal));
+                request.add(new RotateTask(Direction.getAngle(direction)));
                 hasRequest = false;
                 return;
             }
         }
-        else
-        {
 
-        }
         if(super.location.getY() != goal.getY())
         {
             if(super.location.getY() > goal.getY())
             {
                 Direction direction = Direction.getDirection(true, false, false, false);
-                request.add(new RotateTask(Direction.getAngle(direction)));
                 request.add(new WalkToTask(goal));
+                request.add(new RotateTask(Direction.getAngle(direction)));
                 hasRequest = false;
                 return;
             }
             else if(super.location.getY() < goal.getY())
             {
                 Direction direction = Direction.getDirection(false, true, false, false);
-                request.add(new RotateTask(Direction.getAngle(direction)));
                 request.add(new WalkToTask(goal));
+                request.add(new RotateTask(Direction.getAngle(direction)));
                 hasRequest = false;
                 return;
             }

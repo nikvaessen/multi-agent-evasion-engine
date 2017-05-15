@@ -69,7 +69,7 @@ public class WalkToTask
                 Vector2D oldLocation = agent.getLocation();
 
                 // calculate the vector describing the movement from old to new location
-                Vector2D movement = oldLocation.subtract(walkToLocation);
+                Vector2D movement = oldLocation.add(walkToLocation);
 
                 // scale the movement vector to the allowed moveable distance
                 double scalar = 1 / (movement.length() / maxDistance);
@@ -78,16 +78,16 @@ public class WalkToTask
                 // get the new location by adding the allowed movement to the new location
                 Vector2D newLocation = oldLocation.add(movement);
 
-                logger.trace("{} can move to location {} in the allowed movable distance", this, newLocation);
+                if(logger.isTraceEnabled())
+                {
+                    logger.trace("{} can move to location {} in the allowed movable distance", this, newLocation);
+                    logger.trace("oldLocation: {} movement: {} scalar: {}, newLocation: {}",
+                                 oldLocation, movement, scalar, newLocation);
+                }
+
                 return new AgentCommand(agent, newLocation);
             }
         }
-    }
-
-    private Point.Double setToLength(Point.Double v, double length)
-    {
-        double scale = length / Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.y, 2));
-        return new Point2D.Double(v.x * scale, v.y * scale);
     }
 
     /**
