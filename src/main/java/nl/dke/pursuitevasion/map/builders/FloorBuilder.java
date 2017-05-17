@@ -62,9 +62,14 @@ public class FloorBuilder
     {
         this.obstacles = new ArrayList<Obstacle>();
         this.gates = new ArrayList<Gate>();
+        this.exits = new ArrayList<Exit>();
         this.builder = builder;
         this.register = register;
         this.polygon = polygon;
+
+        this.entryEvader = new ArrayList<>();
+        this.entryPursuer = new ArrayList<>();
+
         constructed = false;
         floorID = register.getUniqueID();
     }
