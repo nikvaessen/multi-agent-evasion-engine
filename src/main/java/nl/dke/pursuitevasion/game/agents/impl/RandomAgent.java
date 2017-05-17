@@ -32,7 +32,7 @@ public class RandomAgent extends AbstractAgent{
         super(map, startingFloor, startLocation, startsFacing, radius, visionRange, visionAngle);
     }
 
-    AgentRequest currentRequest;
+    private AgentRequest currentRequest;
 
     public boolean hasNewRequest(){
         return (currentRequest == null || currentRequest.isCompleted());
@@ -46,13 +46,11 @@ public class RandomAgent extends AbstractAgent{
             angle = angle * -1;
         }
         double newAngle = this.getFacingAngle() + angle;
-        System.out.println(String.format("old angle: %f. new angle: %f", this.getFacingAngle(), newAngle));
         request.add(new RotateTask(newAngle));
 
         double distance = ThreadLocalRandom.current().nextDouble(EngineConstants.WALKING_SPEED);
         request.add(new WalkForwardTask(distance));
-
-
+        currentRequest = request;
     };
 
     public static void main(String[] args){
