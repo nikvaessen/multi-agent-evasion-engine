@@ -84,23 +84,23 @@ public class SimpleAgent
         Ellipse2D.Double circle = new Ellipse2D.Double
                 (p.x-super.getRadius(), p.y-super.getRadius(), super.getRadius()*2, super.getRadius()*2);
         for (Obstacle obs: obstacles) {
-            Point north = new Point((int)(circle.getX()+(circle.getHeight()/2)), (int) (circle.getY()));
-            Point south = new Point((int)(circle.getX()+(circle.getHeight()/2)), (int) (circle.getY()+circle.getHeight()));
-            Point east = new Point((int)(circle.getX()+(circle.getHeight())), (int) (circle.getY()+circle.getHeight()/2));
-            Point west = new Point((int)(circle.getX()), (int) (circle.getY()+circle.getHeight()/2));
-            Point southeast = new Point((int)( (circle.getX()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.cos(0.25*Math.PI)) ),
-                    (int) ( (circle.getY()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.sin(0.25*Math.PI)) ) );
-            Point southwest = new Point((int)( (circle.getX()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.cos(0.75*Math.PI)) ),
-                    (int) ( (circle.getY()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.sin(0.75*Math.PI)) ) );
-            Point northwest = new Point((int)( (circle.getX()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.cos(1.25*Math.PI)) ),
-                    (int) ( (circle.getY()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.sin(1.25*Math.PI)) ) );
-            Point northeast = new Point((int)( (circle.getX()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.cos(1.75*Math.PI)) ),
-                    (int) ( (circle.getY()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.sin(1.75*Math.PI)) ) );
-            if ( obs.getPolygon().contains(north) || obs.getPolygon().contains(south) || obs.getPolygon().contains(east)
-                    || obs.getPolygon().contains(west) || obs.getPolygon().contains(southeast)
-                    || obs.getPolygon().contains(southwest) || obs.getPolygon().contains(northeast)
-                    || obs.getPolygon().contains(northwest) ){
-                return true;
+
+            Point[] cornerPoints = new Point[8];
+            cornerPoints[0] = new Point ((int)(circle.getX()+(circle.getHeight()/2)),   (int) (circle.getY()));
+            cornerPoints[1] = new Point ((int)(circle.getX()+(circle.getHeight()/2)),   (int) (circle.getY()+circle.getHeight()));
+            cornerPoints[2] = new Point ((int)(circle.getX()+(circle.getHeight())),     (int) (circle.getY()+circle.getHeight()/2));
+            cornerPoints[3] = new Point ((int)(circle.getX()),                          (int) (circle.getY()+circle.getHeight()/2));
+            double var = 0.25;
+            for (int i=4; i<cornerPoints.length; i++){
+                cornerPoints [i] = new Point((int)( (circle.getX()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.cos(var*Math.PI)) ),
+                        (int) ( (circle.getY()+(circle.getHeight()/2))+((circle.getHeight()/2)*Math.sin(var*Math.PI)) ) );
+                var=var+0.5;
+            }
+
+            for (int i=0; i<cornerPoints.length; i++){
+                if (obs.getPolygon().contains(cornerPoints[i])){
+                    return true;
+                }
             }
         }
         return false;

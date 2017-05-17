@@ -4,6 +4,9 @@ import nl.dke.pursuitevasion.map.AbstractObject;
 import nl.dke.pursuitevasion.map.ObjectType;
 import nl.dke.pursuitevasion.map.MapPolygon;
 
+import java.awt.*;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -65,6 +68,29 @@ public class Floor extends AbstractObject
             }
         }
     }
+
+    public ArrayList<Polygon> getTriangulation(){
+        ArrayList<Polygon> triangles = new ArrayList<>();
+
+        // compute closest distance to outer polygon
+
+        for (Obstacle obs  : obstacles){
+            Object[] test = obstacles.toArray();
+            for(int i=0; i<obs.getPolygon().xpoints.length; i++){
+            }
+        }
+
+        // compute closest link between obstacles
+
+        // connect last of the chain to other border
+
+        // split poylgon in two parts
+
+        //implement triangulation by ear-clipping
+
+        return triangles;
+    }
+
 
     /**
      * A read-only list of the obstacles on the floor
