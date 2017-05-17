@@ -1,5 +1,6 @@
 package nl.dke.pursuitevasion.game.agents.tasks;
 
+import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.AgentCommand;
 import nl.dke.pursuitevasion.game.agents.Angle;
@@ -25,8 +26,8 @@ public class WalkForwardTask extends AbstractAgentTask {
         double opposite = -Math.sin(angle) * walkDistance;
         double adjacent = Math.cos(angle) * walkDistance;
 
-        Point location = agent.getLocation();
-        Point newLocation = new Point((int)(location.x + adjacent),(int)( location.y + opposite));
+        Vector2D location = agent.getLocation();
+        Vector2D newLocation = location.add(adjacent, opposite);
 
         return new AgentCommand(agent, newLocation);
     }

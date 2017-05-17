@@ -2,6 +2,7 @@ package nl.dke.pursuitevasion.game.agents.impl;
 
 import nl.dke.pursuitevasion.game.Engine;
 import nl.dke.pursuitevasion.game.EngineConstants;
+import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.AgentCommand;
 import nl.dke.pursuitevasion.game.agents.AgentRequest;
@@ -28,7 +29,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class RandomAgent extends AbstractAgent{
 
-    public RandomAgent(Map map, Floor startingFloor, Point startLocation, Direction startsFacing, int radius, double visionRange, double visionAngle){
+    public RandomAgent(Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing, int radius, double visionRange, double visionAngle){
         super(map, startingFloor, startLocation, startsFacing, radius, visionRange, visionAngle);
     }
 
@@ -68,7 +69,7 @@ public class RandomAgent extends AbstractAgent{
         }
 
         //agents.add(new SimpleAgent(new Point(5,5), Direction.SOUTH, 5));
-        agents.add(new RandomAgent(map, floor, new Point(100,100), Direction.SOUTH, 5, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
+        agents.add(new RandomAgent(map, floor, new Vector2D(100,100), Direction.SOUTH, 5, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
         /*agents.add(new UserAgent(map, floor, new Point(10, 10), Direction.SOUTH, 5,
                 EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, keyboardInputListener));*/
 

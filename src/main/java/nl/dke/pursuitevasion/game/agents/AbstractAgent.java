@@ -323,7 +323,7 @@ public abstract class AbstractAgent
             // check which agents are within the area.
             ArrayList<AbstractAgent> visibleAgents = new ArrayList<AbstractAgent>();
             for(AbstractAgent agent : agents){
-                Point location = agent.getLocation();
+                Vector2D location = agent.getLocation();
                 if(agent.getFloor() == f && inArc(location) && !isObstructed(location, lines)){
                     visibleAgents.add(agent);
                 }
@@ -331,10 +331,11 @@ public abstract class AbstractAgent
             return visibleAgents;
         }
 
-        private boolean isObstructed(Point p, Collection<Line2D> lines){
+        private boolean isObstructed(Vector2D p, Collection<Line2D> lines){
             // check for obstacles that may obstruct line of sight to an agent
             // Check if a line from the agent to the other agent intersects an obstacle line
-            Line2D ray = new Line2D.Double(location, p);
+
+            Line2D ray = new Line2D.Double(location.getX(), location.getY(), p.getX(), p.getY());
             for(Line2D line : lines){
                 if(ray.intersectsLine(line)){
                     return true;
@@ -383,7 +384,7 @@ public abstract class AbstractAgent
             return lines;
         }
 
-        private boolean inArc(Point p){
+        private boolean inArc(Vector2D p){
             if(p.distance(location) > visionRange){
                 return false;
             }
@@ -399,7 +400,7 @@ public abstract class AbstractAgent
 
         }
 
-        private Point calculateBase()
+        private Vector2D calculateBase()
         {
             int dx = new Long(Math.round(Math.cos(facing.getRadians()) * radius)).intValue();
             //change sign of y because y works reversed from normal cartesian plane
@@ -411,10 +412,10 @@ public abstract class AbstractAgent
                         dx, dy, facing.getAngle(), facing.getRadians());
             }
 
-            return new Point(location.getX() + Math.round(dx), location.getY() + Math.round(dy));
+            return new Vector2D(location.getX() + Math.round(dx), location.getY() + Math.round(dy));
         }
 
-        public Point getBasePoint() {
+        public Vector2D getBasePoint() {
             return calculateBase();
         }
     }

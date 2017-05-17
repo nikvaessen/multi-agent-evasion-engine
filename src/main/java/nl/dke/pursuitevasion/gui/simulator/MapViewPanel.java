@@ -73,7 +73,7 @@ public class MapViewPanel
             logger.trace("painting agent at {}", location);
 
             AbstractAgent.VisionArc visionArc = agent.getVisionArc();
-            Point base = visionArc.getBasePoint();
+            Vector2D base = visionArc.getBasePoint();
             logger.trace("the eyes of the agent are at {}",base);
 
             Color color = Color.RED;
@@ -88,7 +88,7 @@ public class MapViewPanel
 
             logger.trace("drawing arc with radius {}, start angle {} and viewing angle {}",
                     visionRadius, startingAngle, new Double(visionAngle).intValue());
-            g.fillArc(base.x - visionRadius, base.y - visionRadius, visionRadius * 2, visionRadius * 2,
+            g.fillArc((int)Math.round(base.getX()) - visionRadius, (int)Math.round(base.getY()) - visionRadius, visionRadius * 2, visionRadius * 2,
                     startingAngle, new Double(visionAngle).intValue());
             //g.fillOval(base.x - 2, base.y - 2, 4, 4 );
 

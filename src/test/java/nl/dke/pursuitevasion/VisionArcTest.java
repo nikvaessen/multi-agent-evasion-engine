@@ -1,5 +1,6 @@
 package nl.dke.pursuitevasion;
 
+import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.Direction;
 import nl.dke.pursuitevasion.game.agents.impl.SimpleAgent;
@@ -25,12 +26,12 @@ public class VisionArcTest {
     public void testInRange(){
         org.junit.Assert.assertTrue(!floors.isEmpty());
         //create simple agent
-        AbstractAgent agent = new SimpleAgent(map, floor, new Point(10, 10), Direction.SOUTH,
+        AbstractAgent agent = new SimpleAgent(map, floor, new Vector2D(10, 10), Direction.SOUTH,
                 5, 30, 120);
         // create agent in vision range of the agent
-        AbstractAgent inRangeAgent = new SimpleAgent(map, floor, new Point(10, 20), Direction.SOUTH, 5, 30, 120);
+        AbstractAgent inRangeAgent = new SimpleAgent(map, floor, new Vector2D(10, 20), Direction.SOUTH, 5, 30, 120);
         // create agent not in vision range
-        AbstractAgent notInRangeAgent = new SimpleAgent(map, floor, new Point(5,5), Direction.NORTH,
+        AbstractAgent notInRangeAgent = new SimpleAgent(map, floor, new Vector2D(5,5), Direction.NORTH,
                 5,30,120);
         Collection<AbstractAgent> agents = new ArrayList<>();
         agents.add(inRangeAgent);
@@ -45,7 +46,7 @@ public class VisionArcTest {
     public void TestObstructed(){
 
         // create agent with infinite vision
-        AbstractAgent agent = new SimpleAgent(map, floor, new Point(10, 10), Direction.SOUTH,
+        AbstractAgent agent = new SimpleAgent(map, floor, new Vector2D(10, 10), Direction.SOUTH,
                 5, 30, 120);
         // create agent behind obstacle
         AbstractAgent hiddenAgent;
