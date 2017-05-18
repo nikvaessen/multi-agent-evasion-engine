@@ -177,8 +177,8 @@ public class UserAgent
             }
 
             Direction direction = Direction.getDirection(north, south, east, west);
-            request.add(new WalkToTask(getMoveToLocation(request.getAgent().getLocation())));
             request.add(new RotateTask(Direction.getAngle(direction)));
+            request.add(new WalkToTask(getMoveToLocation(request.getAgent().getLocation())));
         }
     }
 
