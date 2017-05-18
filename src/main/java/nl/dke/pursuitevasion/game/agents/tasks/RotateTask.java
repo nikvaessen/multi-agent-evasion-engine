@@ -26,7 +26,7 @@ public class RotateTask
 
     public RotateTask(double rotateToAngle)
     {
-        this.rotateToAngle = rotateToAngle;
+        this.rotateToAngle = rotateToAngle % 360;
         this.shortest = true;
     }
 

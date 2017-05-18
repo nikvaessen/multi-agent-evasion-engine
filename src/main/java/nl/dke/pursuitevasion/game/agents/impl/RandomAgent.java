@@ -42,45 +42,18 @@ public class RandomAgent extends AbstractAgent{
     public boolean isEvader(){return true;};
 
     public void completeRequest(AgentRequest request){
-        double angle = ThreadLocalRandom.current().nextDouble(360)/100;
-        if(ThreadLocalRandom.current().nextDouble() < 0.5){
-            angle = angle * -1;
+        if(ThreadLocalRandom.current().nextDouble() < 0.01){
+            double angle = ThreadLocalRandom.current().nextDouble(360);
+            if(ThreadLocalRandom.current().nextDouble() < 0.5){
+                angle = angle * -1;
+            }
+            double newAngle = this.getFacingAngle() + angle;
+            request.add(new RotateTask(newAngle));
         }
-        double newAngle = this.getFacingAngle() + angle;
-        request.add(new RotateTask(newAngle));
 
-        double distance = ThreadLocalRandom.current().nextDouble(EngineConstants.WALKING_SPEED);
-        request.add(new WalkForwardTask(distance));
+        double scale = ThreadLocalRandom.current().nextDouble();
+        request.add(new WalkForwardTask(scale));
         currentRequest = request;
     };
-
-    public static void main(String[] args){
-        Map map = Map.getSimpleMap();
-        //Map map = Map.getMap("balbul.ser");
-        ArrayList<AbstractAgent> agents = new ArrayList<>();
-        MapViewPanel panel = new MapViewPanel(map, agents);
-        Engine engine = new Engine(map, agents, panel, 60);
-        JFrame frame = new JFrame();
-        Floor floor = null;
-        for(Floor f : map.getFloors())
-        {
-            floor = f;
-            break;
-        }
-
-        //agents.add(new SimpleAgent(new Point(5,5), Direction.SOUTH, 5));
-        agents.add(new RandomAgent(map, floor, new Vector2D(100,100), Direction.SOUTH, 5, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
-        /*agents.add(new UserAgent(map, floor, new Point(10, 10), Direction.SOUTH, 5,
-                EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, keyboardInputListener));*/
-
-        frame.getContentPane().add(panel);
-        frame.pack();
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-
-        engine.start();
-    }
-
-
 
 }

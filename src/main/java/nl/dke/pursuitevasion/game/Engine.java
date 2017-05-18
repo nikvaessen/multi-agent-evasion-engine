@@ -266,8 +266,8 @@ public class Engine
                     break;
                 }
             }
-            while(!request.isCompleted() && Math.abs(allowedMeters - 0) < 0.001
-                  && Math.abs(allowedRotation - 0) < 0.001);
+            while(!request.isCompleted() && Math.abs(allowedMeters - 0) > 0.001
+                  && Math.abs(allowedRotation - 0) > 0.001);
 
             if(logger.isTraceEnabled())
             {
