@@ -80,6 +80,10 @@ public class Engine
 
         private LinkedList<AgentCommand> commands = new LinkedList<>();
 
+        private LinkedList<AbstractAgent> evaders = new LinkedList<>();
+
+        private LinkedList<AbstractAgent> pursuers = new LinkedList<>();
+
         private double metersPerIteration = EngineConstants.WALKING_SPEED / desiredIterationLength;
 
         private double rotationPerIteration = EngineConstants.TURNING_SPEED / desiredIterationLength;
@@ -87,6 +91,20 @@ public class Engine
         @Override
         public void run()
         {
+            // put all the agents in the correct list
+            for(AbstractAgent agent : agents)
+            {
+                if(agent.isEvader())
+                {
+                    evaders.push(agent);
+                }
+                else
+                {
+                    pursuers.push(agent);
+                }
+            }
+
+            // start the game loop
             loop();
         }
 
@@ -116,12 +134,11 @@ public class Engine
                 }
 
                 // 1. Check if game is over
-                //todo implement game over checking
-                if(System.currentTimeMillis() - startTime > 1000000) //1000 seconds
+                removeCaughtEvaders();
+                if(evaders.isEmpty() && !EngineConstants.ALWAYS_LOOP)
                 {
                     break;
                 }
-
 
                 // Determine which agents are in the viewing range of other agents
                 for(AbstractAgent agent : agents){
@@ -357,6 +374,46 @@ public class Engine
                 return true;
             }
             return false;
+        }
+
+        private void removeCaughtEvaders()
+        {
+            //loop over all evaders
+            for(AbstractAgent evader : evaders)
+            {
+                //check if any pursuer close enough to them
+                for(AbstractAgent pursuer : pursuers)
+                {
+                    if(agentsOverlap(evader, pursuer))
+                    {
+                        agents.remove(evader);
+                        evaders.remove(evader);
+                    }
+                }
+            }
+        }
+
+        private boolean agentsOverlap(AbstractAgent agent1, AbstractAgent agent2)
+        {
+            Vector2D location1 = agent1.getLocation();
+            Vector2D location2 = agent2.getLocation();
+            double distance = location2.subtract(location1).length();
+
+            int radius1 = agent1.getRadius();
+            int radius2 = agent2.getRadius();
+
+            if (radius2 >= radius1 && distance <= (radius2 - radius1)) //circle 1 is inside circle 2
+            {
+                return true;
+            }
+            else if (radius1 >= radius2 && distance <= (radius1 - radius2))  //circle 2 is inside circle 1
+            {
+                return true;
+            }
+            else //circles do not overlap if true
+            {
+                return !(distance > (radius1 + radius2));
+            }
         }
     }
 

@@ -15,6 +15,10 @@ public class EngineConstants
     public final static double VISION_RANGE  = 100; // pixels
     public final static double VISION_ANGLE  = 120; // degrees
 
+    //if this is true, the game loop will never end!
+    public final static boolean ALWAYS_LOOP = true;
+
+
     public final static Color FLOOR_COLOR = new Color(153,204,255);
     public final static Color FLOOR_ALT_COLOR = Color.ORANGE;
     public final static Color OBSTACLE_COLOR = new Color((float)0.8,(float)0.8,(float)0.8);//new Color(153,204,255);
