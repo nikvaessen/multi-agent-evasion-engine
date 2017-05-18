@@ -4,7 +4,9 @@ import com.sun.javafx.geom.Line2D;
 import nl.dke.pursuitevasion.game.agents.*;
 import nl.dke.pursuitevasion.game.agents.tasks.AbstractAgentTask;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
+import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
+import nl.dke.pursuitevasion.map.impl.Obstacle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -283,30 +285,34 @@ public class Engine
         //todo fix
         private void outOfBoundCorrection(AgentCommand command)
         {
-//            if(command.isLocationChanged())
-//            {
-//                Point.Double p = command.getNewLocation();
-//                Floor floor = command.getAgent().getFloor();
-//                int radius = command.getAgent().getRadius();
-//
-//                Ellipse2D.Double circle = new Ellipse2D.Double(p.x - radius, p.y - radius, radius * 2, radius * 2);
-//
-//                if(!containing(floor.getPolygon(), circle, false))
-//                {
-//                    int ind = commands.indexOf(command);
-//                    commands.remove(ind);
-//                }
-//
-//                for(Obstacle obs : floor.getObstacles())
-//                {
-//                    if(containing(obs.getPolygon(), circle, true))
-//                    {
-//                        int ind = commands.indexOf(command);
-//                        commands.remove(ind);
-//                    }
-//                }
-//
-//            }
+            if(command.isLocationChanged())
+            {
+                Vector2D location = command.getNewLocation();
+                Floor floor = command.getAgent().getFloor();
+                int radius = command.getAgent().getRadius();
+
+                Ellipse2D.Double circle = new Ellipse2D.Double(
+                        location.getX() - radius,
+                        location.getY() - radius,
+                        radius * 2,
+                        radius * 2);
+
+                if(!containing(floor.getPolygon(), circle, false))
+                {
+                    int ind = commands.indexOf(command);
+                    commands.remove(ind);
+                }
+
+                for(Obstacle obs : floor.getObstacles())
+                {
+                    if(containing(obs.getPolygon(), circle, true))
+                    {
+                        int ind = commands.indexOf(command);
+                        commands.remove(ind);
+                    }
+                }
+
+            }
         }
 
         private boolean containing(Polygon bb, Ellipse2D circle, boolean obstacle)
