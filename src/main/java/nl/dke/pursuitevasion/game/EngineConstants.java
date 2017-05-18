@@ -10,13 +10,13 @@ import java.awt.*;
 public class EngineConstants
 {
     //todo fix this shit to make it realistic
-    public final static double WALKING_SPEED =  10; // pixels
+    public final static double WALKING_SPEED =  40; // pixels
     public final static double TURNING_SPEED = 360; // degrees (1 circle rotation per second)
     public final static double VISION_RANGE  = 100; // pixels
     public final static double VISION_ANGLE  = 120; // degrees
 
     //if this is true, the game loop will never end!
-    public final static boolean ALWAYS_LOOP = true;
+    public final static boolean ALWAYS_LOOP = false;
 
 
     public final static Color FLOOR_COLOR = new Color(153,204,255);
@@ -26,7 +26,10 @@ public class EngineConstants
     public final static Color EXIT_COLOR = new Color(255, 80, 80);
     public final static Color ENTRY_EVADER_COLOR =  new Color(102, 255, 51);
     public final static Color ENTRY_PURSUER_COLOR = new Color(102, 102, 255);
-
+    private final static Color VISION_ARC_BASE_COLOR = Color.red;
+    public final static Color VISION_ARC_COLOR = new Color(VISION_ARC_BASE_COLOR.getRed(), VISION_ARC_BASE_COLOR.getGreen(), VISION_ARC_BASE_COLOR.getBlue(), 20);
+    public final static Color EVADER_COLOR = new Color(181, 19, 19);
+    public final static Color PURSUER_COLOR = new Color(31, 94, 196);
 
 
 }

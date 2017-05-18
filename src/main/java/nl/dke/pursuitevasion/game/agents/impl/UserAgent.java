@@ -195,6 +195,6 @@ public class UserAgent
 
     @Override
     public boolean isEvader() {
-        return true;
+        return false;
     }
 }

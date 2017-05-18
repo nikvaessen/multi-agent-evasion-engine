@@ -100,7 +100,7 @@ public class WalkToTask
     @Override
     protected boolean completesTask(AgentCommand command)
     {
-        return command.getNewLocation().equals(walkToLocation);
+        return Math.abs((command.getNewLocation().subtract(command.getAgent().getLocation())).length()) < 0.0001;
     }
 
     @Override

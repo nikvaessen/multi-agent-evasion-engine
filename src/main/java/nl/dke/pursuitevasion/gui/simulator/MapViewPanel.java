@@ -1,5 +1,7 @@
 package nl.dke.pursuitevasion.gui.simulator;
 
+import nl.dke.pursuitevasion.game.Engine;
+import nl.dke.pursuitevasion.game.EngineConstants;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.map.MapPolygon;
@@ -62,6 +64,10 @@ public class MapViewPanel
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         for(AbstractAgent agent : agents)
         {
+            if(agent.isEvader()){
+                g.setColor(EngineConstants.EVADER_COLOR);
+            }
+            else{g.setColor(EngineConstants.PURSUER_COLOR);}
             Vector2D vLocation = agent.getLocation();
             Point location = new Point(
                     new Long(Math.round(vLocation.getX())).intValue(),
@@ -76,9 +82,8 @@ public class MapViewPanel
             Vector2D base = visionArc.getBasePoint();
             logger.trace("the eyes of the agent are at {}",base);
 
-            Color color = Color.RED;
-            //color = new Color(color.getRed(), color.getBlue(), color.getGreen(), 20);
-            g.setColor(color);
+            // Draw vision arcs
+            g.setColor(EngineConstants.VISION_ARC_COLOR);
 
             double facingAngle = agent.getFacingAngle();
             double visionAngle = agent.getVisionAngle();

@@ -50,16 +50,16 @@ public class SimpleAgent
             if(super.location.getX() > goal.getX())
             {
                 Direction direction = Direction.getDirection(false, false, false, true);
-                request.add(new WalkToTask(goal));
                 request.add(new RotateTask(Direction.getAngle(direction)));
+                request.add(new WalkToTask(goal));
                 hasRequest = false;
                 return;
             }
             else if(super.location.getX() < goal.getX())
             {
                 Direction direction = Direction.getDirection(false, false, true, false);
-                request.add(new WalkToTask(goal));
                 request.add(new RotateTask(Direction.getAngle(direction)));
+                request.add(new WalkToTask(goal));
                 hasRequest = false;
                 return;
             }
@@ -70,16 +70,16 @@ public class SimpleAgent
             if(super.location.getY() > goal.getY())
             {
                 Direction direction = Direction.getDirection(true, false, false, false);
-                request.add(new WalkToTask(goal));
                 request.add(new RotateTask(Direction.getAngle(direction)));
+                request.add(new WalkToTask(goal));
                 hasRequest = false;
                 return;
             }
             else if(super.location.getY() < goal.getY())
             {
                 Direction direction = Direction.getDirection(false, true, false, false);
-                request.add(new WalkToTask(goal));
                 request.add(new RotateTask(Direction.getAngle(direction)));
+                request.add(new WalkToTask(goal));
                 hasRequest = false;
                 return;
             }

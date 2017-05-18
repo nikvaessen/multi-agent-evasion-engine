@@ -252,6 +252,7 @@ public class Engine
             double allowedMeters = metersPerIteration;
             double allowedRotation = rotationPerIteration;
             AbstractAgentTask task = null;
+            AgentCommand command;
 
             if(logger.isTraceEnabled())
             {
@@ -260,18 +261,16 @@ public class Engine
                 logger.trace("Allowed meters: {} Allowed rotation: {}", allowedMeters, allowedRotation);
             }
 
-            do
-            {
-                try
-                {
+            do{
+                try{
                     task = request.peek();
-                    AgentCommand command = task.handle(request.getAgent(), allowedMeters, allowedRotation);
+                    command = task.handle(request.getAgent(), allowedMeters, allowedRotation);
                     commands.add(command);
                     allowedMeters -= command.getMovedDistance();
+
                     allowedRotation -= command.getRotatedDistance();
 
-                    if(logger.isTraceEnabled())
-                    {
+                    if(logger.isTraceEnabled()){
                         logger.trace("Added to commands: {} ", command);
                         logger.trace("peeked request: {}", task);
                         logger.trace("allowed meters left: {}", allowedMeters);
@@ -279,14 +278,12 @@ public class Engine
                         logger.trace("request is completed: {}", request.isCompleted());
                     }
                 }
-                catch(IllegalStateException e)
-                {
+                catch(IllegalStateException e){
                     logger.error("Cannot resolve new task", e);
                     break;
                 }
             }
-            while(!request.isCompleted() && Math.abs(allowedMeters - 0) > 0.001
-                  && Math.abs(allowedRotation - 0) > 0.001);
+            while(!request.isCompleted() && allowedMeters > 0.001 && allowedRotation > 0.001);
 
             if(logger.isTraceEnabled())
             {
@@ -415,6 +412,17 @@ public class Engine
                 return !(distance > (radius1 + radius2));
             }
         }
+    }
+
+    private boolean commandAllowed(AgentCommand command, double allowedMeters, double allowedRotation) {
+        if(command.isLocationChanged()){
+            return allowedMeters - command.getMovedDistance() > 0;
+        }
+        if(command.isAngleChanged()){
+            return allowedRotation - command.getRotatedDistance() > 0.0001;
+        }
+        return true;
+
     }
 
 }
