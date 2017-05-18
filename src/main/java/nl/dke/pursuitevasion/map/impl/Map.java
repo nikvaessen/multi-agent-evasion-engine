@@ -110,30 +110,30 @@ public class Map implements Serializable
     public static Map getSimpleMap()
     {
         MapPolygon mainFloor = new MapPolygon(
-                new int[] {   0, 600, 900, 600,   0},
-                new int[] {   0,   0, 300, 600, 600},
-                5,
+                new int[] {   0, 600, 600, 0},
+                new int[] {   0,   0, 600, 600},
+                4,
                 false
         );
 
         MapPolygon obstacle = new MapPolygon(
-                new int[] {240, 360, 360, 240, 100},
-                new int[] {240, 240, 360, 360, 100},
-                5,
+                new int[] {240, 360, 360, 240},
+                new int[] {240, 240, 360, 360},
+                4,
                 true
         );
 
-        MapPolygon obstacle1 = new MapPolygon(
+      /*  MapPolygon obstacle1 = new MapPolygon(
                 new int[] {500, 550, 450},
                 new int[] {240, 360, 360},
                 3,
                 true
-        );
+        );*/
 
         return MapBuilder.create()
                 .makeFloor(mainFloor)
                 .addObstacle(obstacle)
-                .addObstacle(obstacle1)
+           //     .addObstacle(obstacle1)
                 .finish()
                 .build();
     }

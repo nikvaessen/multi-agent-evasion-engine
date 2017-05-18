@@ -7,10 +7,7 @@ import nl.dke.pursuitevasion.map.MapPolygon;
 
 import java.awt.*;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * A floor is a 2d level in which agents can walk
@@ -71,51 +68,115 @@ public class Floor extends AbstractObject
         }
     }
 
-    public ArrayList<Polygon> getTriangulation(){
+    public ArrayList<ArrayList<Point>> getTriangulation(){
         ArrayList<Polygon> triangles = new ArrayList<>();
+
+        ArrayList<Obstacle> ob = new ArrayList<>(this.obstacles);
 
         // compute closest distance to outer polygon
         Polygon mPoly = getPolygon();
-        Point[][] connection = new Point[obstacles.size()][2];   // create list for connections, for each obstacle a connection and with the two vertices of new connection
-        ArrayList<ArrayList<Point>> conns = new ArrayList<>();
+        // create list for connections, for each obstacle a connection and with the two vertices of new connection
+        ArrayList<ArrayList<Point>> conns = new ArrayList<ArrayList<Point>>();
+
+        System.out.println("1st: compute first link to outer polygon");
+        Point floorCon = null;
+        Point obsCon = null;
+        double smallestDistance=Integer.MAX_VALUE;
         for (Obstacle obs  : obstacles){
-            double smallestDistance=Integer.MAX_VALUE;
             Polygon oPoly = obs.getPolygon();
+
             for(int i=0; i<oPoly.xpoints.length; i++){
             //for all cornerpoints per obstacles,
                 for (int j=0; j<getPolygon().xpoints.length; j++){
                 // compute the difference to each of the cornerpoints of the main/outer polygon
                     // maybe turn this into method?
-                    if (computeDistance(oPoly.xpoints[i],mPoly.xpoints[i],oPoly.ypoints[i],mPoly.ypoints[i])<smallestDistance){
-                        connection[0][0]=new Point(oPoly.xpoints[j], oPoly.ypoints[j]);
-                        connection[0][1]=new Point(mPoly.xpoints[j], mPoly.ypoints[j]);
+                    if (computeDistance(oPoly.xpoints[i],mPoly.xpoints[j],oPoly.ypoints[i],mPoly.ypoints[j])<smallestDistance){
+                        smallestDistance = computeDistance(oPoly.xpoints[i],mPoly.xpoints[j],oPoly.ypoints[i],mPoly.ypoints[j]);
+                        obsCon = new Point(oPoly.xpoints[i], oPoly.ypoints[i]);
+                        floorCon = new Point(mPoly.xpoints[j], mPoly.ypoints[j]);
+                        System.out.println("distance: " + smallestDistance);
+                        System.out.println("obsCon: " + obsCon);
+                        System.out.println("floorCon: " + floorCon);
                     }
                 }
                 // put here code from below?
             }
         }
+        conns.add(new ArrayList<>());
+        conns.get(conns.size()-1).add(obsCon);
+        conns.get(conns.size()-1).add(floorCon);
+        System.out.println("conns" + conns.toString());
+
 
         // compute closest link between obstacles
-        Obstacle[] obstacleList = (Obstacle[]) obstacles.toArray();
-        double smallestDistance=Integer.MAX_VALUE;
-        for (int k=0; k<obstacleList.length; k++){
-            for (int l=0; k<obstacleList[k].getPolygon().xpoints.length; k++){
-                if (k!=obstacleList.length-1){
-                    for (int m=0; m<obstacleList[k+1].getPolygon().xpoints.length; m++)     {
-                        if (computeDistance(obstacleList[k].getPolygon().xpoints[l],
-                                            obstacleList[k+1].getPolygon().xpoints[l],
-                                            obstacleList[k].getPolygon().ypoints[l],
-                                            obstacleList[k+1].getPolygon().ypoints[l],
-                                            )<smallestDistance){
-                            connection[0][0]=new Point(obstacleList[k].getPolygon().xpoints[l], obstacleList[k].getPolygon().ypoints[l]);
-                            connection[0][1]=new Point(obstacleList[k+1].getPolygon().xpoints[l], obstacleList[k+1].getPolygon().ypoints[l]);
+        smallestDistance=Integer.MAX_VALUE;
+        Point floorCon1 = null;
+        Point obsCon1 = null;
+        //loop through obstaclelist
+        System.out.println("2nd: Compute closest link");
+            for (int k=0; k<ob.size(); k++) {
+                //loops through points of each obstacle
+                for (int l = 0; l < ob.get(k).getPolygon().xpoints.length; l++) {
+                    if (k != ob.size() - 1) {
+                        //loops through points of neighbouring obstacle
+                        for (int m = 0; m < ob.get(k+1).getPolygon().xpoints.length; m++) {
+                            if (computeDistance(
+                                    ob.get(k).getPolygon().xpoints[l],
+                                    ob.get(k+1).getPolygon().xpoints[m],
+                                    ob.get(k).getPolygon().ypoints[l],
+                                    ob.get(k+1).getPolygon().ypoints[m]
+                            ) < smallestDistance) {
+                                smallestDistance = computeDistance(ob.get(k).getPolygon().xpoints[l],ob.get(k+1).getPolygon().xpoints[l],ob.get(k).getPolygon().ypoints[l],ob.get(k+1).getPolygon().ypoints[l]);
+                                obsCon1 = new Point(ob.get(k).getPolygon().xpoints[l], ob.get(k).getPolygon().ypoints[l]);
+                                floorCon1 = new Point(ob.get(k+1).getPolygon().xpoints[m], ob.get(k+1).getPolygon().ypoints[m]);
+                                System.out.println("distance: " + smallestDistance);
+                                System.out.println("obsCon: " + obsCon);
+                                System.out.println("floorCon: " + floorCon);
+                            }
                         }
-                    }
-                } else {
+                        //add adding here
 
+
+
+
+                    } else {
+                        System.out.println("3rd: compute last link to outer polygon");
+                        smallestDistance = Integer.MAX_VALUE;
+                        //loops through points of floor
+                        for (int j = 0; j < getPolygon().xpoints.length; j++) {
+                            if (computeDistance(
+                                    ob.get(k).getPolygon().xpoints[l],
+                                    getPolygon().xpoints[j],
+                                    ob.get(k).getPolygon().ypoints[l],
+                                    getPolygon().ypoints[j])
+                                    < smallestDistance) {
+                                smallestDistance = computeDistance(ob.get(k).getPolygon().xpoints[l],getPolygon().xpoints[l],ob.get(k).getPolygon().ypoints[l],getPolygon().ypoints[l]);
+                                obsCon = new Point(ob.get(k).getPolygon().xpoints[l], ob.get(k).getPolygon().ypoints[l]);
+                                floorCon = new Point(getPolygon().xpoints[j], getPolygon().ypoints[j]);
+                                System.out.println("distance: " + smallestDistance);
+                                System.out.println("obsCon: " + obsCon);
+                                System.out.println("floorCon: " + floorCon);
+                            }
+                        }
+                        //add adding here
+
+
+
+
+                    }
                 }
             }
-        }
+
+            conns.add(new ArrayList<>());
+            conns.get(conns.size()-1).add(obsCon1);
+            conns.get(conns.size()-1).add(floorCon1);
+            System.out.println("conns" + conns.toString());
+
+            conns.add(new ArrayList<>());
+            conns.get(conns.size()-1).add(obsCon);
+            conns.get(conns.size()-1).add(floorCon);
+            System.out.println("conns" + conns.toString());
+
 
         // connect last of the chain to other border (?)
 
@@ -126,7 +187,7 @@ public class Floor extends AbstractObject
 
         //implement triangulation by ear-clipping
 
-        return triangles;
+        return conns;
     }
 
     public double computeDistance(int x1,int x2,int y1,int y2){

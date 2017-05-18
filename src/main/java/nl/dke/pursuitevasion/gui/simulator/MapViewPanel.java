@@ -2,6 +2,7 @@ package nl.dke.pursuitevasion.gui.simulator;
 
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.map.MapPolygon;
+import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +30,11 @@ public class MapViewPanel
 
     private Dimension preferredSize;
 
+    private Map m;
+
     public MapViewPanel(Map map, Collection<AbstractAgent> agents)
     {
+        this.m = map;
         this.objects = map.getPolygons();
         this.agents  = agents;
         this.preferredSize = computePreferredSize();
@@ -41,6 +45,9 @@ public class MapViewPanel
     protected void paintComponent(Graphics g)
     {
         super.paintComponent(g);
+
+
+        g.setColor(Color.BLACK);
 
         //draw all polygons which make up the map
         ((Graphics2D) g).setStroke(new BasicStroke(BORDER_STROKE_WIDTH)); //make borders more wide
@@ -89,6 +96,17 @@ public class MapViewPanel
 
 //            Point left = visionArea.getLeftPoint();
 //            g.drawLine(left.x, left.y, base.x, base.y);
+
+            //draw connection of vertices
+            ((Graphics2D) g).setStroke(new BasicStroke(1));
+            Floor floor= (Floor) m.getFloors().toArray()[0];
+            ArrayList<ArrayList<Point>> conns = floor.getTriangulation();
+            g.setColor(Color.MAGENTA);
+            for (int i=0; i<conns.size(); i++){
+                g.drawLine(conns.get(i).get(0).x, conns.get(i).get(0).y,
+                        conns.get(i).get(1).x,conns.get(i).get(1).y);
+            }
+
         }
     }
 
