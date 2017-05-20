@@ -160,6 +160,23 @@ public class Vector2D
         return y;
     }
 
+    /**
+     * Get the x component of this Vector2D
+     *
+     * @return the x component of this Vector2D
+     */
+    public void setX(double x) {
+        this.x = x;
+    }
+    /**
+     * Get the y component of this Vector2D
+     *
+     * @return the y component of this Vector2D
+     */
+    public void setY(double y) {
+        this.y = y;
+    }
+
     @Override
     public boolean equals(Object o)
     {

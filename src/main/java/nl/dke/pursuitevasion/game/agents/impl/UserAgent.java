@@ -24,6 +24,7 @@ public class UserAgent
     implements Receiver<KeyEvent>
 {
     private static Logger logger = LoggerFactory.getLogger(UserAgent.class);
+    private final boolean isEvader;
 
     private boolean north;
     private boolean south;
@@ -31,10 +32,11 @@ public class UserAgent
     private boolean east;
 
     public UserAgent(Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing, int radius,
-                     double visionRange, double visionAngle, KeyboardInputListener listener)
+                     double visionRange, double visionAngle, KeyboardInputListener listener, boolean isEvader)
     {
         super(map, startingFloor, startLocation, startsFacing, radius, visionRange, visionAngle);
         listener.subscribe(this);
+        this.isEvader = isEvader;
     }
 
     @Override
@@ -195,6 +197,6 @@ public class UserAgent
 
     @Override
     public boolean isEvader() {
-        return false;
+        return isEvader;
     }
 }

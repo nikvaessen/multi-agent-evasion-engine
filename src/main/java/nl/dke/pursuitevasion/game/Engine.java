@@ -38,6 +38,12 @@ public class Engine
 
     private Thread gameLoopThread;
 
+    public Engine copy(){
+        Engine e = new Engine(map,agents,null,desiredFPS);
+        e.start();
+        return e;
+    }
+
     public Engine(Map map, Collection<AbstractAgent> agents, MapViewPanel viewPanel, int desiredFPS)
     {
         this.map = map;
@@ -105,7 +111,7 @@ public class Engine
             }
 
             // start the game loop
-            loop();
+            loop(0);
         }
 
         /**
@@ -118,12 +124,15 @@ public class Engine
          * 6. Render on screen
          * 7. Wait if there is time left.
          */
-        private void loop()
+        private void loop(long durationInMillisec)
         {
             // house keeping variables for loop
             long startTime = System.currentTimeMillis(), iterationStartTime, msPassed;
+            long endTime = startTime + durationInMillisec;
+            boolean infinite = false;
+            if (durationInMillisec==0) infinite = true;
             int count = 0;
-            while(true)
+            while(infinite || System.currentTimeMillis()+desiredIterationLength<=endTime)
             {
                 //update housekeeping variables and log
                 iterationStartTime = System.currentTimeMillis();
@@ -293,7 +302,10 @@ public class Engine
 
         private void validateCommands()
         {
-            commands.forEach(this::outOfBoundCorrection);
+            for (int i = 0; i < commands.size(); i++) {
+                outOfBoundCorrection(commands.get(i));
+            }
+            //commands.forEach(this::outOfBoundCorrection);
         }
 
         //todo fix

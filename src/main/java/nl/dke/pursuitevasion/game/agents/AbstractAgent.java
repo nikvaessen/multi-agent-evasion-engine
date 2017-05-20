@@ -1,6 +1,9 @@
 package nl.dke.pursuitevasion.game.agents;
 
+import nl.dke.pursuitevasion.game.EngineConstants;
 import nl.dke.pursuitevasion.game.Vector2D;
+import nl.dke.pursuitevasion.map.AbstractObject;
+import nl.dke.pursuitevasion.map.impl.EntryEvader;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 import nl.dke.pursuitevasion.map.impl.Obstacle;
@@ -11,8 +14,10 @@ import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Random;
 
 /**
  * An agent in a Map environment. An agent can move about and rotate in the Map. It has a location (an x and y
@@ -78,6 +83,7 @@ public abstract class AbstractAgent
      */
     private volatile boolean hasRequest;
 
+
     /**
      * Create an agent in the given Map
      *
@@ -88,16 +94,18 @@ public abstract class AbstractAgent
      * @param radius        the radius of the agent
      */
     public AbstractAgent(Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing,
-                         int radius, double visionRange, double visionAngle)
-    {
+                         int radius, double visionRange, double visionAngle) {
         this.map = map;
         this.floor = startingFloor;
-        this.location = startLocation;
+        setStartLocation(startLocation);
+
         this.facing = new Angle(startsFacing);
         this.radius = radius;
         this.visionRange = visionRange;
         this.visionAngle = visionAngle;
         this.visionArc = new VisionArc();
+
+
     }
 
     /**
@@ -289,6 +297,30 @@ public abstract class AbstractAgent
 
     public Collection<AbstractAgent> getVisibleAgents(){
         return visibleAgents;
+    }
+
+    /** sets the start location inside the map boundaries
+     * @param startLocation
+     */
+    private void setStartLocation(Vector2D startLocation) {
+        this.location = startLocation; if (true) return;
+        ArrayList<AbstractObject> startObject = new ArrayList<>(3);
+        if (isEvader()){
+            startObject.addAll(floor.getEntryEvader());
+        }else startObject.addAll(floor.getEntryPursuer());
+
+        if (startObject.size()==0) return;
+        Random r = EngineConstants.getRandom();
+        Polygon startArea = startObject.get(r.nextInt(startObject.size())).getPolygon();
+
+        Vector2D point = new Vector2D(-6,-6); //first one has to be outside
+        Rectangle2D bound = startArea.getBounds2D();
+        while (!startArea.contains(point.getX(),point.getY())){
+            point.setX(bound.getX() + r.nextDouble()*bound.getWidth());
+            point.setY(bound.getY() + r.nextDouble()*bound.getHeight());
+        }
+        this.location = point;
+
     }
 
     public class VisionArc {

@@ -1,6 +1,7 @@
 package nl.dke.pursuitevasion.game;
 
 import java.awt.*;
+import java.util.Random;
 
 /**
  * Created by nik on 03/03/17.
@@ -16,7 +17,7 @@ public class EngineConstants
     public final static double VISION_ANGLE  = 120; // degrees
 
     //if this is true, the game loop will never end!
-    public final static boolean ALWAYS_LOOP = false;
+    public final static boolean ALWAYS_LOOP = true;
 
 
     public final static Color FLOOR_COLOR = new Color(153,204,255);
@@ -30,6 +31,10 @@ public class EngineConstants
     public final static Color VISION_ARC_COLOR = new Color(VISION_ARC_BASE_COLOR.getRed(), VISION_ARC_BASE_COLOR.getGreen(), VISION_ARC_BASE_COLOR.getBlue(), 20);
     public final static Color EVADER_COLOR = new Color(181, 19, 19);
     public final static Color PURSUER_COLOR = new Color(31, 94, 196);
+    private static long seed = 1337L;
+    private static Random random = new Random(seed);
 
-
+    public static Random getRandom() {
+        return random;
+    }
 }
