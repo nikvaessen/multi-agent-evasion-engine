@@ -115,6 +115,26 @@ public class MapViewPanel
                 g.drawLine(conns.get(i).get(0).x, conns.get(i).get(0).y,
                         conns.get(i).get(1).x,conns.get(i).get(1).y);
             }
+
+
+
+            //draw second splitted polygon
+            ArrayList<Point> polygonPoints2 = floor.newSimplePolygon2;
+            g.setColor(Color.green);
+            for (int i=0; i<polygonPoints2.size()-1; i++){
+                g.drawLine(polygonPoints2.get(i).x, polygonPoints2.get(i).y,
+                        polygonPoints2.get(i+1).x, polygonPoints2.get(i+1).y);
+            }
+
+            //draw first splitted polygon
+            ((Graphics2D) g).setStroke(new BasicStroke(2));
+            ArrayList<Point> polygonPoints1 = floor.newSimplePolygon1;
+            g.setColor(Color.red);
+            for (int i=0; i<polygonPoints1.size()-1; i++){
+                g.drawLine(polygonPoints1.get(i).x, polygonPoints1.get(i).y,
+                        polygonPoints1.get(i+1).x, polygonPoints1.get(i+1).y);
+            }
+//
         }
     }
 
