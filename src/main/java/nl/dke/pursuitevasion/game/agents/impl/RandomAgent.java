@@ -29,6 +29,8 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class RandomAgent extends AbstractAgent{
 
+
+
     public RandomAgent(Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing, int radius, double visionRange, double visionAngle){
         super(map, startingFloor, startLocation, startsFacing, radius, visionRange, visionAngle);
     }

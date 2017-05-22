@@ -30,6 +30,22 @@ public abstract class AbstractAgent
 {
     private final static Logger logger = LoggerFactory.getLogger(AbstractAgent.class);
 
+    public abstract AbstractAgent clone();
+
+    private final int id;
+    private static int idCount = 0;
+
+
+
+    /**
+     * the unique id of an agent.
+     *
+     * @return
+     */
+    public int getId() {
+        return id;
+    }
+
     /**
      * The radius of the agent.
      */
@@ -98,7 +114,7 @@ public abstract class AbstractAgent
         this.map = map;
         this.floor = startingFloor;
         setStartLocation(startLocation);
-
+        this.id = idCount++;
         this.facing = new Angle(startsFacing);
         this.radius = radius;
         this.visionRange = visionRange;
