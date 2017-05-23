@@ -367,6 +367,7 @@ public class Floor extends AbstractObject
                                     newPolygon.add(secondConnection);
                                     //newSimplePolygon1.add(secondConnection);
                                     secondConnectionFound = true;
+                                    // end
                                 }
                             }
                         }
