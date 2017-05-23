@@ -199,9 +199,9 @@ public class Map implements Serializable
         }
         catch (IOException | ClassNotFoundException e){
             MapPolygon mainFloor = new MapPolygon(
-                    new int[] {  0, 300, 900, 900, 300},
-                    new int[] {300,   0,   0, 600, 600},
-                    5,
+                    new int[] {  0, 300, 900, 1200, 900, 300},
+                    new int[] {300,   0,   0, 300, 600, 600},
+                    6,
                     false
             );
 
@@ -212,9 +212,17 @@ public class Map implements Serializable
                     true
             );
 
+            MapPolygon obstacle1 = new MapPolygon(
+                    new int[] {300, 250, 350 },
+                    new int[] {100, 300, 300},
+                    3,
+                    true
+            );
+
             return MapBuilder.create()
                     .makeFloor(mainFloor)
                     .addObstacle(obstacle)
+                    .addObstacle(obstacle1)
                     .finish()
                     .build();
         }

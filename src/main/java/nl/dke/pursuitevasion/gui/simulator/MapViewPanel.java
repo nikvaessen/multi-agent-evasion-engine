@@ -110,7 +110,7 @@ public class MapViewPanel
             ((Graphics2D) g).setStroke(new BasicStroke(1));
             Floor floor= (Floor) m.getFloors().toArray()[0];
             ArrayList<ArrayList<Point>> conns = floor.getTriangulation();
-            g.setColor(Color.MAGENTA);
+            g.setColor(Color.green);
             for (int i=0; i<conns.size(); i++){
                 g.drawLine(conns.get(i).get(0).x, conns.get(i).get(0).y,
                         conns.get(i).get(1).x,conns.get(i).get(1).y);
@@ -119,8 +119,9 @@ public class MapViewPanel
 
 
             //draw second splitted polygon
+            ((Graphics2D) g).setStroke(new BasicStroke(2));
             ArrayList<Point> polygonPoints2 = floor.newSimplePolygon2;
-            g.setColor(Color.green);
+            g.setColor(Color.MAGENTA);
             for (int i=0; i<polygonPoints2.size()-1; i++){
                 g.drawLine(polygonPoints2.get(i).x, polygonPoints2.get(i).y,
                         polygonPoints2.get(i+1).x, polygonPoints2.get(i+1).y);
@@ -134,7 +135,7 @@ public class MapViewPanel
                 g.drawLine(polygonPoints1.get(i).x, polygonPoints1.get(i).y,
                         polygonPoints1.get(i+1).x, polygonPoints1.get(i+1).y);
             }
-//
+
         }
     }
 
