@@ -219,4 +219,14 @@ public class Map implements Serializable
                     .build();
         }
     }
+
+    public static Map getSimpleMapNoHoles(){
+        MapBuilder b = MapBuilder.create();
+        return b.makeFloor(new MapPolygon(
+                new int[] { 200, 500, 700, 700, 500, 200, 0, 0},
+                new int[] { 0, 0, 200, 500, 700, 700, 500, 200},
+                8,
+                false
+        )).finish().build();
+    }
 }

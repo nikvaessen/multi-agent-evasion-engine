@@ -1,5 +1,7 @@
 package nl.dke.pursuitevasion.game;
 
+import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.Map;
 import java.util.Objects;
 
@@ -170,6 +172,10 @@ public class Vector2D
                    Math.abs(this.y - v.y) < 0.00001;
         }
         return false;
+    }
+
+    public Point2D toPoint(){
+        return new Point2D.Double(x, y);
     }
 
     @Override

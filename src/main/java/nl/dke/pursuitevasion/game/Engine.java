@@ -224,18 +224,20 @@ public class Engine
                 msPassed = System.currentTimeMillis() - iterationStartTime;
                 if(msPassed < desiredIterationLength)
                 {
+                    /*
                     try
                     {
                         if(logger.isDebugEnabled())
                         {
                             logger.debug("waiting for {} ms", desiredIterationLength - msPassed);
                         }
-                        Thread.sleep(desiredIterationLength - msPassed);
+                        //Thread.sleep(desiredIterationLength - msPassed);
+
                     }
                     catch(InterruptedException e)
                     {
                         e.printStackTrace();
-                    }
+                    }*/
                 }
                 else
                 {
@@ -301,8 +303,13 @@ public class Engine
         {
             if(command.isLocationChanged())
             {
+                AbstractAgent agent = command.getAgent();
+                Floor floor = agent.getFloor();
                 Vector2D location = command.getNewLocation();
-                Floor floor = command.getAgent().getFloor();
+                //if(floor.contains(location.toPoint()))
+
+
+                //Floor floor = command.getAgent().getFloor();
                 int radius = command.getAgent().getRadius();
 
                 Ellipse2D.Double circle = new Ellipse2D.Double(
