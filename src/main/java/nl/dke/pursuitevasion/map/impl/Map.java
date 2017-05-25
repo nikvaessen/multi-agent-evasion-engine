@@ -221,8 +221,8 @@ public class Map implements Serializable
 
             return MapBuilder.create()
                     .makeFloor(mainFloor)
-                    .addObstacle(obstacle)
                     .addObstacle(obstacle1)
+                    .addObstacle(obstacle)
                     .finish()
                     .build();
         }
