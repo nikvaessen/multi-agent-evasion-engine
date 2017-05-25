@@ -50,7 +50,9 @@ public class MinimalPathOverseer {
     }
 
     // Checks whether an agent should be making a new request.
-    public boolean getShouldDoSomething(int agentNumber){}
+    public boolean getShouldDoSomething(int agentNumber){
+        return false;
+    }
 
     // Determines what request an agent should make.
     public void getTask(int agentNumber, AgentRequest request){}

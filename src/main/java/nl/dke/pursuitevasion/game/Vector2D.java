@@ -181,7 +181,7 @@ public class Vector2D
     @Override
     public int hashCode()
     {
-        return Objects.hashCode(this);
+        return Objects.hash(x, y);
     }
 
     @Override
