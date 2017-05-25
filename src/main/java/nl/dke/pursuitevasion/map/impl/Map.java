@@ -213,7 +213,7 @@ public class Map implements Serializable
             );
 
             MapPolygon obstacle1 = new MapPolygon(
-                    new int[] {300, 250, 350 },
+                    new int[] {300, 350, 250},
                     new int[] {100, 300, 300},
                     3,
                     true

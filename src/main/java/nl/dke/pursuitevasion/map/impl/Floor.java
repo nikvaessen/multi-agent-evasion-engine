@@ -251,11 +251,11 @@ public class Floor extends AbstractObject
         int index = polygon1.get(polygon1.size()-1).x;
         polygon1.remove(polygon1.size()-1);
         Point firstConnection1 = polygon1.get(polygon1.size()-1);
-        polygon1.remove(polygon1.size()-1);
+        //polygon1.remove(polygon1.size()-1);
 
         polygon1 = findObstaclePart(obstacleVertices, conns, firstConnection1, polygon1);
         Point secondConnection1 = polygon1.get(polygon1.size()-1);
-        polygon1.remove(polygon1.size()-1);
+        //polygon1.remove(polygon1.size()-1);
 
         polygon1 = findLastPartOfFloor(floorVertices, firstConnection1, secondConnection1, conns, polygon1);
         newSimplePolygon1=polygon1;
@@ -267,11 +267,11 @@ public class Floor extends AbstractObject
         //since we don't need index anymore, last element can be deleted immediately
         polygon2.remove(polygon2.size()-1);
         Point firstConnection2 = polygon2.get(polygon2.size()-1);
-        polygon2.remove(polygon2.size()-1);
+        //polygon2.remove(polygon2.size()-1);
 
         polygon2 = findObstaclePart(obstacleVertices, conns, firstConnection2, polygon2);
         Point secondConnection2 = polygon2.get(polygon2.size()-1);
-        polygon2.remove(polygon2.size()-1);
+        //polygon2.remove(polygon2.size()-1);
 
         polygon2 = findLastPartOfFloor(floorVertices, firstConnection2, secondConnection2, conns, polygon2);
         newSimplePolygon2=polygon2;
@@ -280,11 +280,14 @@ public class Floor extends AbstractObject
     }
 
     public ArrayList<Point> findFirstPartOfFloor(int startingIndex, Point[] floorVertices, ArrayList<ArrayList<Point>> conns, ArrayList<Point> newPolygon){
+        System.out.println("STARTING INDEX; "+ startingIndex);
         Point firstConnection = null;
         Point index=null;
         boolean firstConnectionFound = false;
         for (int h=startingIndex; h<floorVertices.length; h++) {
             //checks if the given floor point is equal to one of the floor points in the connections list
+            System.out.println("boolean: "+firstConnectionFound);
+            System.out.println("vertex: " + floorVertices[h]);
             if (!firstConnectionFound) {
                 if (checkForConn(floorVertices[h], conns)) {
                     index = new Point(h,h);
@@ -296,6 +299,8 @@ public class Floor extends AbstractObject
                 }
             }
         }
+        System.out.println("1st conn: "+firstConnection);
+        System.out.println(index);
         newPolygon.add(index);
         return newPolygon;
     }
@@ -314,65 +319,164 @@ public class Floor extends AbstractObject
         //maybe check later if this isnt the first obstacle, if it is, then its fine,
         //if its second or higher, then the missing first parts need to be covered as well in another loop
 
-        for (int i=indexOfObstaclePoint[0]; i>=0; i--){
-            System.out.println("index: " + i);
-            // is this constraint right?
-            if (i!=0) {
+        System.out.println();
+        for (int i=0; i<obstacleVertices.size(); i++){
+            System.out.println("Obstacle: "+i);
+            for (int j=0; j<obstacleVertices.get(i).size(); j++) {
+                System.out.println(obstacleVertices.get(i).get(j));
+            }
+        }
+        System.out.println();
+
+        boolean found = false;
+        int[] indexOfLastObstacleConnection = new int[2];
+        for (int k = 0; k < otherObstacleConnections.length; k++) {
+            for (int i = indexOfObstaclePoint[0]; i >= 0; i--) {
+                System.out.println("index: " + i);
+                // is this constraint right?
+
                 System.out.println("first part");
                 //start searching from found point backwards until you reach the first index
-                for (int j = indexOfObstaclePoint[1]; j >= 0; j--) {
-                    for (int k=0; k<otherObstacleConnections.length; k++) {
-                        if (otherObstacleConnections[k].equals(new Point(-1,-1))) {
-                            otherObstacleConnections = searchForIntraObstacleConnection(otherObstacleConnections, newPolygon, obstacleVertices, indexOfObstaclePoint[1], conns, i, j, k);
-                        }
-                    }
-                    System.out.println("HELLO");
-                    System.out.println("secondConn.toString: "+secondConnection.getX());
-                    if (secondConnection.getLocation().equals(new Point(-1,-1))) {
-                        secondConnection = searchForSecondConnection(secondConnection, newPolygon, obstacleVertices, indexOfObstaclePoint[1], conns, i, j);
-                    }
-                }
-            } else {
-                System.out.println("second part");
-                for (int l=obstacleVertices.size()-1; l > indexOfObstaclePoint[0]; l--){
-                    //start searching from found point backwards until you reach the first index
-                    for (int j = indexOfObstaclePoint[1]; j >= 0; j--) {
-                        System.out.println(otherObstacleConnections[0].x);
-                        for (int k=0; k<otherObstacleConnections.length; k++) {
-                            if (otherObstacleConnections[k].equals(new Point(-1,-1))) {
-                                otherObstacleConnections = searchForIntraObstacleConnection(otherObstacleConnections, newPolygon, obstacleVertices, indexOfObstaclePoint[1], conns, l, j, k);
-                            }
-                        }
-                        System.out.println("HOI");
-                        System.out.println("secondConn.toString: "+secondConnection.getX());
-                        if (secondConnection.getLocation().equals(new Point(-1,-1))) {
-                            secondConnection = searchForSecondConnection(secondConnection, newPolygon, obstacleVertices, indexOfObstaclePoint[1], conns, l, j);
-                        }
 
-                    /*    if (!secondConnectionFound) {
-                            newPolygon.add(obstacleVertices.get(l).get(j));
-                            if (j != indexOfObstaclePoint[1] && checkForConn(obstacleVertices.get(l).get(j), conns)) {
-                                secondConnection = getConn(obstacleVertices.get(l).get(j), conns);
-                                newPolygon.add(secondConnection);
-                                secondConnectionFound = true;
-                            } else {
-                                //if you reached the first element, continue at the end of the list until the found first connection
-                                for (int k = obstacleVertices.get(l).size() - 1; k > indexOfObstaclePoint[1]; k--) {
-                                    if (!secondConnectionFound) {
-                                        newPolygon.add(obstacleVertices.get(l).get(k));
-                                        if (checkForConn(obstacleVertices.get(l).get(k), conns)) {
-                                            secondConnection = getConn(obstacleVertices.get(l).get(k), conns);
-                                            newPolygon.add(secondConnection);
-                                            secondConnectionFound = true;
-                                        }
+                for (int j = indexOfObstaclePoint[1]; j >= 0; j--) {
+                    System.out.println("otherObstacleConnections.length1: " + (otherObstacleConnections.length - 1));
+
+                    System.out.println(obstacleVertices.get(i).get(j));
+                    newPolygon.add(obstacleVertices.get(i).get(j));
+                    if (j != indexOfObstaclePoint[1] && checkForConn(obstacleVertices.get(i).get(j), conns)) {
+                        otherObstacleConnections[k] = getConn(obstacleVertices.get(i).get(j), conns);
+                        newPolygon.add(otherObstacleConnections[k]);
+                        System.out.println("1");
+                        if (k==otherObstacleConnections.length-1){
+                            indexOfLastObstacleConnection = getIndexOfObstacleConn(otherObstacleConnections[k], obstacleVertices);
+                            found = true;
+                        }
+                    } else {
+                        //if you reached the first element, continue at the end of the list until the found first connection
+                        for (int m = obstacleVertices.get(i).size() - 1; m > indexOfObstaclePoint[1]; m--) {
+                            if (!found) {
+                                newPolygon.add(obstacleVertices.get(i).get(m));
+                                if (checkForConn(obstacleVertices.get(i).get(m), conns)) {
+                                    otherObstacleConnections[k] = getConn(obstacleVertices.get(i).get(m), conns);
+                                    newPolygon.add(otherObstacleConnections[k]);
+                                    System.out.println("2");
+                                    System.out.println("k: "+k);
+                                    if (k==otherObstacleConnections.length-1){
+                                        indexOfLastObstacleConnection = getIndexOfObstacleConn(otherObstacleConnections[k], obstacleVertices);
+                                        found = true;
                                     }
                                 }
                             }
-                        } */
+                        }
+                    }
+                }
+            }
+
+            System.out.println("second part");
+            for (int l = obstacleVertices.size() - 1; l > indexOfObstaclePoint[0]; l--) {
+                //start searching from found point backwards until you reach the first index
+                for (int j = indexOfObstaclePoint[1]; j >= 0; j--) {
+
+                    System.out.println(obstacleVertices.get(l).get(j));
+                    newPolygon.add(obstacleVertices.get(l).get(j));
+                    if (j != indexOfObstaclePoint[1] && checkForConn(obstacleVertices.get(l).get(j), conns)) {
+                        otherObstacleConnections[k] = getConn(obstacleVertices.get(l).get(j), conns);
+                        newPolygon.add(otherObstacleConnections[k]);
+                        System.out.println("3");
+                        if (k==otherObstacleConnections.length-1){
+                            indexOfLastObstacleConnection = getIndexOfObstacleConn(otherObstacleConnections[k], obstacleVertices);
+                            found = true;
+                        }
+                    } else {
+                        //if you reached the first element, continue at the end of the list until the found first connection
+                        for (int n = obstacleVertices.get(l).size() - 1; n > indexOfObstaclePoint[1]; n--) {
+                            if (!found) {
+                                newPolygon.add(obstacleVertices.get(l).get(n));
+                                if (checkForConn(obstacleVertices.get(l).get(n), conns)) {
+                                    otherObstacleConnections[k] = getConn(obstacleVertices.get(l).get(n), conns);
+                                    newPolygon.add(otherObstacleConnections[k]);
+                                    System.out.println("4");
+                                    System.out.println("k: "+k);
+                                    if (k==otherObstacleConnections.length-1){
+                                        indexOfLastObstacleConnection = getIndexOfObstacleConn(otherObstacleConnections[k], obstacleVertices);
+                                        found = true;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
+        System.out.println();
+        System.out.println("after obstacles");
+        for (int i=0; i<newPolygon.size(); i++){
+            System.out.println(newPolygon.get(i));
+        }
+
+        boolean lastConnectionFound = false;
+        for (int i=indexOfLastObstacleConnection[0]; i>=0; i--) {
+            System.out.println("indexOfLastObstacleConnection0: " + indexOfLastObstacleConnection[0]);
+            System.out.println("indexOfLastObstacleConnection1: " + indexOfLastObstacleConnection[1]);
+            for (int j = indexOfLastObstacleConnection[1]; j >= 0; j--) {
+                if (j != indexOfObstaclePoint[1] && checkForConn(obstacleVertices.get(i).get(j), conns)) {
+                    System.out.println("HELLO");
+                    if (!otherObstacleConnections[otherObstacleConnections.length - 1].equals(new Point(-1, -1)) && secondConnection.getLocation().equals(new Point(-1, -1))) {
+                        System.out.println("Do I get here?");
+                        secondConnection = searchForSecondConnection(secondConnection, newPolygon, obstacleVertices, indexOfObstaclePoint[1], conns, i, j);
+                        System.out.println("secondConn.toString: " + secondConnection.getX());
+                        System.out.println("secondConn.toString: " + secondConnection.getY());
+                        lastConnectionFound = true;
+                    }
+                } else {
+                    for (int n = obstacleVertices.get(i).size() - 1; n > indexOfObstaclePoint[1]; n--) {
+                        System.out.println("HELLO");
+                        if (!otherObstacleConnections[otherObstacleConnections.length - 1].equals(new Point(-1, -1)) && secondConnection.getLocation().equals(new Point(-1, -1))) {
+                            System.out.println("Do I get here?");
+                            secondConnection = searchForSecondConnection(secondConnection, newPolygon, obstacleVertices, indexOfObstaclePoint[1], conns, i, n);
+                            System.out.println("secondConn.toString: " + secondConnection.getX());
+                            System.out.println("secondConn.toString: " + secondConnection.getY());
+                            lastConnectionFound = true;
+                        }
+                    }
+                }
+            }
+        }
+        if (!lastConnectionFound) {
+            for (int l = obstacleVertices.size() - 1; l > indexOfLastObstacleConnection[0]; l--) {
+                for (int j = indexOfLastObstacleConnection[1]; j >= 0; j--) {
+                    if (j != indexOfObstaclePoint[1] && checkForConn(obstacleVertices.get(l).get(j), conns)) {
+                        if (!lastConnectionFound) {
+                            System.out.println("HOI");
+                            System.out.println("secondConn.toString: " + secondConnection.getX());
+                            System.out.println("secondConn.toString: " + secondConnection.getY());
+                            if (!otherObstacleConnections[otherObstacleConnections.length - 1].equals(new Point(-1, -1)) && secondConnection.getLocation().equals(new Point(-1, -1))) {
+                                System.out.println("is it here?");
+                                secondConnection = searchForSecondConnection(secondConnection, newPolygon, obstacleVertices, indexOfObstaclePoint[1], conns, l, j);
+                                lastConnectionFound = true;
+                            }
+                        }
+                    } else {
+                        for (int n = obstacleVertices.get(l).size() - 1; n > indexOfObstaclePoint[1]; n--) {
+                            if (!lastConnectionFound) {
+                                System.out.println("HOI");
+                                System.out.println("secondConn.toString: " + secondConnection.getX());
+                                System.out.println("secondConn.toString: " + secondConnection.getY());
+                                if (!otherObstacleConnections[otherObstacleConnections.length - 1].equals(new Point(-1, -1)) && secondConnection.getLocation().equals(new Point(-1, -1))) {
+                                    System.out.println("is it here?");
+                                    secondConnection = searchForSecondConnection(secondConnection, newPolygon, obstacleVertices, indexOfObstaclePoint[1], conns, l, n);
+                                    lastConnectionFound = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        System.out.println("last conn: "+ secondConnection.getX());
+        System.out.println("last conn: "+ secondConnection.getY());
+
         System.out.println();
         for (int i=0; i<newPolygon.size(); i++){
             System.out.println(newPolygon.get(i));
@@ -386,6 +490,7 @@ public class Floor extends AbstractObject
                                                     ArrayList<ArrayList<Point>> conns, int i, int j, int m){
 
         boolean found=false;
+        System.out.println(obstacleVertices.get(i).get(j));
         newPolygon.add(obstacleVertices.get(i).get(j));
         if (j != indexOfObstaclePoint && checkForConn(obstacleVertices.get(i).get(j), conns)) {
             otherObstacleConnections[m] = getConn(obstacleVertices.get(i).get(j), conns);
@@ -409,18 +514,25 @@ public class Floor extends AbstractObject
     }
 
     public Point searchForSecondConnection(Point secondConnection, ArrayList<Point> newPolygon,
-                                           ArrayList<ArrayList<Point>> obstacleVertices, int indexOfObstaclePoint,
+                                           ArrayList<ArrayList<Point>> obstacleVertices, int indexOfLastObstaclePoint,
                                            ArrayList<ArrayList<Point>> conns, int i, int j){
+        System.out.println("SEARCH FOR 2nd CONN");
         boolean found=false;
+        System.out.println(obstacleVertices.get(i).get(j));
         newPolygon.add(obstacleVertices.get(i).get(j));
-        if (j != indexOfObstaclePoint && checkForConn(obstacleVertices.get(i).get(j), conns)) {
+        if (j != indexOfLastObstaclePoint && checkForConn(obstacleVertices.get(i).get(j), conns)) {
+            System.out.println("1?");
             secondConnection = getConn(obstacleVertices.get(i).get(j), conns);
             newPolygon.add(secondConnection);
             found = true;
         } else {
+            System.out.println("2?");
+            System.out.println(obstacleVertices.get(i).get(j));
             //if you reached the first element, continue at the end of the list until the found first connection
-            for (int k = obstacleVertices.get(i).size() - 1; k > indexOfObstaclePoint; k--) {
+            for (int k = obstacleVertices.get(i).size() - 1; k > indexOfLastObstaclePoint; k--) {
                 if (!found) {
+                    System.out.println("3?");
+                    System.out.println(obstacleVertices.get(i).get(k));
                     newPolygon.add(obstacleVertices.get(i).get(k));
                     if (checkForConn(obstacleVertices.get(i).get(k), conns)) {
                         secondConnection = getConn(obstacleVertices.get(i).get(k), conns);
@@ -430,11 +542,18 @@ public class Floor extends AbstractObject
                 }
             }
         }
-
+        System.out.println();
         return secondConnection;
     }
 
     public ArrayList<Point> findLastPartOfFloor(Point[] floorVertices, Point firstConnection, Point secondConnection, ArrayList<ArrayList<Point>> conns, ArrayList<Point> newPolygon){
+
+        System.out.println("WTF");
+        System.out.println();
+        System.out.println("after everything");
+        for (int i=0; i<newPolygon.size(); i++){
+            System.out.println(newPolygon.get(i));
+        }
         int indexOfConnectionFromObstacle=-1;
         for (int i=0; i<floorVertices.length; i++){
             if (secondConnection.equals(floorVertices[i])){
@@ -454,6 +573,11 @@ public class Floor extends AbstractObject
                     }
                 }
             }
+        }
+        System.out.println();
+        System.out.println("after everything");
+        for (int i=0; i<newPolygon.size(); i++){
+            System.out.println(newPolygon.get(i));
         }
         return newPolygon;
     }
