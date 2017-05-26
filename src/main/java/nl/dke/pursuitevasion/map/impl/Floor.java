@@ -7,6 +7,8 @@ import nl.dke.pursuitevasion.map.MapPolygon;
 import org.jgrapht.*;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
@@ -23,6 +25,11 @@ import java.util.*;
  */
 public class Floor extends AbstractObject
 {
+
+    /**
+     * The logger of this class
+     */
+    private final static Logger logger = LoggerFactory.getLogger(Floor.class);
 
     /**
      * Obstacles can be placed on the floor to obstruct vision
@@ -208,6 +215,14 @@ public class Floor extends AbstractObject
         {
             for(Vector2D u : vertexes)
             {
+                if(logger.isTraceEnabled())
+                {
+                    logger.trace("v:{}, u:{}, v==u:{}, not exists: {}, sight: {}",
+                                 v, u,
+                                 !v.equals(u),
+                                 g.getEdge(u, v) == null,
+                                 isLineOfSight(v, u));
+                }
                 if(!v.equals(u) && g.getEdge(u, v) == null && isLineOfSight(v, u))
                 {
                     DefaultWeightedEdge e = new DefaultWeightedEdge();
@@ -291,9 +306,26 @@ public class Floor extends AbstractObject
         Line2D lineBetweenPoints = new Line2D.Double(
                 new Point2D.Double(v.getX(), v.getY()),
                 new Point2D.Double(u.getX(), u.getY()));
-
+        if(logger.isTraceEnabled())
+        {
+            logger.trace("u = {}, v = {}, line_uv = [{} {}, {} {}]",
+                         u,v,
+                         lineBetweenPoints.getX1(),
+                         lineBetweenPoints.getY1(),
+                         lineBetweenPoints.getX2(),
+                         lineBetweenPoints.getX2());
+        }
         for (Line2D line: lines)
         {
+            if(logger.isTraceEnabled())
+            {
+                logger.trace("intersects with [{} {},{} {}] : {}",
+                             line.getX1(),
+                             line.getY1(),
+                             line.getX2(),
+                             line.getX2(),
+                             lineBetweenPoints.intersectsLine(line));
+            }
             if(line.intersectsLine(lineBetweenPoints))
             {
                 return false;

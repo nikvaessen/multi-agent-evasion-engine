@@ -1,6 +1,5 @@
 package nl.dke.pursuitevasion.game;
 
-import com.sun.javafx.geom.Line2D;
 import nl.dke.pursuitevasion.game.agents.*;
 import nl.dke.pursuitevasion.game.agents.tasks.AbstractAgentTask;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
