@@ -16,7 +16,7 @@ public class EngineConstants
     public final static double VISION_ANGLE  = 120; // degrees
 
     //if this is true, the game loop will never end!
-    public final static boolean ALWAYS_LOOP = false;
+    public final static boolean ALWAYS_LOOP = true;
 
 
     public final static Color FLOOR_COLOR = new Color(153,204,255);

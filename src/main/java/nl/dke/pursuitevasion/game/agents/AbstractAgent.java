@@ -1,5 +1,6 @@
 package nl.dke.pursuitevasion.game.agents;
 
+import nl.dke.pursuitevasion.game.MapInfo;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
@@ -78,6 +79,8 @@ public abstract class AbstractAgent
      */
     private volatile boolean hasRequest;
 
+    protected volatile MapInfo mapInfo;
+
     /**
      * Create an agent in the given Map
      *
@@ -98,6 +101,10 @@ public abstract class AbstractAgent
         this.visionRange = visionRange;
         this.visionAngle = visionAngle;
         this.visionArc = new VisionArc();
+    }
+
+    public void setMapInfo(MapInfo mapInfo){
+        this.mapInfo = mapInfo;
     }
 
     /**

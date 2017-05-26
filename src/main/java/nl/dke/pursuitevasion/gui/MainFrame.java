@@ -5,6 +5,7 @@ import nl.dke.pursuitevasion.game.EngineConstants;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.Direction;
+import nl.dke.pursuitevasion.game.agents.impl.DistanceAgent;
 import nl.dke.pursuitevasion.game.agents.impl.SimpleAgent;
 import nl.dke.pursuitevasion.game.agents.impl.UserAgent;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
@@ -40,6 +41,7 @@ public class MainFrame extends JFrame
         //agents.add(new SimpleAgent(new Point(5,5), Direction.SOUTH, 5));
         agents.add(new UserAgent(map, floor, new Vector2D(10, 10), Direction.SOUTH, 5,
                                  EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, keyboardInputListener));
+        agents.add(new DistanceAgent(map, floor, new Vector2D(20,20), Direction.SOUTH, 5, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
 //        agents.add(new SimpleAgent(map, floor, new Vector2D(15,15), Direction.SOUTH, 5,
 //                EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
 

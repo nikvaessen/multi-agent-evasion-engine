@@ -88,6 +88,11 @@ public class Engine
 
         private double rotationPerIteration = EngineConstants.TURNING_SPEED / desiredIterationLength;
 
+
+        public LinkedList<AbstractAgent> getPursuerList(){
+            return pursuers;
+        }
+
         @Override
         public void run()
         {
@@ -219,6 +224,43 @@ public class Engine
                         logger.debug("Updated MapViewPanel");
                     }
                 }
+
+                // give pursuers new location of evader
+                //compute mapinfo which stores evader location
+
+
+                LinkedList<Vector2D> locationOfPursuer = new LinkedList<>();
+                for (AbstractAgent agent: pursuers){
+                    locationOfPursuer.add(agent.getLocation());
+                }
+                MapInfo forEvader = new MapInfo(locationOfPursuer);
+
+                for (AbstractAgent agent: evaders){
+                    agent.setMapInfo(forEvader);
+                }
+
+                //give evade new location of pursuer
+                //compute mapinfo whis stores purseur locations
+
+                LinkedList<Vector2D> locationOfEvaders = new LinkedList<>();
+                for(AbstractAgent agent : evaders){
+                    locationOfEvaders.add(agent.getLocation());
+                }
+                MapInfo forPursuer = new MapInfo(locationOfEvaders);
+
+                for (AbstractAgent agent: pursuers){
+                    agent.setMapInfo(forPursuer);
+                }
+
+
+
+                //give pursuers new location of evader
+                //compute mapinfo whis stores evader locations
+                // for(AbstractAgent agent : pursuers){
+                //    agent.setMapInfo(new MapInfo());
+                //}
+
+
 
                 // 6. wait
                 msPassed = System.currentTimeMillis() - iterationStartTime;
