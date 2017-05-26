@@ -7,9 +7,6 @@ import nl.dke.pursuitevasion.game.agents.Direction;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by Jan on 24-5-2017.
  */
@@ -17,7 +14,7 @@ public class MininalPathAgent extends AbstractAgent{
 
     private int agentNumber;
 
-    private MinimalPathOverseer overseer;
+    public MinimalPathOverseer overseer;
 
     public MininalPathAgent(Map map, Floor floor, Vector2D startLocation, Direction startsFacing, int radius, double visionRange, double visionAngle){
         super(map, floor, startLocation, startsFacing, radius, visionRange, visionAngle);
@@ -27,7 +24,7 @@ public class MininalPathAgent extends AbstractAgent{
         catch (NullPointerException e){
             overseer = MinimalPathOverseer.init(map);
         }
-        agentNumber = overseer.addAgent(this);
+        agentNumber = overseer.registerAgent(this);
     }
 
     @Override

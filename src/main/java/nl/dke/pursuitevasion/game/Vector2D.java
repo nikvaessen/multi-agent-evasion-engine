@@ -178,6 +178,23 @@ public class Vector2D
         return new Point2D.Double(x, y);
     }
 
+    // Creates a vector2D instance from an array of doubles
+    // Presumes the array to be in [x,y] format.
+    // Rejects arrays that are smaller than 2 elements.
+    // Ignores elements beyond index 1.
+    public static Vector2D fromDoubleArray(double[] coords){
+        // check that the size is correct
+        if(coords.length < 2)
+        {
+            throw new IllegalArgumentException("coordinate array should have at least 2 elements");
+        }
+        return new Vector2D(coords[0], coords[1]);
+    }
+
+    public static Vector2D fromPoint2D(Point2D point){
+        return new Vector2D(point.getX(), point.getY());
+    }
+
     @Override
     public int hashCode()
     {
