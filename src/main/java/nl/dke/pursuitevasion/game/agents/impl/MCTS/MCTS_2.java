@@ -46,7 +46,8 @@ public class MCTS_2 implements Strategy{
     }
 
     public Move start(){
-       // setNewRoot();
+
+       setNewRoot(realState.turnOrder);
 
         double startTime = System.currentTimeMillis();
         n_expansion = 0;
@@ -109,9 +110,9 @@ public class MCTS_2 implements Strategy{
     }
 
 
-
+    @Deprecated
     private Move startQuick() {
-        setNewRoot();
+        //setNewRoot(new TurnOrder());
         double startTime = System.currentTimeMillis();
         n_expansion = 0;
         while (System.currentTimeMillis() - startTime <maxtTime){
@@ -326,6 +327,7 @@ public class MCTS_2 implements Strategy{
             Move move = moves.remove((int) (Math.random() * moves.size()));
 
             newNode.setMove(move);
+
             n_expansion++;
            // if (!newNode.isWinningMove() && !newNode.isLosingMove() ){
                 if (depthLevel==2) simulateQuick(newNode); else
@@ -374,9 +376,11 @@ public class MCTS_2 implements Strategy{
         //execute a full turn order
 
         //check if finished
-
+        TurnOrder to = node.getTurn();
         //repeat until 4 seconds are full
-        node.incrementWin(node.getState().evaluate(node.getTurn()), node.getTurn());
+        double[] value = node.getState().evaluate(to);
+
+        node.incrementWin(value[0],value[1],to);
 
         /*if(node.isEvader() == StatusCell.Blue)
             current = StatusCell.Red;

@@ -74,11 +74,16 @@ public class State {
 
     }
 
-    public double evaluate(TurnOrder turn) {
+    public double[] evaluate(TurnOrder turn) {
 
         //sum of square distances... the smaller the better
-        if (turn.isEvader())
+        if (turn.isEvader()){
+            Vector2D distance1
+            Vector2D distance1
+            Vector2D distance1
+        }
         return 3.4;
+        return new double[0];
     }
 
     public AbstractAgent getAgent(int id) {

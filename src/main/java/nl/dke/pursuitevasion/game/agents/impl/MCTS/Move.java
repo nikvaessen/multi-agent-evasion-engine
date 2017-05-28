@@ -14,6 +14,10 @@ import java.util.Collections;
  * Created by giogio on 1/13/17.
  */
 public class Move {
+    private int shortestDistance; //special storing of save file
+    private double distance1;
+    private double distance2;
+    private double distance0;
     private  ArrayList<Move> moves;
     private ArrayList<Move> freeMoves;
     private  AbstractAgent agent;
@@ -33,11 +37,17 @@ public class Move {
         return Math.asin(angle.getRadians())* skale * EngineConstants.WALKING_SPEED;
     }
 
-    private Move(AbstractAgent agent, Angle angle, double skale){
+    public Move(AbstractAgent agent, Angle angle, double skale, double distance0, double distance1, double distance2, int shortestDistance) {
         this.angle = angle;
         this.skale = skale;
         this.agent = agent;
+        this.distance0 = distance0;
+        this.distance1 = distance1;
+        this.distance2 = distance2;
+        this.shortestDistance = shortestDistance;
+
     }
+
 
     public Move(AbstractAgent agent,Byte b){
         double skale = b%16+1 ;
@@ -86,22 +96,24 @@ public class Move {
         if (player.isEvader()) {
             //add 16 moves, one for every direction. The length is a fourth of the distance to the closest pursuer
 
-        }
-        if (!player.isEvader()){
-            //add 16 moves, one for every direction. The length is a fourth of the distance of evader to closest pursuer,
-            //with an minimum distance of speed*timeframe and direction 0 is the direct angle closing in to the evader
-            Angle a = new Angle(0);
-            a = new Angle(evader,pursuer.get(i));
+            Angle a = new Angle(evader,pursuer.get(i));
             double OverSixteen = 1./16.;
             for (int j = 0; j < 16; j++) {
 
                 Angle b = a.clone(); a.rotate((int) OverSixteen);
 
-                Move n = new Move(evader,b,skaleA);
 
+                Move n = new Move(evader,b,skaleA,distance0,distance1,distance2,i);
                 moves.add(n);
             }
-
+        }
+        if (!player.isEvader()){
+            //add 16 moves, one for every direction. The length is a fourth of the distance of evader to closest pursuer,
+            //with an minimum distance of speed*timeframe and direction 0 is the direct angle closing in to the evader
+            Angle a = new Angle(player,evader);
+            Move n = new Move(player,a,skaleA);
+            Move n = new Move(evader,b,skaleA,distance0,distance1,distance2,i);
+            moves.add(n);
         }
         for (Move m: moves) {
             if (!m.isLegal(state.map)) {
@@ -125,7 +137,11 @@ public class Move {
         return freeMoves;
     }
 
-
+    /**
+     *  bad legality check
+     * @param map
+     * @return
+     */
     private boolean isLegal(Map map) {
         Vector2D v = new Vector2D(this.agent.getLocation());
         v.add(this.getDeltaX(),this.getDeltaY());

@@ -43,10 +43,11 @@ public class NodeTree_2 {
     }
 
 
-    public void incrementWin(double wins, TurnOrder winningPlayer){
-        if (this.currentplayer.isSameTeam(winningPlayer.getIDCurrent())) this.wins+=wins;
+    public void incrementWin(double scoreWinning, double scoreLoosing, TurnOrder winningPlayer){
+        if (this.currentplayer.isSameTeam(winningPlayer.getIDCurrent())) this.wins+=scoreWinning;
+        else this.wins+=scoreLoosing;
         if(parent!=null)
-            parent.incrementWin(wins, winningPlayer);
+            parent.incrementWin(scoreWinning, scoreLoosing, winningPlayer);
     }
     public void incrementGame(){
         this.games+=1;
