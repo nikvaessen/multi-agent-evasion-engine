@@ -810,7 +810,7 @@ public class ModelView extends JPanel {
                     break;
             }
 
-          //  g2d.setColor(new Color((float)Math.random(),(float)Math.random(),(float)Math.random()));
+          //  g2d.setTurn(new Color((float)Math.random(),(float)Math.random(),(float)Math.random()));
           //  g2d.fillPolygon(poly);
             g2d.setColor(Color.BLACK);
             g2d.fillOval(p.x-2,p.y-2,4,4);
@@ -833,10 +833,10 @@ public class ModelView extends JPanel {
             int x = this.getWidth();
             int y = this.getHeight();
             g2d.setStroke(new BasicStroke(5));
-            g2d.setColor(Color.cyan);
+            g2d.setTurn(Color.cyan);
             g2d.drawLine(x*1/3,y*1/3,x*2/3,y*2/3);
 
-            g2d.setColor(Color.RED);
+            g2d.setTurn(Color.RED);
             g2d.fillOval((int)lastClickedPoint.getX()-5,(int)lastClickedPoint.getY()-5,10,10);
         }*/
 

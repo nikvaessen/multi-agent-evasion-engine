@@ -201,6 +201,10 @@ public abstract class AbstractAgent
         return radius;
     }
 
+    public boolean sameID(AbstractAgent a){
+        return (a.getId()==id);
+    }
+
     /**
      * This method will add tasks to a request until the desired state of the agent
      * will be reached by the request.

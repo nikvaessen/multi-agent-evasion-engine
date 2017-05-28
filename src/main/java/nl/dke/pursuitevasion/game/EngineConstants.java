@@ -33,6 +33,7 @@ public class EngineConstants
     public final static Color PURSUER_COLOR = new Color(31, 94, 196);
     private static long seed = 1337L;
     private static Random random = new Random(seed);
+    public static double shortestMoveLength = 10;
 
     public static Random getRandom() {
         return random;

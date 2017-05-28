@@ -1,7 +1,6 @@
 package nl.dke.pursuitevasion.game.agents.impl.MCTS;
 
 
-import nl.dke.pursuitevasion.game.Engine;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 
 import java.util.*;
@@ -18,6 +17,7 @@ public class NodeTree_2 {
     private TurnOrder currentplayer;
     private int wins,games;
     private boolean winningMove, losingMove, deadCell;
+
 
 
     public NodeTree_2(NodeTree_2 parent){
@@ -37,16 +37,16 @@ public class NodeTree_2 {
         state = parent.getState().clone();
         state.executeMove(move);
 
-        state.evaluate();
+        state.evaluate(currentplayer);
 
 
     }
 
 
-    public void incrementWin(int wins, boolean b){
-        if (b) this.wins+=wins;
+    public void incrementWin(double wins, TurnOrder winningPlayer){
+        if (this.currentplayer.isSameTeam(winningPlayer.getIDCurrent())) this.wins+=wins;
         if(parent!=null)
-            parent.incrementWin(wins, !b);
+            parent.incrementWin(wins, winningPlayer);
     }
     public void incrementGame(){
         this.games+=1;
@@ -62,7 +62,7 @@ public class NodeTree_2 {
         this.state = state;
     }
 
-    public void setColor(TurnOrder currentplayer) {
+    public void setTurn(TurnOrder currentplayer) {
         this.currentplayer = currentplayer;
     }
 
@@ -203,6 +203,17 @@ public class NodeTree_2 {
     }
 
     public ArrayList<Move> getFreeMoves() {
-        return null;
+        //if (depth == 1)
+            return move.getFreeMoves(this);
+       // ArrayList<Move> free = move.getFreeMoves(this);
+       // for (Move m: free){
+       //     free.addAll(m.getFreeMoves());
+       // }
+
+    }
+
+
+    public TurnOrder getTurn() {
+        return currentplayer;
     }
 }

@@ -1,20 +1,27 @@
 package nl.dke.pursuitevasion.game.agents.impl.MCTS;
 
 import nl.dke.pursuitevasion.game.EngineConstants;
+import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.Angle;
+import nl.dke.pursuitevasion.game.agents.Direction;
+import nl.dke.pursuitevasion.map.impl.Map;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Created by giogio on 1/13/17.
  */
 public class Move {
+    private  ArrayList<Move> moves;
+    private ArrayList<Move> freeMoves;
     private  AbstractAgent agent;
     private double skale = 1;
     private Angle angle;
     private double deltaX;
     private double deltaY;
+
 
 
 
@@ -58,12 +65,73 @@ public class Move {
         return agent;
     }
 
-    public static ArrayList<Move> getMoves(AbstractAgent player) {
+    public ArrayList<Move> getMoves(AbstractAgent player, State state) {
+       if (moves != null) return moves;
+        double skale = 0;
 
-        return null;
+        ArrayList<AbstractAgent> pursuer = state.pursuers;
+        AbstractAgent evader = state.evaders.get(0);
+        Vector2D evaderLoc = evader.getLocation();
+
+        double distance0 = pursuer.get(0).getLocation().distance(evaderLoc);
+        double distance1 = pursuer.get(1).getLocation().distance(evaderLoc);
+        double distance2 = pursuer.get(2).getLocation().distance(evaderLoc);
+        double shortest = distance0; int i = 0;
+        if (distance1<distance0) {i = 1; shortest = distance1;}
+        if (distance2<shortest) {i = 2; shortest = distance2;}
+        double skaleA = shortest/4;
+        if (skaleA < EngineConstants.shortestMoveLength) skaleA=EngineConstants.shortestMoveLength;
+
+        moves = new ArrayList<Move>();
+        if (player.isEvader()) {
+            //add 16 moves, one for every direction. The length is a fourth of the distance to the closest pursuer
+
+        }
+        if (!player.isEvader()){
+            //add 16 moves, one for every direction. The length is a fourth of the distance of evader to closest pursuer,
+            //with an minimum distance of speed*timeframe and direction 0 is the direct angle closing in to the evader
+            Angle a = new Angle(0);
+            a = new Angle(evader,pursuer.get(i));
+            double OverSixteen = 1./16.;
+            for (int j = 0; j < 16; j++) {
+
+                Angle b = a.clone(); a.rotate((int) OverSixteen);
+
+                Move n = new Move(evader,b,skaleA);
+
+                moves.add(n);
+            }
+
+        }
+        for (Move m: moves) {
+            if (!m.isLegal(state.map)) {
+                moves.remove(m);
+            }
+        }
+        return moves;
     }
 
-    public static ArrayList<Move> getFreeMoves(NodeTree_2 node) {
-        return null;
+    public ArrayList<Move> getFreeMoves(NodeTree_2 node) {
+
+        if (freeMoves != null) return freeMoves;
+
+        freeMoves = new ArrayList<>();
+        ArrayList<Move> allMoves = getMoves(node.getPlayer(),node.getState());
+        Collections.copy(allMoves,freeMoves);
+
+
+
+
+        return freeMoves;
     }
+
+
+    private boolean isLegal(Map map) {
+        Vector2D v = new Vector2D(this.agent.getLocation());
+        v.add(this.getDeltaX(),this.getDeltaY());
+        if (map.isInsideAndLegal(v)) return true;
+        return false;
+    }
+
+
 }

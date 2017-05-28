@@ -4,6 +4,7 @@ import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.AgentRequest;
 import nl.dke.pursuitevasion.game.agents.Direction;
+import nl.dke.pursuitevasion.game.agents.tasks.WalkForwardTask;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 
@@ -11,6 +12,8 @@ import nl.dke.pursuitevasion.map.impl.Map;
  * Created by Nibbla on 19.05.2017.
  */
 public class PursuerKillKillKillEmAll extends AbstractAgent{
+    private static CoordinatorPursuerKillKillKillEmAll CoordinatorPursuer;
+
     /**
      * Create an agent in the given Map
      *
@@ -28,6 +31,11 @@ public class PursuerKillKillKillEmAll extends AbstractAgent{
 
     @Override
     protected void completeRequest(AgentRequest request) {
+        if (this.CoordinatorPursuer == null) this.CoordinatorPursuer = new CoordinatorPursuerKillKillKillEmAll();
+
+        CoordinatorPursuer.getNextMove(this,);
+
+        request.add(new WalkForwardTask(2));
 
     }
 

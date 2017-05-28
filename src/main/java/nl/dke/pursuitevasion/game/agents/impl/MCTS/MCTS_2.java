@@ -17,7 +17,7 @@ public class MCTS_2 implements Strategy{
     private State realState;
     private int maxtTime, n_expansion;
     private NodeTree_2 root;
-    private NodeTree_2 lastMove;
+    private NodeTree_2 lastFinalSelectedMove;
 
     int[][] blueWinboard;
     int[][] bluePlayboard;
@@ -46,7 +46,7 @@ public class MCTS_2 implements Strategy{
     }
 
     public Move start(){
-        setNewRoot();
+       // setNewRoot();
 
         double startTime = System.currentTimeMillis();
         n_expansion = 0;
@@ -54,9 +54,7 @@ public class MCTS_2 implements Strategy{
             monteCarloSearch(root,startTime);
         }else {
             while (System.currentTimeMillis() - startTime < maxtTime) {
-
                 expansion(selection(root));
-
             }
         }
         printTree(root);
@@ -92,7 +90,7 @@ public class MCTS_2 implements Strategy{
     private void monteCarloSearch(NodeTree_2 root, double startTime) {
 
 
-        ArrayList<Move> moves = Move.getMoves(root.getPlayer());
+        ArrayList<Move> moves = root.getFreeMoves();
         for (int i = 0; i < moves.size(); i++) {
             NodeTree_2 newNode = new NodeTree_2(root);
             newNode.setMove(moves.get(i));
@@ -150,7 +148,7 @@ public class MCTS_2 implements Strategy{
                 bestValue = value;
             }
         }
-        lastMove = bestNode;
+        lastFinalSelectedMove = bestNode;
         return bestNode;
     }
 
@@ -165,17 +163,21 @@ public class MCTS_2 implements Strategy{
                 bestValue = value;
             }
         }
-        lastMove = bestNode;
+        lastFinalSelectedMove = bestNode;
         return bestNode;
     }
 
+    /**
+     * checked
+     * @return
+     */
     public NodeTree_2 getBestMove(){
         NodeTree_2 bestNode = null;
         double bestValue = -999999999;
         for(NodeTree_2 child: root.getChildren()){
            
             if(child.isWinningMove() || child.isLosingMove()){
-                lastMove = child;
+                lastFinalSelectedMove = child;
                 return child ;
             }
             int value = child.getGames();
@@ -184,14 +186,14 @@ public class MCTS_2 implements Strategy{
                 bestValue = value;
             }
         }
-        lastMove = bestNode;
+        lastFinalSelectedMove = bestNode;
         return bestNode;
     }
 
     public NodeTree_2 selection(NodeTree_2 node){
 
 
-        if( Move.getFreeMoves(node).size()>0) //TODO check that all moves are looked at.
+        if( node.getFreeMoves().size()>0) //TODO check that all moves are looked at.
             return node;
 
         NodeTree_2 bestNode = node;
@@ -258,12 +260,16 @@ public class MCTS_2 implements Strategy{
 
     /**
      * resets the root of the monte carlo search tree, after a move has taken.
+     * For this to work, the executed move is compared with all child moves of the last selected one.
+     * I suppose it works like this, as the active player has always two steps.
      */
-    public void setNewRoot(){
-        if(lastMove!=null) {
-            State copy = lastMove.getState().clone();
+    public void setNewRoot(TurnOrder t){
+        if(lastFinalSelectedMove !=null||ally.getIDCurrent()!=t.getIDCurrent()) {
+            //if the mcst has been used before, it now has to be advanced to the new state.
+            //the code right now appears to call set New Root again, and by that deletes the factual tree?!?!?!?!
+            State copy = lastFinalSelectedMove.getState().clone();
 
-            for (NodeTree_2 child : lastMove.getChildren()) {
+            for (NodeTree_2 child : lastFinalSelectedMove.getChildren()) {
                 Move move = child.getMove();
                 copy.executeMove(move);
                 if (copy.equals(realState)) {
@@ -273,14 +279,16 @@ public class MCTS_2 implements Strategy{
                     System.out.println("USED________");
                     return;
                 }
-                copy = lastMove.getState().clone();
+                copy = lastFinalSelectedMove.getState().clone();
             }
-            lastMove = null;
-            setNewRoot();
+            lastFinalSelectedMove = null;
+            t.nextPlayer();
+            setNewRoot(t);
         }else {
-            root = new NodeTree_2(null);
+            //
+            if(root == null) root = new NodeTree_2(null);
             TurnOrder to = ally.clone();to.nextPlayer();
-            root.setColor(to);
+            root.setTurn(to);
             root.setState(realState.clone());
         }
     }
@@ -297,7 +305,7 @@ public class MCTS_2 implements Strategy{
 
     private void specialExpansion(NodeTree_2 node) {
 
-        ArrayList<Move> moves =  Move.getFreeMoves(node);
+        ArrayList<Move> moves =  node.getFreeMoves();
         NodeTree_2 newNode = new NodeTree_2(node);
         ExtensionStrategy es = new ExtensionStrategy(moves,node.getState(),ally);
 
@@ -316,6 +324,7 @@ public class MCTS_2 implements Strategy{
             ArrayList<Move> moves = node.getFreeMoves();
             NodeTree_2 newNode = new NodeTree_2(node);
             Move move = moves.remove((int) (Math.random() * moves.size()));
+
             newNode.setMove(move);
             n_expansion++;
            // if (!newNode.isWinningMove() && !newNode.isLosingMove() ){
@@ -367,7 +376,7 @@ public class MCTS_2 implements Strategy{
         //check if finished
 
         //repeat until 4 seconds are full
-
+        node.incrementWin(node.getState().evaluate(node.getTurn()), node.getTurn());
 
         /*if(node.isEvader() == StatusCell.Blue)
             current = StatusCell.Red;
@@ -393,7 +402,7 @@ public class MCTS_2 implements Strategy{
         }
 
         if(copy.hasWon(ally)) {
-            node.incrementWin(1, node.isEvader()==ally);
+
             //rave(copy, ally, true);
             //rave(copy,enemy,false);
         }
@@ -513,7 +522,7 @@ public class MCTS_2 implements Strategy{
 
     @Override
     public void resetTree() {
-        lastMove = null;
+        lastFinalSelectedMove = null;
         System.out.println("DOOONE ___________________________");
     }
 

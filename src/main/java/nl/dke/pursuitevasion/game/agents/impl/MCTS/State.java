@@ -1,6 +1,7 @@
 package nl.dke.pursuitevasion.game.agents.impl.MCTS;
 
 import nl.dke.pursuitevasion.game.Engine;
+import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.map.impl.Map;
 
@@ -17,9 +18,35 @@ public class State {
     Map map;
     Engine e;
 
+    HistoryNode historyNode;
+
+
+    public State(Engine e, Map map, TurnOrder turnOrder, ArrayList<AbstractAgent> evaders, ArrayList<AbstractAgent> pursuers) {
+        this.e = e;
+        this.map = map;
+        this.turnOrder = turnOrder;
+        this.evaders = evaders;
+        this.pursuers = pursuers;
+
+        prepareMaprepresentation(map);
+    }
+
+    private void prepareMaprepresentation(Map map) {
+        historyNode = new HistoryNode(600);
+        HistoryNode.getDistance(HistoryNode,HistoryNode);
+    }
+
+
+    private State() {
+
+    }
+
 
     public State clone(){
         State s = new State();
+        s.map = map;
+        s.e = e;
+
         s.pursuers = new ArrayList<>(3);
         for (AbstractAgent p: pursuers){
             s.pursuers.add(p.clone());
@@ -34,6 +61,7 @@ public class State {
     public void executeMove(Move move) {
         AbstractAgent toMove = null;
         int id = move.getAgent().getId();
+
         for (AbstractAgent p: pursuers){
             if (p.getId()== id) toMove = p;
         }
@@ -46,8 +74,11 @@ public class State {
 
     }
 
-    public void evaluate() {
+    public double evaluate(TurnOrder turn) {
 
+        //sum of square distances... the smaller the better
+        if (turn.isEvader())
+        return 3.4;
     }
 
     public AbstractAgent getAgent(int id) {
@@ -64,5 +95,26 @@ public class State {
         //TODO
 
         return false;
+    }
+
+    private class HistoryNode {
+        //an t->x,y memory
+        ArrayList<String> history = new ArrayList<>(600);
+        ArrayList<Vector2D> history2 = new ArrayList<>(600);
+        ArrayList<Vector2D> history3 = new ArrayList<>(600);
+        ArrayList<Vector2D> history4 = new ArrayList<>(600);
+
+
+        public HistoryNode(int width, int height) {
+
+        }
+
+        public HistoryNode(int expectedSeconds) {
+
+        }
+
+        public void update(AbstractAgent a){
+
+        }
     }
 }
