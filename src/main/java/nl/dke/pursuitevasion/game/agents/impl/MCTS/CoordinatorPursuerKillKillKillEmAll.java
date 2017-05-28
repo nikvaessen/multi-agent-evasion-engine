@@ -8,6 +8,7 @@ import nl.dke.pursuitevasion.game.agents.Direction;
 import nl.dke.pursuitevasion.game.agents.tasks.AbstractAgentTask;
 import nl.dke.pursuitevasion.game.agents.tasks.WalkToTask;
 import nl.dke.pursuitevasion.gui.KeyboardInputListener;
+import nl.dke.pursuitevasion.gui.editor.ModelView;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 
@@ -23,6 +24,7 @@ public class CoordinatorPursuerKillKillKillEmAll{
     private final Engine engine;
     List<PursuerKillKillKillEmAll> pursuers = new ArrayList<>(3);
     private MCTS_2 m;
+    private ModelView viewport;
 
 
     public CoordinatorPursuerKillKillKillEmAll(Engine e, Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing, int radius,
@@ -45,9 +47,12 @@ public class CoordinatorPursuerKillKillKillEmAll{
     }
 
     public AbstractAgentTask getNextMove(PursuerKillKillKillEmAll p, List<AbstractAgent> pursuer, List<AbstractAgent> evader, long currentTime){
-        State s = new State(currentTime);
-        TurnOrder t = new TurnOrder(pursuer,evader);
-        if (m = null) m = new MCTS_2(s,p, pursuer, evader, t);
+        TurnOrder t = new TurnOrder(p,pursuer,evader);
+        State s = new State(engine, map, t, evader, pursuer);
+
+
+        if (m == null) m = new MCTS_2(s,p, pursuer, evader, t);
+        if (viewport!=null)viewport.showMCTS(m);
         Move move = m.start();
         AbstractAgentTask abstractAgentTask = new WalkToTask(move.getAgent().getLocation(),false);
         if (!m.hasCalculated) m.calculate(durationInMS);

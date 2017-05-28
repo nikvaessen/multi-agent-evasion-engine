@@ -33,7 +33,7 @@ public class PursuerKillKillKillEmAll extends AbstractAgent{
     protected void completeRequest(AgentRequest request) {
         if (this.CoordinatorPursuer == null) this.CoordinatorPursuer = new CoordinatorPursuerKillKillKillEmAll();
 
-        CoordinatorPursuer.getNextMove(this,);
+        CoordinatorPursuer.getNextMove(this,pur);
 
         request.add(new WalkForwardTask(2));
 

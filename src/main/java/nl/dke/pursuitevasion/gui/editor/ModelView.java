@@ -1,6 +1,7 @@
 package nl.dke.pursuitevasion.gui.editor;
 
 import nl.dke.pursuitevasion.game.EngineConstants;
+import nl.dke.pursuitevasion.game.agents.impl.MCTS.MCTS_2;
 import nl.dke.pursuitevasion.gui.Voronoi;
 import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.impl.*;
@@ -55,6 +56,7 @@ public class ModelView extends JPanel {
     private ArrayList<MoveObject> allPoints = new ArrayList<>();
     private ArrayList<MoveObject> allPointsUndo = new ArrayList<>();
     private Point pressed; //for moving purposes
+    private MCTS_2 MCTSToShow = null;
 
 
     public void finalizeVoronoi() {
@@ -250,6 +252,10 @@ public class ModelView extends JPanel {
         objects.add(0,new EditorObject(polygon,LastID));
         objects.get(0).setType(ObjectType.FLOOR);
         repaint();
+    }
+
+    public void showMCTS(MCTS_2 m) {
+        this.MCTSToShow = m;
     }
 
     // everything in the editor is an abstractobject

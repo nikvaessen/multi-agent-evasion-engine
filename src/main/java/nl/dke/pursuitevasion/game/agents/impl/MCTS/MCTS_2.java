@@ -16,6 +16,9 @@ public class MCTS_2 implements Strategy{
 
     private State realState;
     private int maxtTime, n_expansion;
+
+
+
     private NodeTree_2 root;
     private NodeTree_2 lastFinalSelectedMove;
 
@@ -45,6 +48,9 @@ public class MCTS_2 implements Strategy{
 
     }
 
+    public NodeTree_2 getRoot() {
+        return root;
+    }
     public Move start(){
 
        setNewRoot(realState.turnOrder);
@@ -378,7 +384,8 @@ public class MCTS_2 implements Strategy{
         //check if finished
         TurnOrder to = node.getTurn();
         //repeat until 4 seconds are full
-        double[] value = node.getState().evaluate(to);
+        //node.getState().evaluate(to);
+        double[] value = Evaluator.calcValues();
 
         node.incrementWin(value[0],value[1],to);
 

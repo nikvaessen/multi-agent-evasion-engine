@@ -37,7 +37,7 @@ public class NodeTree_2 {
         state = parent.getState().clone();
         state.executeMove(move);
 
-        state.evaluate(currentplayer);
+       // state.evaluate(currentplayer); should be done later or every expanded node gets one evaluation.
 
 
     }
@@ -204,6 +204,7 @@ public class NodeTree_2 {
     }
 
     public ArrayList<Move> getFreeMoves() {
+
         //if (depth == 1)
             return move.getFreeMoves(this);
        // ArrayList<Move> free = move.getFreeMoves(this);
