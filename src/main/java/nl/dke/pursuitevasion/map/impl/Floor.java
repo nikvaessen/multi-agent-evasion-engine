@@ -14,7 +14,6 @@ import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.*;
 
@@ -193,7 +192,8 @@ public class Floor extends AbstractObject
 
      * @return the visibility graph
      */
-    private WeightedGraph<Vector2D, DefaultWeightedEdge> computeVisibilityGraph() {
+    private WeightedGraph<Vector2D, DefaultWeightedEdge> computeVisibilityGraph()
+    {
         WeightedGraph<Vector2D, DefaultWeightedEdge> g
                 = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
 
@@ -306,6 +306,17 @@ public class Floor extends AbstractObject
         Line2D lineBetweenPoints = new Line2D.Double(
                 new Point2D.Double(v.getX(), v.getY()),
                 new Point2D.Double(u.getX(), u.getY()));
+
+        ArrayList<Polygon> obstaclePolygons = new ArrayList<>();
+        for(AbstractObject object : obstacles)
+        {
+            obstaclePolygons.add(object.getPolygon());
+        }
+
+        for(Polygon p : obstaclePolygons)
+        {
+            //p.intersects()
+        }
         if(logger.isTraceEnabled())
         {
             logger.trace("u = {}, v = {}, line_uv = [{} {}, {} {}]",
@@ -333,6 +344,15 @@ public class Floor extends AbstractObject
         }
 
         return true;
+    }
+
+    private boolean lineIntersectsPolygon(Polygon p, Line2D line)
+    {
+        for (int i = 0; i < p.npoints; i++)
+        {
+            new Vector2D(p.xpoints[i], p.ypoints[i]);
+        }
+        return false;
     }
 
 }
