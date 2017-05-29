@@ -1,5 +1,10 @@
 package nl.dke.pursuitevasion.map;
 
+import nl.dke.pursuitevasion.game.Vector2D;
+import org.jgrapht.alg.NeighborIndex;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleGraph;
+
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
@@ -9,6 +14,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Vector;
 
 /**
  * A general object, which can be placed in the map.
@@ -35,6 +41,18 @@ public abstract class AbstractObject implements Serializable
     private Collection<Line2D> connectionLines;
 
     /**
+     * The graph which represent the polygon. Vertexes of the vertexes of the polygon
+     * and the edges are the lines between the vertexes which create the polygon
+     */
+    private SimpleGraph<Vector2D, DefaultEdge> graph;
+
+    /**
+     * The list of the neighbours of the vertexes of the graph representing the
+     * polygon
+     */
+    private NeighborIndex<Vector2D, DefaultEdge> neigbourList;
+
+    /**
      * General constructor which registers the object and gets a unique idea
      */
     public AbstractObject(MapPolygon polygon, int id)
@@ -42,6 +60,8 @@ public abstract class AbstractObject implements Serializable
         this.id = id;
         this.polygon = polygon;
         this.connectionLines = Collections.unmodifiableCollection(computeConnectingLines());
+        this.graph = constructGraph(this.polygon);
+        this.neigbourList = new NeighborIndex<>(graph);
     }
 
     /**
@@ -66,6 +86,24 @@ public abstract class AbstractObject implements Serializable
     public MapPolygon getPolygon()
     {
         return polygon;
+    }
+
+    /**
+     * Get the graph representing the polygon
+     * @return the graph representing the polygon
+     */
+    public SimpleGraph<Vector2D, DefaultEdge> getPolygonGraph()
+    {
+        return graph;
+    }
+
+    /**
+     * The neighbour list of the graph of the polygon
+     * @return the neighbour list
+     */
+    public NeighborIndex<Vector2D, DefaultEdge> getNeigbourList()
+    {
+        return neigbourList;
     }
 
     @Override
@@ -125,6 +163,49 @@ public abstract class AbstractObject implements Serializable
             }
         }
         return lines;
+    }
+
+    private SimpleGraph<Vector2D, DefaultEdge> constructGraph(Polygon p)
+    {
+        SimpleGraph<Vector2D, DefaultEdge> g = new SimpleGraph<>(DefaultEdge.class);
+
+        //first add all vertexes
+        for (int i = 0; i < p.npoints; i++)
+        {
+            g.addVertex(new Vector2D(p.xpoints[i], p.ypoints[i]));
+        }
+
+        //create edges along polygon lines. Each vertex has 2 neighbours
+        Vector2D leftNeighbour, rightNeighbour;
+        for (int i = 0; i < p.npoints; i++)
+        {
+            //select left neighbour
+            if(i == 0)
+            {
+                leftNeighbour = new Vector2D(p.xpoints[p.npoints -1], p.ypoints[p.npoints - 1]);
+            }
+            else
+            {
+                leftNeighbour = new Vector2D(p.xpoints[i-1], p.ypoints[i-1]);
+            }
+
+            //select right neighbour
+            if(i == p.npoints - 1)
+            {
+                rightNeighbour = new Vector2D(p.xpoints[0], p.ypoints[0]);
+            }
+            else
+            {
+                rightNeighbour = new Vector2D(p.xpoints[i + 1], p.ypoints[i + 1]);
+            }
+
+            //add the edges
+            Vector2D v = new Vector2D(p.xpoints[i], p.ypoints[i]);
+            g.addEdge(v, leftNeighbour);
+            g.addEdge(v, rightNeighbour);
+        }
+
+        return g;
     }
 
     /**

@@ -5,7 +5,9 @@ import nl.dke.pursuitevasion.map.AbstractObject;
 import nl.dke.pursuitevasion.map.ObjectType;
 import nl.dke.pursuitevasion.map.MapPolygon;
 import org.jgrapht.*;
+import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleGraph;
 import org.jgrapht.graph.SimpleWeightedGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -197,21 +199,21 @@ public class Floor extends AbstractObject
         WeightedGraph<Vector2D, DefaultWeightedEdge> g
                 = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
 
-        // Get all polygons
-        ArrayList<MapPolygon> polygons = new ArrayList<>();
-        polygons.add(getPolygon());
-        getObstacles().forEach(obstacle -> polygons.add(obstacle.getPolygon()));
+        // Get all subgraphs
+        ArrayList<SimpleGraph<Vector2D, DefaultEdge>> graphs = new ArrayList<>();
+        graphs.add(getPolygonGraph());
+        getObstacles().forEach(obstacle -> graphs.add(obstacle.getPolygonGraph()));
 
-        //Each endpoint of the polygon is a vertex in the graph
-        for (Polygon p : polygons)
+        //Each vertex of the graphs of the AbstractObject is a vertex in the visibility-graph
+        for(SimpleGraph<Vector2D, DefaultEdge> subgraph : graphs)
         {
-            for (int i = 0; i < p.npoints; i++)
+            for (Vector2D v : subgraph.vertexSet())
             {
-                g.addVertex(new Vector2D(p.xpoints[i], p.ypoints[i]));
+                g.addVertex(v);
             }
         }
 
-        //add all edges
+        //add the rest of the edges
         Set<Vector2D> vertexes = g.vertexSet();
         for(Vector2D v : vertexes)
         {
@@ -220,7 +222,7 @@ public class Floor extends AbstractObject
                 //check conditions
                 boolean vertexesEqual = v.equals(u);
                 boolean edgeExists = g.getEdge(u, v) != null;
-                boolean vertexesLineOfSight = isLineOfSight(v, u);
+                boolean vertexesLineOfSight = isLineOfSight(v, u, obstacles);
 
                 //log
                 if(logger.isTraceEnabled())
@@ -243,6 +245,136 @@ public class Floor extends AbstractObject
         }
 
         return g;
+    }
+
+    /**
+     * Calculate if there is line-of-sight visibility between two locations according to the floor
+     *
+     * @param v location 1
+     * @param u location 2
+     * @param obstacles the obstacles of this map
+     * @return true when there is line-of-sight visibility between the two given points,
+     * false otherwise
+     */
+    private boolean isLineOfSight(Vector2D v, Vector2D u, Collection<Obstacle> obstacles)
+    {
+        // Step 1 - Check if given u and v are neighbours on the same polygon.
+        //          If they are, there is visibility
+        if(neighbourInObject(this, u, v))
+        {
+            return true;
+        }
+        for(Obstacle o : obstacles)
+        {
+            if(neighbourInObject(o, u, v))
+            {
+                return true;
+            }
+        }
+
+        // Step 2 - Determine which case applies and solve
+
+        // the line between given points v and u
+        Line2D lineBetweenPoints = new Line2D.Double(
+                new Point2D.Double(v.getX(), v.getY()),
+                new Point2D.Double(u.getX(), u.getY()));
+
+        // Knowing that they are not neighbours:
+        // case 1: They are both vertexes on a non-solid polygon (both vertexes of floor)
+        //         Check for intersection with solid-polygons inside floor and non-solid
+        //         polygon excluding lines with one endpoint being either vertex
+        if(bothInObject(this, u, v))
+        {
+            for(Line2D line: lines)
+            {
+                if(!endpointInLine(v, line ) && !endpointInLine(u, line))
+                {
+                    if(line.intersectsLine(lineBetweenPoints))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        // case 2: They are both end-points of the same solid-polygons.
+        //         no visibility if they are not neighbours, but they are not as
+        //         that is checked in step 1
+        for(Obstacle o : obstacles)
+        {
+            if(bothInObject(o, u, v))
+            {
+                return false;
+            }
+        }
+
+        // case 3: One is vertex on non-solid polygon, one is vertex on solid-polygon
+        //         Also check for intersection with solid-polygons, but exclude lines
+        //         where one endpoint is the vertex of the solid polygon
+        // case 4: both vertexes are part of different solid-polygons
+        //         same as case 3
+        for(Line2D line: lines)
+        {
+            if(!endpointInLine(v, line ) && !endpointInLine(u, line))
+            {
+                if(line.intersectsLine(lineBetweenPoints))
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Check if 2 vertexes are neighbours in the same polygon of an AbstractObject
+     * @param o the AbstractObject which defines the polygon
+     * @param u vertex 1
+     * @param v vertex 2
+     * @return true if both given vertexes are neighbour in given polygon p, false otherwise
+     */
+    private boolean neighbourInObject(AbstractObject o, Vector2D u, Vector2D v)
+    {
+        return o.getPolygonGraph().containsVertex(v) && o.getNeigbourList().neighborListOf(v).contains(u);
+    }
+
+    /**
+     * Calcuate if 2 vertexes are part of the same polygon of an AbstractObject
+     * @param o the AbstractObject which defines the polygon
+     * @param u vertex 1
+     * @param v vertex 2
+     * @return true is both given vertexes are a vertex in the given polygon, false otherwise
+     */
+    private boolean bothInObject(AbstractObject o, Vector2D u, Vector2D v)
+    {
+        return o.getPolygonGraph().vertexSet().containsAll(Arrays.asList(u, v));
+    }
+
+    /**
+     * Check whether the given point is an endpoint of the given line
+     *
+     * @param v the point
+     * @param line the line
+     * @return whether the given point is an enpoint on the given line
+     */
+    public boolean endpointInLine(Vector2D v, Line2D line)
+    {
+        Vector2D e1 = new Vector2D(line.getX1(), line.getY1());
+        Vector2D e2 = new Vector2D(line.getX2(), line.getY2());
+
+        return v.equals(e1) || v.equals(e2);
+    }
+
+    private boolean lineIntersectsPolygon(Polygon p, Line2D line)
+    {
+        // step 1: check if u and v
+
+        for (int i = 0; i < p.npoints; i++)
+        {
+            new Vector2D(p.xpoints[i], p.ypoints[i]);
+        }
+        return false;
     }
 
     /**
@@ -303,77 +435,5 @@ public class Floor extends AbstractObject
         return lines;
     }
 
-    /**
-     * Calculate if there is line-of-sight visibility between two locations according to the floor
-     *
-     * @param v location 1
-     * @param u location 2
-     * @return true when there is line-of-sight visibility between the two given points,
-     * false otherwise
-     */
-    private boolean isLineOfSight(Vector2D v, Vector2D u)
-    {
-        // Step 1 - Check if given u and v are neighbours on the same polygon.
-        //          If they are, there is visibility.
-
-        // Step 2 - Determine which case applies and solve
-        // Knowing that they are not neighbours:
-        // case 1: They are both vertexes on a non-solid polygon (both vertexes of floor)
-        //         Check for intersection with solid-polygons inside floor and non-solid
-        //         polygon excluding lines with one endpoint being either vertex
-        // case 2: One is vertex on non-solid polygon, one is vertex on solid-polygon
-        //         Also check for intersection with solid-polygons, but exclude lines
-        //         where one endpoint is the vertex of the solid polygon
-        // case 3: They are both end-points of solid-polygons.
-        //         no visibility if they are not neighbours,
-        //return false;
-
-        // the line between given points v and u
-        Line2D lineBetweenPoints = new Line2D.Double(
-                new Point2D.Double(v.getX(), v.getY()),
-                new Point2D.Double(u.getX(), u.getY()));
-
-        if(logger.isTraceEnabled())
-        {
-            logger.trace("u = {}, v = {}, line_uv = [{} {}, {} {}]",
-                    u,v,
-                    lineBetweenPoints.getX1(),
-                    lineBetweenPoints.getY1(),
-                    lineBetweenPoints.getX2(),
-                    lineBetweenPoints.getX2());
-        }
-
-        //get the polygons of the obstacles on the floor. The line u-v may not cross
-        //these polygons
-        ArrayList<Polygon> obstaclePolygons = new ArrayList<>();
-        for(AbstractObject object : obstacles)
-        {
-            obstaclePolygons.add(object.getPolygon());
-        }
-
-        //check if given line crosses obstacle polygon. If it does,
-        //then there is no line-of-sight
-        for(Polygon p : obstaclePolygons)
-        {
-            boolean intersects = lineIntersectsPolygon(p, lineBetweenPoints);
-            if(intersects)
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private boolean lineIntersectsPolygon(Polygon p, Line2D line)
-    {
-        // step 1: check if u and v
-
-        for (int i = 0; i < p.npoints; i++)
-        {
-            new Vector2D(p.xpoints[i], p.ypoints[i]);
-        }
-        return false;
-    }
 
 }
