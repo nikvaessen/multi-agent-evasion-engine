@@ -79,6 +79,10 @@ public abstract class AbstractAgent
      */
     private volatile boolean hasRequest;
 
+    /**
+     * The information about the environment the agent is currently in. The engine determines which information
+     * is passed along to this agent
+     */
     protected volatile MapInfo mapInfo;
 
     /**
@@ -224,7 +228,7 @@ public abstract class AbstractAgent
      */
     public void resetHasNewRequest()
     {
-        hasRequest = false;
+        hasRequestComputed = false;
     }
 
     /**

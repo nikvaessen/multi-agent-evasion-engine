@@ -8,6 +8,8 @@ import nl.dke.pursuitevasion.game.agents.Direction;
 import nl.dke.pursuitevasion.game.agents.tasks.WalkToTask;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 
@@ -16,6 +18,11 @@ import java.util.LinkedList;
  */
 public class DistanceAgent extends AbstractAgent
 {
+    /**
+     * The logger of this class
+     */
+    private final static Logger logger = LoggerFactory.getLogger(DistanceAgent.class);
+
     /**
      * Create an agent in the given Map
      *
@@ -35,7 +42,11 @@ public class DistanceAgent extends AbstractAgent
     @Override
     protected void completeRequest(AgentRequest request)
     {
-        System.out.println("Hello?");
+        if(logger.isTraceEnabled())
+        {
+            logger.trace("Completing request for {}", this);
+        }
+
         MapInfo info = super.mapInfo;
         System.out.println(info.getAgentPoints().get(0).getX());
         LinkedList<Vector2D> agentPoint = new LinkedList<>(info.getAgentPoints());
@@ -90,12 +101,23 @@ public class DistanceAgent extends AbstractAgent
     @Override
     protected boolean hasNewRequest()
     {
-        return true;
+        boolean hasNewRequest = mapInfo != null;
+        if(logger.isTraceEnabled())
+        {
+            logger.trace("mapInfo != null: {}", mapInfo != null);
+        }
+        super.resetHasNewRequest();
+        return hasNewRequest;
     }
 
     @Override
     public boolean isEvader()
     {
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "Distance" + super.toString();
     }
 }

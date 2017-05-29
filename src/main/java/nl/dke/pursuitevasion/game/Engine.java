@@ -1,6 +1,6 @@
 package nl.dke.pursuitevasion.game;
 
-import com.sun.javafx.geom.Line2D;
+//import com.sun.javafx.geom.Line2D;
 import nl.dke.pursuitevasion.game.agents.*;
 import nl.dke.pursuitevasion.game.agents.tasks.AbstractAgentTask;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
@@ -150,14 +150,22 @@ public class Engine
                     // make agents update their vision arcs
                     agent.getVisionArc().update(agents);
 
-
                     // make information available to agents
                 }
 
                 // 2. Check agents
+                if(logger.isTraceEnabled())
+                {
+                    logger.trace("Trying to see if {} agents have a request", agents.size());
+                }
                 for(AbstractAgent agent : agents)
                 {
-                    if(agent.hasRequest())
+                    boolean hasRequest = agent.hasRequest();
+                    if(logger.isTraceEnabled())
+                    {
+                        logger.trace("{} has a request: {}", agent, hasRequest);
+                    }
+                    if(hasRequest)
                     {
                         AgentRequest request = agent.getRequest();
                         requests.add(request);

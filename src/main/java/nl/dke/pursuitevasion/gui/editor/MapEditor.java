@@ -27,11 +27,11 @@ public class MapEditor extends JPanel
     private Map map;
 
 
-    public MapEditor(int prefaredWidht, int prefaredHeight) {
-        this.setPreferredSize(new Dimension(prefaredWidht, prefaredHeight));
+    public MapEditor(int preferredWidth, int preferredHeight) {
+        this.setPreferredSize(new Dimension(preferredWidth, preferredHeight));
         this.setLayout(new BorderLayout(5, 5));
 
-        this.modelView = new ModelView(prefaredWidht*4/5,prefaredHeight,this);
+        this.modelView = new ModelView(preferredWidth *4/5, preferredHeight,this);
 
         this.add(modelView,BorderLayout.CENTER);
 
@@ -39,11 +39,11 @@ public class MapEditor extends JPanel
 
 
         this.EastView = new JTabbedPane();
-        EastView.setPreferredSize(new Dimension(prefaredWidht*1/5,prefaredHeight));
-        this.optionView = new OptionView(prefaredWidht*1/5,prefaredHeight);
+        EastView.setPreferredSize(new Dimension(preferredWidth *1/5, preferredHeight));
+        this.optionView = new OptionView(preferredWidth *1/5, preferredHeight);
 
-        this.objectSelectionView = new ObjectSelectionView(prefaredWidht*1/5,prefaredHeight);
-        this.fileView = new FileView(prefaredWidht*1/5,prefaredHeight);
+        this.objectSelectionView = new ObjectSelectionView(preferredWidth *1/5, preferredHeight);
+        this.fileView = new FileView(preferredWidth *1/5, preferredHeight);
 
         EastView.add(fileView,"FileView");
         EastView.add(optionView,"Level Generator");
@@ -71,15 +71,15 @@ public class MapEditor extends JPanel
     }
 
     private class OptionView extends JPanel {
-        public OptionView(int prefaredWidth, int prefaredHeight) {
+        public OptionView(int preferredWidth, int preferredHeight) {
             Random r = new Random();
-            this.setPreferredSize(new Dimension(prefaredWidth,prefaredHeight));
+            this.setPreferredSize(new Dimension(preferredWidth, preferredHeight));
             this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
             OptionView optionView = this;
 
 
             JLabel l2 = new JLabel("Name");
-            JTextField text2 = new JTextField("Map" + r.nextInt(100)); text2.setMaximumSize(new Dimension(prefaredWidth,25));
+            JTextField text2 = new JTextField("Map" + r.nextInt(100)); text2.setMaximumSize(new Dimension(preferredWidth,25));
             optionView.add(l2); text2.setAlignmentX(Component.LEFT_ALIGNMENT);
             optionView.add(text2);
 
@@ -87,7 +87,7 @@ public class MapEditor extends JPanel
             final SpinnerModel sm1 = new SpinnerNumberModel(48, 0, 1024, 12); //default value,lower bound,upper bound,increment by
             JSpinner spinner1 = new JSpinner(sm1);
             ((JSpinner.DefaultEditor)spinner1.getEditor()).getTextField().setColumns(10);
-            spinner1.setMaximumSize(new Dimension(prefaredWidth,25));
+            spinner1.setMaximumSize(new Dimension(preferredWidth,25));
             optionView.add(l1); spinner1.setAlignmentX(Component.LEFT_ALIGNMENT);
             l1.setLabelFor(spinner1);
             optionView.add(spinner1);
@@ -98,7 +98,7 @@ public class MapEditor extends JPanel
             SpinnerModel sm3 = new SpinnerNumberModel(0, 0, modelView.getWidth(), 1); //default value,lower bound,upper bound,increment by
             JSpinner spinner3 = new JSpinner(sm3);
             ((JSpinner.DefaultEditor)spinner3.getEditor()).getTextField().setColumns(10);
-            spinner3.setMaximumSize(new Dimension(prefaredWidth,25));
+            spinner3.setMaximumSize(new Dimension(preferredWidth,25));
             optionView.add(l3); spinner3.setAlignmentX(Component.LEFT_ALIGNMENT);
             l1.setLabelFor(spinner3);
             optionView.add(spinner3);
@@ -106,14 +106,14 @@ public class MapEditor extends JPanel
             JLabel l4 = new JLabel("Width");
             final SpinnerModel sm4 = new SpinnerNumberModel(600, 0, 1024, 9); //default value,lower bound,upper bound,increment by
             JSpinner spinner4 = new JSpinner(sm4);
-            spinner4.setMaximumSize(new Dimension(prefaredWidth,25));
+            spinner4.setMaximumSize(new Dimension(preferredWidth,25));
             optionView.add(l4); spinner4.setAlignmentX(Component.LEFT_ALIGNMENT);
             optionView.add(spinner4);
 
             JLabel l5 = new JLabel("Height");
             final SpinnerModel sm5 = new SpinnerNumberModel(400, 0, 800, 9); //default value,lower bound,upper bound,increment by
             JSpinner spinner5 = new JSpinner(sm5); spinner5.setPreferredSize(new Dimension(200,50));
-            spinner5.setMaximumSize(new Dimension(prefaredWidth,25));
+            spinner5.setMaximumSize(new Dimension(preferredWidth,25));
             spinner5.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             optionView.add(l5);

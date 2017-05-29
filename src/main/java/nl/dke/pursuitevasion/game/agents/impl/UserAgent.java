@@ -197,4 +197,9 @@ public class UserAgent
     public boolean isEvader() {
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "User" + super.toString();
+    }
 }
