@@ -203,8 +203,10 @@ public class Floor extends AbstractObject
         getObstacles().forEach(obstacle -> polygons.add(obstacle.getPolygon()));
 
         //Each endpoint of the polygon is a vertex in the graph
-        for (Polygon p : polygons) {
-            for (int i = 0; i < p.npoints; i++) {
+        for (Polygon p : polygons)
+        {
+            for (int i = 0; i < p.npoints; i++)
+            {
                 g.addVertex(new Vector2D(p.xpoints[i], p.ypoints[i]));
             }
         }
@@ -215,18 +217,26 @@ public class Floor extends AbstractObject
         {
             for(Vector2D u : vertexes)
             {
+                //check conditions
+                boolean vertexesEqual = v.equals(u);
+                boolean edgeExists = g.getEdge(u, v) != null;
+                boolean vertexesLineOfSight = isLineOfSight(v, u);
+
+                //log
                 if(logger.isTraceEnabled())
                 {
-                    logger.trace("v:{}, u:{}, v==u:{}, not exists: {}, sight: {}",
+                    logger.trace("v:{}, u:{}, v==u:{}, exists: {}, sight: {}",
                                  v, u,
-                                 !v.equals(u),
-                                 g.getEdge(u, v) == null,
-                                 isLineOfSight(v, u));
+                                 vertexesEqual,
+                                 edgeExists,
+                                 vertexesLineOfSight);
                 }
-                if(!v.equals(u) && g.getEdge(u, v) == null && isLineOfSight(v, u))
+
+                //add edge if vertexes not equal, edge doesn't exist, and there is line of sight between the vertexes
+                if(!vertexesEqual && !edgeExists && vertexesLineOfSight)
                 {
                     DefaultWeightedEdge e = new DefaultWeightedEdge();
-                    g.addEdge(u, v, e);
+                    g.addEdge(v, u, e);
                     g.setEdgeWeight(e, v.distance(u));
                 }
             }
@@ -303,41 +313,50 @@ public class Floor extends AbstractObject
      */
     private boolean isLineOfSight(Vector2D v, Vector2D u)
     {
+        // Step 1 - Check if given u and v are neighbours on the same polygon.
+        //          If they are, there is visibility.
+
+        // Step 2 - Determine which case applies and solve
+        // Knowing that they are not neighbours:
+        // case 1: They are both vertexes on a non-solid polygon (both vertexes of floor)
+        //         Check for intersection with solid-polygons inside floor and non-solid
+        //         polygon excluding lines with one endpoint being either vertex
+        // case 2: One is vertex on non-solid polygon, one is vertex on solid-polygon
+        //         Also check for intersection with solid-polygons, but exclude lines
+        //         where one endpoint is the vertex of the solid polygon
+        // case 3: They are both end-points of solid-polygons.
+        //         no visibility if they are not neighbours,
+        //return false;
+
+        // the line between given points v and u
         Line2D lineBetweenPoints = new Line2D.Double(
                 new Point2D.Double(v.getX(), v.getY()),
                 new Point2D.Double(u.getX(), u.getY()));
 
+        if(logger.isTraceEnabled())
+        {
+            logger.trace("u = {}, v = {}, line_uv = [{} {}, {} {}]",
+                    u,v,
+                    lineBetweenPoints.getX1(),
+                    lineBetweenPoints.getY1(),
+                    lineBetweenPoints.getX2(),
+                    lineBetweenPoints.getX2());
+        }
+
+        //get the polygons of the obstacles on the floor. The line u-v may not cross
+        //these polygons
         ArrayList<Polygon> obstaclePolygons = new ArrayList<>();
         for(AbstractObject object : obstacles)
         {
             obstaclePolygons.add(object.getPolygon());
         }
 
+        //check if given line crosses obstacle polygon. If it does,
+        //then there is no line-of-sight
         for(Polygon p : obstaclePolygons)
         {
-            //p.intersects()
-        }
-        if(logger.isTraceEnabled())
-        {
-            logger.trace("u = {}, v = {}, line_uv = [{} {}, {} {}]",
-                         u,v,
-                         lineBetweenPoints.getX1(),
-                         lineBetweenPoints.getY1(),
-                         lineBetweenPoints.getX2(),
-                         lineBetweenPoints.getX2());
-        }
-        for (Line2D line: lines)
-        {
-            if(logger.isTraceEnabled())
-            {
-                logger.trace("intersects with [{} {},{} {}] : {}",
-                             line.getX1(),
-                             line.getY1(),
-                             line.getX2(),
-                             line.getX2(),
-                             lineBetweenPoints.intersectsLine(line));
-            }
-            if(line.intersectsLine(lineBetweenPoints))
+            boolean intersects = lineIntersectsPolygon(p, lineBetweenPoints);
+            if(intersects)
             {
                 return false;
             }
@@ -348,6 +367,8 @@ public class Floor extends AbstractObject
 
     private boolean lineIntersectsPolygon(Polygon p, Line2D line)
     {
+        // step 1: check if u and v
+
         for (int i = 0; i < p.npoints; i++)
         {
             new Vector2D(p.xpoints[i], p.ypoints[i]);

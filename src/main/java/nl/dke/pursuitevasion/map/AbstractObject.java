@@ -1,7 +1,14 @@
 package nl.dke.pursuitevasion.map;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Line2D;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * A general object, which can be placed in the map.
@@ -23,12 +30,18 @@ public abstract class AbstractObject implements Serializable
     private final MapPolygon polygon;
 
     /**
+     * The collection of lines connecting the vertexes of the polygon
+     */
+    private Collection<Line2D> connectionLines;
+
+    /**
      * General constructor which registers the object and gets a unique idea
      */
     public AbstractObject(MapPolygon polygon, int id)
     {
         this.id = id;
         this.polygon = polygon;
+        this.connectionLines = Collections.unmodifiableCollection(computeConnectingLines());
     }
 
     /**
@@ -74,5 +87,51 @@ public abstract class AbstractObject implements Serializable
 
         }
         return false;
+    }
+
+    /**
+     * Compute the lines between all vertexes of the polygon of this object
+     */
+    private Collection<Line2D> computeConnectingLines()
+    {
+       return getLines(this.polygon);
+    }
+
+    /**
+     * Get the lines between all vertexes of the given polygon
+     *
+     * @param polygon the polygon
+     * @return the lines between all vertexes of the polygon
+     */
+    private ArrayList<Line2D> getLines(Polygon polygon){
+        ArrayList<java.awt.geom.Line2D> lines = new ArrayList<>();
+        Point2D start = null;
+        Point2D last = null;
+        for (PathIterator iter = polygon.getPathIterator(null); !iter.isDone(); iter.next()) {
+            double[] points = new double[6];
+            int type = iter.currentSegment(points);
+            if (type == PathIterator.SEG_MOVETO) {
+                Point2D moveP = new Point2D.Double(points[0], points[1]);
+                last = moveP;
+                start = moveP;
+            } else if (type == PathIterator.SEG_LINETO) {
+                Point2D newP = new Point2D.Double(points[0], points[1]);
+                java.awt.geom.Line2D line = new java.awt.geom.Line2D.Double(last, newP);
+                lines.add(line);
+                last = newP;
+            } else if (type == PathIterator.SEG_CLOSE){
+                java.awt.geom.Line2D line = new java.awt.geom.Line2D.Double(start, last);
+                lines.add(line);
+            }
+        }
+        return lines;
+    }
+
+    /**
+     * Get the lines between all vertexes of the object
+     * @return A collection of lines between each vertex of the object
+     */
+    public Collection<Line2D> getConnectionLines() {
+        return connectionLines;
     }
 }
