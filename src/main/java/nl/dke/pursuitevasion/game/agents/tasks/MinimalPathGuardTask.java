@@ -10,7 +10,7 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.List;
+ import java.util.List;
 
 /**
  * Created by Jan on 25-5-2017.
@@ -217,7 +217,6 @@ public class MinimalPathGuardTask extends AbstractAgentTask{
     @Override
     protected boolean completesTask(AgentCommand command) {
         // Ask the overseer
-        MinimalPathAgent a = new MinimalPathAgent();
-        MinimalPathOverseer
+        return false;
     }
 }

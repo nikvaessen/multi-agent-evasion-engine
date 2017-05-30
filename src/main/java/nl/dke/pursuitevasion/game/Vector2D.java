@@ -195,10 +195,11 @@ public class Vector2D
         return new Vector2D(point.getX(), point.getY());
     }
 
+
     @Override
     public int hashCode()
     {
-        return Objects.hashCode(this);
+        return Objects.hash(x, y);
     }
 
     @Override

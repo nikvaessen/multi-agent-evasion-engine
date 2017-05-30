@@ -7,16 +7,18 @@ import nl.dke.pursuitevasion.game.agents.Direction;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 
+import java.util.Collection;
+
 /**
  * Created by Jan on 24-5-2017.
  */
-public class MininalPathAgent extends AbstractAgent{
+public class MinimalPathAgent extends AbstractAgent{
 
     private int agentNumber;
 
     public MinimalPathOverseer overseer;
 
-    public MininalPathAgent(Map map, Floor floor, Vector2D startLocation, Direction startsFacing, int radius, double visionRange, double visionAngle){
+    public MinimalPathAgent(Map map, Floor floor, Vector2D startLocation, Direction startsFacing, int radius, double visionRange, double visionAngle){
         super(map, floor, startLocation, startsFacing, radius, visionRange, visionAngle);
         try{
             overseer = MinimalPathOverseer.getIntance();
@@ -30,17 +32,31 @@ public class MininalPathAgent extends AbstractAgent{
     @Override
     protected void completeRequest(AgentRequest request) {
         // Aks the static "overseer" what this agent should do
-        overseer.getTask(this.agentNumber, request);
+        overseer.getTask(this, request);
     }
 
     @Override
     protected boolean hasNewRequest() {
         // ask the static "overseer" if this agent should do something
-        return overseer.getShouldDoSomething(this.agentNumber);
+        return overseer.getShouldDoSomething(this);
     }
 
     @Override
     public boolean isEvader() {
         return false;
+    }
+
+    private AbstractAgent evader = null;
+    public AbstractAgent getEvader(){
+        if(evader == null){
+            for (AbstractAgent agent : this.getVisibleAgents()) {
+                if(agent.isEvader()){
+                    evader = agent;
+                    return evader;
+                }
+            }
+            return null;
+        }
+        else{return evader;}
     }
 }

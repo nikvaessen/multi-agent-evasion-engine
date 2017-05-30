@@ -41,6 +41,7 @@ public class MapPolygon extends java.awt.Polygon
         while(!it.isDone()){
             it.currentSegment(current);
             points.add(Vector2D.fromDoubleArray(current));
+            it.next();
         }
         return points;
 

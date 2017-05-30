@@ -1,56 +1,65 @@
 package nl.dke.pursuitevasion.game.agents.impl.MinimalPath;
 
 import nl.dke.pursuitevasion.game.Vector2D;
+import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.AgentRequest;
-import nl.dke.pursuitevasion.map.MapPolygon;
+import nl.dke.pursuitevasion.game.agents.tasks.MinimalPathGuardTask;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import org.jgrapht.*;
 import org.jgrapht.alg.interfaces.KShortestPathAlgorithm;
 import org.jgrapht.alg.shortestpath.KShortestPaths;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
-import org.jgrapht.graph.UndirectedWeightedSubgraph;
+import org.jgrapht.graph.WeightedPseudograph;
 
 /**
  * Created by Jan on 24-5-2017.
+ * Oversees 3 MinimalPathAgents
  */
 public class MinimalPathOverseer {
-
+    // The instance of the singleton
     private static MinimalPathOverseer instance;
-    private static List<MininalPathAgent> agents = new ArrayList<>(3);
+    // agents that are supervised by the overseer
+    static List<MinimalPathAgent> agents = new ArrayList<>(3);
+    // maps agents to guardpaths
+    private HashMap<MinimalPathAgent, GraphPath> guardMap;
+
+    private WeightedPseudograph<Vector2D, DefaultWeightedEdge> visibilityGraph;
+    private Map map;
+    private Vector2D u;
+    private Vector2D v;
+    private List<GraphPath<Vector2D, DefaultWeightedEdge>> paths;
+
 
     private MinimalPathOverseer(Map map){
+        this.map = map;
         // Build visibility graph
 
-        // TODO replace PLACEHOLDER LINE.
-        //
-        UndirectedWeightedSubgraph<Vector2D, DefaultWeightedEdge> visibilityGraph =
-                new UndirectedWeightedSubgraph<Vector2D, DefaultWeightedEdge>(null);
+        // TODO replace PLACEHOLDER LINE with the actual visibility graph.
+        visibilityGraph = constructVisibilityGraph(map);
+
         // get u and v
-        Vector2D[] uv = getFurthestPoints(map);
-        Vector2D u = uv[0];
-        Vector2D v = uv[1];
-        // Calculate Π1 between u and v
-        KShortestPathAlgorithm<Vector2D, DefaultWeightedEdge> a = new KShortestPaths<Vector2D, DefaultWeightedEdge>(visibilityGraph, 3);
-        List<GraphPath<Vector2D, DefaultWeightedEdge>> paths = a.getPaths(u, v);
+        Vector2D[] uv = getFurthestPoints();
+        this.u = uv[0];
+        this.v = uv[1];
+        // Calculate minimal paths between u and v
+        paths = calculateMinimalPaths();
+    }
 
-
+    public List<GraphPath<Vector2D, DefaultWeightedEdge>> calculateMinimalPaths(){
+        KShortestPathAlgorithm<Vector2D, DefaultWeightedEdge> a = new KShortestPaths<>(visibilityGraph, 2);
+        return a.getPaths(u, v);
     }
 
     /**
      * Gets the 2 points furthest away from each other.
-     * @param map
      * @return Vector2D[] : size 2 array holding the points
      */
-    private Vector2D[] getFurthestPoints(Map map) {
-        // TODO fix ugly line
+    public Vector2D[] getFurthestPoints() {
         Floor floor = map.getFloors().iterator().next();
         Vector2D[] uv = new Vector2D[2];
         // iterate over all points
@@ -69,8 +78,28 @@ public class MinimalPathOverseer {
             }
         }
         return uv;
+    }
+    private static WeightedPseudograph<Vector2D, DefaultWeightedEdge> constructVisibilityGraph(Map map) {
+        WeightedPseudograph<Vector2D, DefaultWeightedEdge> g = new WeightedPseudograph<>(
+                DefaultWeightedEdge.class);
+        // simple polygon. So all verteces can see each other.
+        Floor f = map.getFloors().iterator().next();
+        Collection<Vector2D> points = f.getPolygon().getPoints();
+        for (Vector2D point : points) {
+            g.addVertex(point);
+        }
 
-    })
+        for (Vector2D point1 : points) {
+            for (Vector2D point2: points) {
+                g.addEdge(point1, point2);
+                DefaultWeightedEdge e = g.getEdge(point1, point2);
+                g.setEdgeWeight(e, point1.distance(point2));
+            }
+        }
+        return g;
+
+    }
+
 
     // The overseer is a Singleton
     public static MinimalPathOverseer getIntance(){
@@ -86,10 +115,20 @@ public class MinimalPathOverseer {
         return instance;
     }
 
+    // Assigns agents 1 and 2 to the first 2 minimal paths.
+    private void assignPaths(){
+        guardMap.put(agents.get(0), paths.get(0));
+        guardMap.put(agents.get(1), paths.get(1));
+    }
+
     // Registers an agent with the overseer
-    public static int registerAgent(MininalPathAgent agent){
-        if(agents.size() <= 3){
+    public int registerAgent(MinimalPathAgent agent){
+        if(agents.size() < 3){
             agents.add(agent);
+            guardMap.put(agent, null);
+            if(agents.size() == 3){
+                assignPaths();
+            }
             return agents.size()-1;
         }
         else{
@@ -98,9 +137,15 @@ public class MinimalPathOverseer {
     }
 
     // Checks whether an agent should be making a new request.
-    public boolean getShouldDoSomething(int agentNumber){}
+    public boolean getShouldDoSomething(MinimalPathAgent agent){
+        // TODO: implement mechanism to determine whether an agent should make a new request
+        return false;
+
+    }
 
     // Determines what request an agent should make.
-    public void getTask(int agentNumber, AgentRequest request){}
+    public void getTask(MinimalPathAgent agent, AgentRequest request){
+        request.add(new MinimalPathGuardTask(guardMap.get(agent), agent.getEvader()));
+    }
 
 }
