@@ -1,6 +1,5 @@
 package nl.dke.pursuitevasion.game;
 
-import com.sun.javafx.geom.Line2D;
 import nl.dke.pursuitevasion.game.agents.*;
 import nl.dke.pursuitevasion.game.agents.tasks.AbstractAgentTask;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
@@ -15,8 +14,6 @@ import java.awt.geom.Ellipse2D;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.function.Predicate;
-
-;
 
 /**
  * Created by nik on 2/8/17.
@@ -51,13 +48,6 @@ public class Engine
         this.desiredIterationLength = Math.round(1000d / (double) desiredFPS);
         this.agents = agents;
         this.mapViewPanel = viewPanel;
-
-        //set all agents to the correct vision angle and degrees
-        agents.forEach(agent ->
-                       {
-                           agent.setVisionRange(EngineConstants.VISION_RANGE);
-                           agent.setVisionAngle(EngineConstants.VISION_ANGLE);
-                       });
     }
 
     public Engine(Map map, Collection<AbstractAgent> agents, int desiredFPS)
@@ -94,11 +84,6 @@ public class Engine
 
         private double rotationPerIteration = EngineConstants.TURNING_SPEED / desiredIterationLength;
 
-
-        public LinkedList<AbstractAgent> getPursuerList(){
-            return pursuers;
-        }
-
         @Override
         public void run()
         {
@@ -116,7 +101,7 @@ public class Engine
             }
 
             // start the game loop
-            loop(0);
+            loop();
         }
 
         /**
@@ -129,15 +114,13 @@ public class Engine
          * 6. Render on screen
          * 7. Wait if there is time left.
          */
-        private void loop(long durationInMillisec)
+        private void loop()
         {
             // house keeping variables for loop
             long startTime = System.currentTimeMillis(), iterationStartTime, msPassed;
-            long endTime = startTime + durationInMillisec;
-            boolean infinite = false;
-            if (durationInMillisec==0) infinite = true;
+            long endTime;
             int count = 0;
-            while(infinite || System.currentTimeMillis()+desiredIterationLength<=endTime)
+            while(true)
             {
                 //update housekeeping variables and log
                 iterationStartTime = System.currentTimeMillis();
@@ -151,6 +134,7 @@ public class Engine
                 removeCaughtEvaders();
                 if(evaders.isEmpty() && !EngineConstants.ALWAYS_LOOP)
                 {
+                    endTime = System.currentTimeMillis();
                     break;
                 }
 
@@ -163,39 +147,34 @@ public class Engine
                 }
 
                 // give pursuers new location of evader
+
                 //compute mapinfo which stores evader location
-
-
                 LinkedList<Vector2D> locationOfPursuer = new LinkedList<>();
-                for (AbstractAgent agent: pursuers){
+                for (AbstractAgent agent: pursuers)
+                {
                     locationOfPursuer.add(agent.getLocation());
                 }
                 MapInfo forEvader = new MapInfo(locationOfPursuer);
 
+                //and give it
                 for (AbstractAgent agent: evaders){
                     agent.setMapInfo(forEvader);
                 }
 
                 //give evade new location of pursuer
-                //compute mapinfo whis stores purseur locations
-
+                // compute mapinfo which stores pursuers locations
                 LinkedList<Vector2D> locationOfEvaders = new LinkedList<>();
-                for(AbstractAgent agent : evaders){
+                for(AbstractAgent agent : evaders)
+                {
                     locationOfEvaders.add(agent.getLocation());
                 }
                 MapInfo forPursuer = new MapInfo(locationOfEvaders);
 
-                for (AbstractAgent agent: pursuers){
+                //and give it
+                for (AbstractAgent agent: pursuers)
+                {
                     agent.setMapInfo(forPursuer);
                 }
-
-
-
-                //give pursuers new location of evader
-                //compute mapinfo whis stores evader locations
-                // for(AbstractAgent agent : pursuers){
-                //    agent.setMapInfo(new MapInfo());
-                //}
 
                 // 2. Check agents
                 if(logger.isTraceEnabled())
@@ -276,10 +255,6 @@ public class Engine
                         logger.debug("Updated MapViewPanel");
                     }
                 }
-
-
-
-
 
                 // 6. wait
                 msPassed = System.currentTimeMillis() - iterationStartTime;

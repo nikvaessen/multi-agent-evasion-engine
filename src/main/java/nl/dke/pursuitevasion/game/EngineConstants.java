@@ -31,6 +31,8 @@ public class EngineConstants
     public final static Color VISION_ARC_COLOR = new Color(VISION_ARC_BASE_COLOR.getRed(), VISION_ARC_BASE_COLOR.getGreen(), VISION_ARC_BASE_COLOR.getBlue(), 20);
     public final static Color EVADER_COLOR = new Color(181, 19, 19);
     public final static Color PURSUER_COLOR = new Color(31, 94, 196);
+
+    // Constants needed for MCTS
     public static final long CALCULATION_TIME = 16;
     private static long seed = 1337L;
     private static Random random = new Random(seed);
