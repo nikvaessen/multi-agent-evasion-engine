@@ -1,5 +1,6 @@
 package nl.dke.pursuitevasion.game.agents;
 
+import nl.dke.pursuitevasion.game.MapInfo;
 import nl.dke.pursuitevasion.game.EngineConstants;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.map.AbstractObject;
@@ -83,6 +84,11 @@ public abstract class AbstractAgent
      */
     private volatile boolean hasRequest;
 
+    /**
+     * The information about the environment the agent is currently in. The engine determines which information
+     * is passed along to this agent
+     */
+    protected volatile MapInfo mapInfo;
 
     /**
      * Create an agent in the given Map
@@ -106,6 +112,10 @@ public abstract class AbstractAgent
         this.visionArc = new VisionArc();
 
 
+    }
+
+    public void setMapInfo(MapInfo mapInfo){
+        this.mapInfo = mapInfo;
     }
 
     /**
@@ -225,7 +235,7 @@ public abstract class AbstractAgent
      */
     public void resetHasNewRequest()
     {
-        hasRequest = false;
+        hasRequestComputed = false;
     }
 
     /**
@@ -376,7 +386,45 @@ public abstract class AbstractAgent
             return false;
         }
 
+        private Collection<Line2D> getFloorLines(Floor floor){
+            ArrayList<Polygon> obstructions = new ArrayList<>();
+            obstructions.add(floor.getPolygon());
+            for (Obstacle obstacle:
+                    floor.getObstacles()) {
+                obstructions.add(obstacle.getPolygon());
+            }
+            // TODO maybe limit this to the closest polygons.
+            // get the lines for all objects in the Floor
+            ArrayList<Line2D> lines = new ArrayList<>();
+            for(Polygon polygon : obstructions){
+                lines.addAll(getLines(polygon));
+            }
+            return lines;
+        }
 
+        private ArrayList<Line2D> getLines(Polygon polygon){
+            ArrayList<java.awt.geom.Line2D> lines = new ArrayList<>();
+            Point2D start = null;
+            Point2D last = null;
+            for (PathIterator iter = polygon.getPathIterator(null); !iter.isDone(); iter.next()) {
+                double[] points = new double[6];
+                int type = iter.currentSegment(points);
+                if (type == PathIterator.SEG_MOVETO) {
+                    Point2D moveP = new Point2D.Double(points[0], points[1]);
+                    last = moveP;
+                    start = moveP;
+                } else if (type == PathIterator.SEG_LINETO) {
+                    Point2D newP = new Point2D.Double(points[0], points[1]);
+                    java.awt.geom.Line2D line = new java.awt.geom.Line2D.Double(last, newP);
+                    lines.add(line);
+                    last = newP;
+                } else if (type == PathIterator.SEG_CLOSE){
+                    java.awt.geom.Line2D line = new java.awt.geom.Line2D.Double(start, last);
+                    lines.add(line);
+                }
+            }
+            return lines;
+        }
 
         private boolean inArc(Vector2D p){
             if(p.distance(location) > visionRange){

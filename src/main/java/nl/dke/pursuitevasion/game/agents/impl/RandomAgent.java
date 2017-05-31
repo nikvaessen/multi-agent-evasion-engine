@@ -42,6 +42,7 @@ public class RandomAgent extends AbstractAgent{
     public boolean isEvader(){return true;};
 
     public void completeRequest(AgentRequest request){
+        System.out.println("Heyho");
         if(ThreadLocalRandom.current().nextDouble() < 0.01){
             double angle = ThreadLocalRandom.current().nextDouble(360);
             if(ThreadLocalRandom.current().nextDouble() < 0.5){
