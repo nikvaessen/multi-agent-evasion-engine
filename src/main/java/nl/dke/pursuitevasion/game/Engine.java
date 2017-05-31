@@ -364,6 +364,7 @@ public class Engine
         //todo fix
         private void outOfBoundCorrection(AgentCommand command)
         {
+
             if(command.isLocationChanged())
             {
                 AbstractAgent agent = command.getAgent();
