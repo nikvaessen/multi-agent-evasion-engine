@@ -3,6 +3,7 @@ package nl.dke.pursuitevasion.game;
 import nl.dke.pursuitevasion.game.agents.*;
 import nl.dke.pursuitevasion.game.agents.tasks.AbstractAgentTask;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
+import nl.dke.pursuitevasion.map.AbstractObject;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 import nl.dke.pursuitevasion.map.impl.Obstacle;
@@ -229,7 +230,7 @@ public class Engine
                 }
 
                 // check if all commands are valid
-                validateCommands();
+                commands.removeIf(this::isInvalidCommand);
 
                 // 4. Make the moves
                 if(logger.isDebugEnabled())
@@ -307,7 +308,8 @@ public class Engine
 
                     allowedRotation -= command.getRotatedDistance();
 
-                    if(logger.isTraceEnabled()){
+                    if(logger.isTraceEnabled())
+                    {
                         logger.trace("Added to commands: {} ", command);
                         logger.trace("peeked request: {}", task);
                         logger.trace("allowed meters left: {}", allowedMeters);
@@ -315,7 +317,8 @@ public class Engine
                         logger.trace("request is completed: {}", request.isCompleted());
                     }
                 }
-                catch(IllegalStateException e){
+                catch(IllegalStateException e)
+                {
                     logger.error("Cannot resolve new task", e);
                     break;
                 }
@@ -328,51 +331,50 @@ public class Engine
             }
         }
 
-        private void validateCommands()
-        {
-            for (int i = 0; i < commands.size(); i++) {
-                outOfBoundCorrection(commands.get(i));
-            }
-            //commands.forEach(this::outOfBoundCorrection);
-        }
-
         //todo fix
-        private void outOfBoundCorrection(AgentCommand command)
-        {
 
+        /**
+         * Check whether a given command moves the agent into an invalid location
+         *
+         * @param command the command to check for being invalid
+         * @return True if the command is invalid, false if the command is legal
+         */
+        private boolean isInvalidCommand(AgentCommand command)
+        {
+            // if the location changed, check if the new location is valid
             if(command.isLocationChanged())
             {
+                //get the current information
                 AbstractAgent agent = command.getAgent();
                 Floor floor = agent.getFloor();
                 Vector2D location = command.getNewLocation();
-                //if(floor.contains(location.toPoint()))
-
-
-                //Floor floor = command.getAgent().getFloor();
                 int radius = command.getAgent().getRadius();
-
                 Ellipse2D.Double circle = new Ellipse2D.Double(
                         location.getX() - radius,
                         location.getY() - radius,
                         radius * 2,
                         radius * 2);
 
-                if(!containing(floor.getPolygon(), circle, false))
+                //check if the new location is inside the floor
+                if(!inside(floor, location))
                 {
-                    int ind = commands.indexOf(command);
-                    commands.remove(ind);
+                    return true;
                 }
 
+                //check if the new location is inside an obstacle
+                //if it's on the boundary it is still okay
                 for(Obstacle obs : floor.getObstacles())
                 {
-                    if(containing(obs.getPolygon(), circle, true))
+                    if(inside(obs, location) && !onBoundary(obs, location))
                     {
-                        int ind = commands.indexOf(command);
-                        commands.remove(ind);
+                        return true;
                     }
                 }
 
+                //if both cases are false, command is legal
             }
+
+            return false;
         }
 
         private boolean containing(Polygon bb, Ellipse2D circle, boolean obstacle)
@@ -419,6 +421,16 @@ public class Engine
             return false;
         }
 
+        private boolean onBoundary(AbstractObject o, Vector2D point)
+        {
+            return o.onBoundary(point);
+        }
+
+        private boolean inside(AbstractObject o, Vector2D point)
+        {
+            return o.inside(point);
+        }
+
         private void removeCaughtEvaders()
         {
             //loop over all evaders
@@ -461,10 +473,12 @@ public class Engine
     }
 
     private boolean commandAllowed(AgentCommand command, double allowedMeters, double allowedRotation) {
-        if(command.isLocationChanged()){
+        if(command.isLocationChanged())
+        {
             return allowedMeters - command.getMovedDistance() > 0;
         }
-        if(command.isAngleChanged()){
+        if(command.isAngleChanged())
+        {
             return allowedRotation - command.getRotatedDistance() > 0.0001;
         }
         return true;

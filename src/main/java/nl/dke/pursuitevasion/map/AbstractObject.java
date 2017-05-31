@@ -215,4 +215,33 @@ public abstract class AbstractObject implements Serializable
     public Collection<Line2D> getConnectionLines() {
         return connectionLines;
     }
+
+    /**
+     * Checks whether the given vector is on the boundary lines of this polygon
+     *
+     * @param v the vector to check
+     * @return true is the point is on the boundary line, false otherwise
+     */
+    public boolean onBoundary(Vector2D v)
+    {
+        for(Line2D line : connectionLines)
+        {
+            if(line.ptSegDist(v.getX(), v.getY()) < 0.5)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks whether the given vector is inside this polygon
+     *
+     * @param v the vector to check
+     * @return true is the point is inside, false otherwise
+     */
+    public boolean inside(Vector2D v)
+    {
+        return this.polygon.contains(v.getX(), v.getY());
+    }
 }
