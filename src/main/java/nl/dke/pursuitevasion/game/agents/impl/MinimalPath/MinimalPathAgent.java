@@ -29,10 +29,12 @@ public class MinimalPathAgent extends AbstractAgent{
         agentNumber = overseer.registerAgent(this);
     }
 
+    public int getAgentNumber(){return agentNumber;}
+
     @Override
     protected void completeRequest(AgentRequest request) {
         // Aks the static "overseer" what this agent should do
-        overseer.getTask(this, request);
+        overseer.getTask(this, request, this.mapInfo);
     }
 
     @Override
@@ -46,17 +48,5 @@ public class MinimalPathAgent extends AbstractAgent{
         return false;
     }
 
-    private AbstractAgent evader = null;
-    public AbstractAgent getEvader(){
-        if(evader == null){
-            for (AbstractAgent agent : this.getVisibleAgents()) {
-                if(agent.isEvader()){
-                    evader = agent;
-                    return evader;
-                }
-            }
-            return null;
-        }
-        else{return evader;}
-    }
+
 }

@@ -359,6 +359,8 @@ public abstract class AbstractAgent
 
     }
 
+    public MapInfo getMapInfo(){return mapInfo;}
+
     public AbstractAgent copy() {
 
         try {

@@ -1,9 +1,9 @@
 package nl.dke.pursuitevasion.game;
 
-import com.sun.javafx.geom.Line2D;
 import nl.dke.pursuitevasion.game.agents.*;
 import nl.dke.pursuitevasion.game.agents.tasks.AbstractAgentTask;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
+import nl.dke.pursuitevasion.map.AbstractObject;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 import nl.dke.pursuitevasion.map.impl.Obstacle;
@@ -15,8 +15,6 @@ import java.awt.geom.Ellipse2D;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.function.Predicate;
-
-;
 
 /**
  * Created by nik on 2/8/17.
@@ -51,13 +49,6 @@ public class Engine
         this.desiredIterationLength = Math.round(1000d / (double) desiredFPS);
         this.agents = agents;
         this.mapViewPanel = viewPanel;
-
-        //set all agents to the correct vision angle and degrees
-        agents.forEach(agent ->
-                       {
-                           agent.setVisionRange(EngineConstants.VISION_RANGE);
-                           agent.setVisionAngle(EngineConstants.VISION_ANGLE);
-                       });
     }
 
     public Engine(Map map, Collection<AbstractAgent> agents, int desiredFPS)
@@ -94,11 +85,6 @@ public class Engine
 
         private double rotationPerIteration = EngineConstants.TURNING_SPEED / desiredIterationLength;
 
-
-        public LinkedList<AbstractAgent> getPursuerList(){
-            return pursuers;
-        }
-
         @Override
         public void run()
         {
@@ -116,7 +102,7 @@ public class Engine
             }
 
             // start the game loop
-            loop(0);
+            loop();
         }
 
         /**
@@ -129,15 +115,13 @@ public class Engine
          * 6. Render on screen
          * 7. Wait if there is time left.
          */
-        private void loop(long durationInMillisec)
+        private void loop()
         {
             // house keeping variables for loop
             long startTime = System.currentTimeMillis(), iterationStartTime, msPassed;
-            long endTime = startTime + durationInMillisec;
-            boolean infinite = false;
-            if (durationInMillisec==0) infinite = true;
+            long endTime;
             int count = 0;
-            while(infinite || System.currentTimeMillis()+desiredIterationLength<=endTime)
+            while(true)
             {
                 //update housekeeping variables and log
                 iterationStartTime = System.currentTimeMillis();
@@ -151,6 +135,7 @@ public class Engine
                 removeCaughtEvaders();
                 if(evaders.isEmpty() && !EngineConstants.ALWAYS_LOOP)
                 {
+                    endTime = System.currentTimeMillis();
                     break;
                 }
 
@@ -160,6 +145,36 @@ public class Engine
                     agent.getVisionArc().update(agents);
 
                     // make information available to agents
+                }
+
+                // give pursuers new location of evader
+
+                //compute mapinfo which stores evader location
+                LinkedList<Vector2D> locationOfPursuer = new LinkedList<>();
+                for (AbstractAgent agent: pursuers)
+                {
+                    locationOfPursuer.add(agent.getLocation());
+                }
+                MapInfo forEvader = new MapInfo(locationOfPursuer);
+
+                //and give it
+                for (AbstractAgent agent: evaders){
+                    agent.setMapInfo(forEvader);
+                }
+
+                //give evade new location of pursuer
+                // compute mapinfo which stores pursuers locations
+                LinkedList<Vector2D> locationOfEvaders = new LinkedList<>();
+                for(AbstractAgent agent : evaders)
+                {
+                    locationOfEvaders.add(agent.getLocation());
+                }
+                MapInfo forPursuer = new MapInfo(locationOfEvaders);
+
+                //and give it
+                for (AbstractAgent agent: pursuers)
+                {
+                    agent.setMapInfo(forPursuer);
                 }
 
                 // 2. Check agents
@@ -215,7 +230,7 @@ public class Engine
                 }
 
                 // check if all commands are valid
-                validateCommands();
+                commands.removeIf(this::isInvalidCommand);
 
                 // 4. Make the moves
                 if(logger.isDebugEnabled())
@@ -242,61 +257,23 @@ public class Engine
                     }
                 }
 
-                // give pursuers new location of evader
-                //compute mapinfo which stores evader location
-
-
-                LinkedList<Vector2D> locationOfPursuer = new LinkedList<>();
-                for (AbstractAgent agent: pursuers){
-                    locationOfPursuer.add(agent.getLocation());
-                }
-                MapInfo forEvader = new MapInfo(locationOfPursuer);
-
-                for (AbstractAgent agent: evaders){
-                    agent.setMapInfo(forEvader);
-                }
-
-                //give evade new location of pursuer
-                //compute mapinfo whis stores purseur locations
-
-                LinkedList<Vector2D> locationOfEvaders = new LinkedList<>();
-                for(AbstractAgent agent : evaders){
-                    locationOfEvaders.add(agent.getLocation());
-                }
-                MapInfo forPursuer = new MapInfo(locationOfEvaders);
-
-                for (AbstractAgent agent: pursuers){
-                    agent.setMapInfo(forPursuer);
-                }
-
-
-
-                //give pursuers new location of evader
-                //compute mapinfo whis stores evader locations
-                // for(AbstractAgent agent : pursuers){
-                //    agent.setMapInfo(new MapInfo());
-                //}
-
-
-
                 // 6. wait
                 msPassed = System.currentTimeMillis() - iterationStartTime;
                 if(msPassed < desiredIterationLength)
                 {
-                    /*
+
                     try
                     {
                         if(logger.isDebugEnabled())
                         {
                             logger.debug("waiting for {} ms", desiredIterationLength - msPassed);
                         }
-                        //Thread.sleep(desiredIterationLength - msPassed);
-
+                        Thread.sleep(desiredIterationLength - msPassed);
                     }
                     catch(InterruptedException e)
                     {
                         e.printStackTrace();
-                    }*/
+                    }
                 }
                 else
                 {
@@ -331,7 +308,8 @@ public class Engine
 
                     allowedRotation -= command.getRotatedDistance();
 
-                    if(logger.isTraceEnabled()){
+                    if(logger.isTraceEnabled())
+                    {
                         logger.trace("Added to commands: {} ", command);
                         logger.trace("peeked request: {}", task);
                         logger.trace("allowed meters left: {}", allowedMeters);
@@ -339,7 +317,8 @@ public class Engine
                         logger.trace("request is completed: {}", request.isCompleted());
                     }
                 }
-                catch(IllegalStateException e){
+                catch(IllegalStateException e)
+                {
                     logger.error("Cannot resolve new task", e);
                     break;
                 }
@@ -352,50 +331,50 @@ public class Engine
             }
         }
 
-        private void validateCommands()
-        {
-            for (int i = 0; i < commands.size(); i++) {
-                outOfBoundCorrection(commands.get(i));
-            }
-            //commands.forEach(this::outOfBoundCorrection);
-        }
-
         //todo fix
-        private void outOfBoundCorrection(AgentCommand command)
+
+        /**
+         * Check whether a given command moves the agent into an invalid location
+         *
+         * @param command the command to check for being invalid
+         * @return True if the command is invalid, false if the command is legal
+         */
+        private boolean isInvalidCommand(AgentCommand command)
         {
+            // if the location changed, check if the new location is valid
             if(command.isLocationChanged())
             {
+                //get the current information
                 AbstractAgent agent = command.getAgent();
                 Floor floor = agent.getFloor();
                 Vector2D location = command.getNewLocation();
-                //if(floor.contains(location.toPoint()))
-
-
-                //Floor floor = command.getAgent().getFloor();
                 int radius = command.getAgent().getRadius();
-
                 Ellipse2D.Double circle = new Ellipse2D.Double(
                         location.getX() - radius,
                         location.getY() - radius,
                         radius * 2,
                         radius * 2);
 
-                if(!containing(floor.getPolygon(), circle, false))
+                //check if the new location is inside the floor
+                if(!inside(floor, location))
                 {
-                    int ind = commands.indexOf(command);
-                    commands.remove(ind);
+                    return true;
                 }
 
+                //check if the new location is inside an obstacle
+                //if it's on the boundary it is still okay
                 for(Obstacle obs : floor.getObstacles())
                 {
-                    if(containing(obs.getPolygon(), circle, true))
+                    if(inside(obs, location) && !onBoundary(obs, location))
                     {
-                        int ind = commands.indexOf(command);
-                        commands.remove(ind);
+                        return true;
                     }
                 }
 
+                //if both cases are false, command is legal
             }
+
+            return false;
         }
 
         private boolean containing(Polygon bb, Ellipse2D circle, boolean obstacle)
@@ -442,6 +421,16 @@ public class Engine
             return false;
         }
 
+        private boolean onBoundary(AbstractObject o, Vector2D point)
+        {
+            return o.onBoundary(point);
+        }
+
+        private boolean inside(AbstractObject o, Vector2D point)
+        {
+            return o.inside(point);
+        }
+
         private void removeCaughtEvaders()
         {
             //loop over all evaders
@@ -484,10 +473,12 @@ public class Engine
     }
 
     private boolean commandAllowed(AgentCommand command, double allowedMeters, double allowedRotation) {
-        if(command.isLocationChanged()){
+        if(command.isLocationChanged())
+        {
             return allowedMeters - command.getMovedDistance() > 0;
         }
-        if(command.isAngleChanged()){
+        if(command.isAngleChanged())
+        {
             return allowedRotation - command.getRotatedDistance() > 0.0001;
         }
         return true;

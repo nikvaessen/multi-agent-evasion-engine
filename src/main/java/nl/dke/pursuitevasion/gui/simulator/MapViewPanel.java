@@ -5,6 +5,7 @@ import nl.dke.pursuitevasion.game.EngineConstants;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.impl.MCTS.MCTS_2;
+import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathAgent;
 import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.impl.Map;
 import org.slf4j.Logger;
@@ -77,7 +78,8 @@ public class MapViewPanel
             if(agent.isEvader()){
                 g.setColor(EngineConstants.EVADER_COLOR);
             }
-            else{g.setColor(EngineConstants.PURSUER_COLOR);}
+            else{
+                g.setColor(EngineConstants.PURSUER_COLOR);}
             Vector2D vLocation = agent.getLocation();
             Point location = new Point(
                     new Long(Math.round(vLocation.getX())).intValue(),
@@ -92,6 +94,11 @@ public class MapViewPanel
             Vector2D base = visionArc.getBasePoint();
             logger.trace("the eyes of the agent are at {}",base);
 
+            // Draw the agent numbers for the MinimalPathAgents.
+            if(agent instanceof MinimalPathAgent){
+                g.drawString(Integer.toString(((MinimalPathAgent) agent).getAgentNumber()),
+                        (int)Math.round(vLocation.getX()), (int)Math.round(vLocation.getY()) + 10);
+            }
             // Draw vision arcs
             g.setColor(EngineConstants.VISION_ARC_COLOR);
 

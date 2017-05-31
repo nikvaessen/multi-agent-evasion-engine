@@ -1,5 +1,6 @@
 package nl.dke.pursuitevasion.game.agents.impl.MinimalPath;
 
+import nl.dke.pursuitevasion.game.MapInfo;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.AgentRequest;
@@ -7,13 +8,14 @@ import nl.dke.pursuitevasion.game.agents.tasks.MinimalPathGuardTask;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 
+import java.nio.file.Path;
 import java.util.*;
 
 import org.jgrapht.*;
 import org.jgrapht.alg.interfaces.KShortestPathAlgorithm;
 import org.jgrapht.alg.shortestpath.KShortestPaths;
-
 import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.Subgraph;
 import org.jgrapht.graph.WeightedPseudograph;
 
 /**
@@ -26,7 +28,7 @@ public class MinimalPathOverseer {
     // agents that are supervised by the overseer
     static List<MinimalPathAgent> agents = new ArrayList<>(3);
     // maps agents to guardpaths
-    private HashMap<MinimalPathAgent, GraphPath> guardMap;
+    private HashMap<MinimalPathAgent, GraphPath> guardMap = new HashMap<>();
 
     private WeightedGraph<Vector2D, DefaultWeightedEdge> visibilityGraph;
     private Map map;
@@ -39,8 +41,8 @@ public class MinimalPathOverseer {
         this.map = map;
         // Build visibility graph
 
-        // TODO replace PLACEHOLDER LINE with the actual visibility graph.
         visibilityGraph = map.getFloors().iterator().next().getVisibilityGraph();
+
 
         // get u and v
         Vector2D[] uv = getFurthestPoints();
@@ -48,6 +50,10 @@ public class MinimalPathOverseer {
         this.v = uv[1];
         // Calculate minimal paths between u and v
         paths = calculateMinimalPaths();
+    }
+
+    public Graph<Vector2D, DefaultWeightedEdge> pruneVisibilityGraph(){
+        return null;
     }
 
     public List<GraphPath<Vector2D, DefaultWeightedEdge>> calculateMinimalPaths(){
@@ -82,7 +88,7 @@ public class MinimalPathOverseer {
     private static WeightedPseudograph<Vector2D, DefaultWeightedEdge> constructVisibilityGraph(Map map) {
         WeightedPseudograph<Vector2D, DefaultWeightedEdge> g = new WeightedPseudograph<>(
                 DefaultWeightedEdge.class);
-        // simple polygon. So all verteces can see each other.
+        // simple polygon. So all vertexes can see each other.
         Floor f = map.getFloors().iterator().next();
         Collection<Vector2D> points = f.getPolygon().getPoints();
         for (Vector2D point : points) {
@@ -129,7 +135,7 @@ public class MinimalPathOverseer {
             if(agents.size() == 3){
                 assignPaths();
             }
-            return agents.size()-1;
+            return agents.size();
         }
         else{
             throw new IllegalStateException("There are already 3 agents instantiated");
@@ -138,14 +144,35 @@ public class MinimalPathOverseer {
 
     // Checks whether an agent should be making a new request.
     public boolean getShouldDoSomething(MinimalPathAgent agent){
+        // check whether the agent already has an assigned path.
+    /*    GraphPath<Vector2D, DefaultWeightedEdge> path = guardMap.get(agent);
+        if(path == null){
+
+        }*/
         // TODO: implement mechanism to determine whether an agent should make a new request
-        return false;
+        return true;
 
     }
 
     // Determines what request an agent should make.
-    public void getTask(MinimalPathAgent agent, AgentRequest request){
-        request.add(new MinimalPathGuardTask(guardMap.get(agent), agent.getEvader()));
+    public void getTask(MinimalPathAgent agent, AgentRequest request, MapInfo mapInfo){
+        // TODO Make agents guard their path for a minimum amount of iterations.
+        GraphPath<Vector2D, DefaultWeightedEdge> path = guardMap.get(agent);
+        if(path == null){
+            // No path for this agent yet.
+            path = getPath(agent, mapInfo);
+        }
+        if(mapInfo.getAgentPoints().size() > 0){
+            Vector2D evader = mapInfo.getAgentPoints().get(0);
+            if(path != null){
+                request.add(new MinimalPathGuardTask(path, evader));
+            }
+
+        }
+    }
+
+    private GraphPath<Vector2D,DefaultWeightedEdge> getPath(MinimalPathAgent agent, MapInfo mapInfo) {
+        return null;
     }
 
 }

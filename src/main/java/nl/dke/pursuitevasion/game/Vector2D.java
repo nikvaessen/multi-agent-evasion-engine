@@ -2,6 +2,7 @@ package nl.dke.pursuitevasion.game;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 
@@ -10,7 +11,7 @@ import java.util.Objects;
  * <p>
  * Created by nik on 07/05/17.
  */
-public class Vector2D
+public class Vector2D implements Serializable
 {
     /**
      * The x component of the Vector2D
