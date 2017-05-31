@@ -44,13 +44,13 @@ public abstract class AbstractObject implements Serializable
      * The graph which represent the polygon. Vertexes of the vertexes of the polygon
      * and the edges are the lines between the vertexes which create the polygon
      */
-    private SimpleGraph<Vector2D, DefaultEdge> graph;
+    private transient SimpleGraph<Vector2D, DefaultEdge> graph;
 
     /**
      * The list of the neighbours of the vertexes of the graph representing the
      * polygon
      */
-    private NeighborIndex<Vector2D, DefaultEdge> neigbourList;
+    private transient NeighborIndex<Vector2D, DefaultEdge> neigbourList;
 
     /**
      * General constructor which registers the object and gets a unique idea
@@ -60,8 +60,6 @@ public abstract class AbstractObject implements Serializable
         this.id = id;
         this.polygon = polygon;
         this.connectionLines = Collections.unmodifiableCollection(computeConnectingLines());
-        this.graph = constructGraph(this.polygon);
-        this.neigbourList = new NeighborIndex<>(graph);
     }
 
     /**
@@ -94,6 +92,11 @@ public abstract class AbstractObject implements Serializable
      */
     public SimpleGraph<Vector2D, DefaultEdge> getPolygonGraph()
     {
+        if(this.graph == null){
+            this.graph = constructGraph(this.polygon);
+            this.neigbourList = new NeighborIndex<>(graph);
+        }
+
         return graph;
     }
 
@@ -103,6 +106,9 @@ public abstract class AbstractObject implements Serializable
      */
     public NeighborIndex<Vector2D, DefaultEdge> getNeigbourList()
     {
+        if(this.graph == null){
+            this.getPolygonGraph();
+        }
         return neigbourList;
     }
 
@@ -201,8 +207,13 @@ public abstract class AbstractObject implements Serializable
 
             //add the edges
             Vector2D v = new Vector2D(p.xpoints[i], p.ypoints[i]);
-            g.addEdge(v, leftNeighbour);
-            g.addEdge(v, rightNeighbour);
+            try {
+                g.addEdge(v, leftNeighbour);
+                g.addEdge(v, rightNeighbour);
+            }
+            catch (IllegalArgumentException e){
+                //lol we fucked up
+            }
         }
 
         return g;

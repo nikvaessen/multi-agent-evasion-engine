@@ -7,6 +7,7 @@ import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.Direction;
 import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathAgent;
 import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathOverseer;
+import nl.dke.pursuitevasion.game.agents.impl.RandomAgent;
 import nl.dke.pursuitevasion.game.agents.impl.UserAgent;
 import nl.dke.pursuitevasion.gui.KeyboardInputListener;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
@@ -28,8 +29,8 @@ public class MinimalPathTest {
 
     public static void main(String[] args) {
         // do init stuff
-        Map map = Map.getMap("simpleMap.ser");
-
+        //Map map = Map.getMap("simpleMap.ser");
+        Map map = Map.getMap("NikMap.ser");
         ArrayList<AbstractAgent> agents = new ArrayList<>();
         JFrame frame = new JFrame();
         Floor floor = map.getFloors().iterator().next();
@@ -41,7 +42,9 @@ public class MinimalPathTest {
         agents.add(new MinimalPathAgent(map, floor, new Vector2D(50.0,50.0), Direction.NORTH, 5, 100000, 360));
         agents.add(new MinimalPathAgent(map, floor, new Vector2D(75.0,50.0), Direction.NORTH, 5, 100000, 360));
         agents.add(new MinimalPathAgent(map, floor, new Vector2D(25.0,50.0), Direction.NORTH, 5, 100000, 360));
-        agents.add(new UserAgent(map, floor, new Vector2D(200.0, 100.0), Direction.NORTH, 5, 100, 120, l, true));
+        //agents.add(new RandomAgent(map, floor, new Vector2D(200.0, 100.0), Direction.NORTH, 5, 100, 120));
+        agents.add(new UserAgent(map, floor, new Vector2D(200.0, 30.0), Direction.NORTH, 5, 100, 120, l, true));
+
         Engine simulationEngine = new Engine(map, agents, panel, 60);
 
 
