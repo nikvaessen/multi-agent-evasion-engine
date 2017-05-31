@@ -28,7 +28,7 @@ public class MinimalPathOverseer {
     // maps agents to guardpaths
     private HashMap<MinimalPathAgent, GraphPath> guardMap;
 
-    private WeightedPseudograph<Vector2D, DefaultWeightedEdge> visibilityGraph;
+    private WeightedGraph<Vector2D, DefaultWeightedEdge> visibilityGraph;
     private Map map;
     private Vector2D u;
     private Vector2D v;
@@ -40,7 +40,7 @@ public class MinimalPathOverseer {
         // Build visibility graph
 
         // TODO replace PLACEHOLDER LINE with the actual visibility graph.
-        visibilityGraph = constructVisibilityGraph(map);
+        visibilityGraph = map.getFloors().iterator().next().getVisibilityGraph();
 
         // get u and v
         Vector2D[] uv = getFurthestPoints();
