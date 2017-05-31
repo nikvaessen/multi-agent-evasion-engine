@@ -4,7 +4,12 @@ import nl.dke.pursuitevasion.map.AbstractObject;
 import nl.dke.pursuitevasion.map.ObjectType;
 import nl.dke.pursuitevasion.map.MapPolygon;
 
+import java.awt.*;
+import java.awt.geom.Line2D;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -15,6 +20,47 @@ import java.util.Collections;
  */
 public class Floor extends AbstractObject
 {
+    public Collection<Line2D> getLines(){return lines;}
+
+    private Collection<Line2D> constructLines(){
+        ArrayList<Polygon> obstructions = new ArrayList<>();
+        obstructions.add(this.getPolygon());
+        for (Obstacle obstacle : this.getObstacles()) {
+            obstructions.add(obstacle.getPolygon());
+        }
+
+        ArrayList<Line2D> lines = new ArrayList<>();
+        // Get the lines for all objects in the floor (includes the floor).
+        for(Polygon polygon : obstructions){
+            lines.addAll(getLines(polygon));
+        }
+        return lines;
+    }
+
+    private ArrayList<Line2D> getLines(Polygon polygon){
+        ArrayList<java.awt.geom.Line2D> lines = new ArrayList<>();
+        Point2D start = null;
+        Point2D last = null;
+        for (PathIterator iter = polygon.getPathIterator(null); !iter.isDone(); iter.next()) {
+            double[] points = new double[6];
+            int type = iter.currentSegment(points);
+            if (type == PathIterator.SEG_MOVETO) {
+                Point2D moveP = new Point2D.Double(points[0], points[1]);
+                last = moveP;
+                start = moveP;
+            } else if (type == PathIterator.SEG_LINETO) {
+                Point2D newP = new Point2D.Double(points[0], points[1]);
+                java.awt.geom.Line2D line = new java.awt.geom.Line2D.Double(last, newP);
+                lines.add(line);
+                last = newP;
+            } else if (type == PathIterator.SEG_CLOSE){
+                java.awt.geom.Line2D line = new java.awt.geom.Line2D.Double(start, last);
+                lines.add(line);
+            }
+        }
+        return lines;
+    }
+
 
     /**
      * Obstacles can be placed on the floor to obstruct vision
@@ -28,6 +74,7 @@ public class Floor extends AbstractObject
     private final Collection<Exit> exits;
     private final Collection<EntryPursuer> entryPursuer;
     private final Collection<EntryEvader> entryEvader;
+    private final Collection<Line2D> lines;
 
 
     /**
@@ -51,6 +98,7 @@ public class Floor extends AbstractObject
         this.exits = Collections.unmodifiableCollection(exits);
         this.entryEvader = Collections.unmodifiableCollection(entryEvader);
         this.entryPursuer = Collections.unmodifiableCollection(entryPursuer);
+        this.lines = this.constructLines();
     }
 
     /**

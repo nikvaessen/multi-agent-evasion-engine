@@ -351,7 +351,7 @@ public abstract class AbstractAgent
             // TODO: filter out agent on other floors
             Floor f = getFloor();
             // pre-calculate all lines created by obstacles in the floor
-            Collection<Line2D> lines = getFloorLines(f);
+            Collection<Line2D> lines = f.getLines();
             // check which agents are within the area.
             ArrayList<AbstractAgent> visibleAgents = new ArrayList<AbstractAgent>();
             for(AbstractAgent agent : agents){
@@ -376,45 +376,7 @@ public abstract class AbstractAgent
             return false;
         }
 
-        private Collection<Line2D> getFloorLines(Floor floor){
-            ArrayList<Polygon> obstructions = new ArrayList<>();
-            obstructions.add(floor.getPolygon());
-            for (Obstacle obstacle:
-                    floor.getObstacles()) {
-                obstructions.add(obstacle.getPolygon());
-            }
-            // TODO maybe limit this to the closest polygons.
-            // get the lines for all objects in the Floor
-            ArrayList<Line2D> lines = new ArrayList<>();
-            for(Polygon polygon : obstructions){
-                lines.addAll(getLines(polygon));
-            }
-            return lines;
-        }
 
-        private ArrayList<Line2D> getLines(Polygon polygon){
-            ArrayList<java.awt.geom.Line2D> lines = new ArrayList<>();
-            Point2D start = null;
-            Point2D last = null;
-            for (PathIterator iter = polygon.getPathIterator(null); !iter.isDone(); iter.next()) {
-                double[] points = new double[6];
-                int type = iter.currentSegment(points);
-                if (type == PathIterator.SEG_MOVETO) {
-                    Point2D moveP = new Point2D.Double(points[0], points[1]);
-                    last = moveP;
-                    start = moveP;
-                } else if (type == PathIterator.SEG_LINETO) {
-                    Point2D newP = new Point2D.Double(points[0], points[1]);
-                    java.awt.geom.Line2D line = new java.awt.geom.Line2D.Double(last, newP);
-                    lines.add(line);
-                    last = newP;
-                } else if (type == PathIterator.SEG_CLOSE){
-                    java.awt.geom.Line2D line = new java.awt.geom.Line2D.Double(start, last);
-                    lines.add(line);
-                }
-            }
-            return lines;
-        }
 
         private boolean inArc(Vector2D p){
             if(p.distance(location) > visionRange){

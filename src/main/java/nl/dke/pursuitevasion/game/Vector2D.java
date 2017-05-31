@@ -1,5 +1,7 @@
 package nl.dke.pursuitevasion.game;
 
+import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.Map;
 import java.util.Objects;
 
@@ -189,10 +191,32 @@ public class Vector2D
         return false;
     }
 
+    public Point2D toPoint(){
+        return new Point2D.Double(x, y);
+    }
+
+    // Creates a vector2D instance from an array of doubles
+    // Presumes the array to be in [x,y] format.
+    // Rejects arrays that are smaller than 2 elements.
+    // Ignores elements beyond index 1.
+    public static Vector2D fromDoubleArray(double[] coords){
+        // check that the size is correct
+        if(coords.length < 2)
+        {
+            throw new IllegalArgumentException("coordinate array should have at least 2 elements");
+        }
+        return new Vector2D(coords[0], coords[1]);
+    }
+
+    public static Vector2D fromPoint2D(Point2D point){
+        return new Vector2D(point.getX(), point.getY());
+    }
+
+
     @Override
     public int hashCode()
     {
-        return Objects.hashCode(this);
+        return Objects.hash(x, y);
     }
 
     @Override
