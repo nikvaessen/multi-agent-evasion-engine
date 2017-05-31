@@ -9,13 +9,14 @@ import nl.dke.pursuitevasion.map.impl.Map;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Nibbla on 20.05.2017.
  */
 public class State {
-    ArrayList<AbstractAgent> pursuers = new ArrayList<>(3);
-    ArrayList<AbstractAgent> evaders = new ArrayList<>(1);
+    ArrayList<AbstractAgent> pursuers; //= new ArrayList<>(3);
+    ArrayList<AbstractAgent> evaders;// = new ArrayList<>(1);
     TurnOrder turnOrder;
 
     Map map;
@@ -35,21 +36,29 @@ public class State {
         StatePreCalcValue precalc = allTheCalculations.get(sh);
         if (precalc == null) precalc = Evaluator.calcValues(s,sh);
         allTheCalculations.put(sh, precalc);
+
+
         return precalc;
     }
 
-    private static StatePreCalcValue calcValues(State s, StateHandler sh) {
-        return new StatePreCalcValue(s,sh);
-    }
 
-    public State(Engine e, Map map, TurnOrder turnOrder, ArrayList<AbstractAgent> evaders, ArrayList<AbstractAgent> pursuers) {
+
+    public State(Engine e, Map map, TurnOrder turnOrder, List<AbstractAgent> evaders, List<AbstractAgent> pursuers) {
         this.e = e;
         this.map = map;
         this.turnOrder = turnOrder;
-        this.evaders = evaders;
-        this.pursuers = pursuers;
+
+
 
         this.stateHandler = new StateHandler(this);
+        this.evaders = new ArrayList<>(1);
+        this.pursuers = new ArrayList<>(3);
+        for (AbstractAgent p: pursuers){
+            this.pursuers.add(p.copy());
+        }
+        for (AbstractAgent f: evaders){
+            this.evaders.add(f.copy());
+        }
 
     }
 
@@ -70,11 +79,12 @@ public class State {
         s.distances = distances;
         s.distancesCalculated = distancesCalculated;
         s.pursuers = new ArrayList<>(3);
+        s.evaders = new ArrayList<>(1);
         for (AbstractAgent p: pursuers){
-            s.pursuers.add(p.clone());
+            s.pursuers.add(p.copy());
         }
         for (AbstractAgent e: evaders){
-            s.evaders.add(e.clone());
+            s.evaders.add(e.copy());
         }
         s.turnOrder = turnOrder.clone();
         s.stateHandler = stateHandler;
@@ -83,7 +93,7 @@ public class State {
 
     public void executeMove(Move move) {
         AbstractAgent toMove = null;
-        int id = move.getAgent().getId();
+        int id = move.getId();
 
         for (AbstractAgent p: pursuers){
             if (p.getId()== id) toMove = p;
@@ -92,7 +102,9 @@ public class State {
             if (e.getId()== id) toMove = e;
         }
         if (toMove == null) return;
-        toMove.getLocation().add(move.getDeltaX(),move.getDeltaY());
+        Vector2D delta = toMove.getLocation().add(move.getDeltaX(),move.getDeltaY());
+        toMove.getLocation().setX(delta.getX());
+        toMove.getLocation().setY(delta.getY());
         distancesCalculated = false;
 
     }
@@ -145,20 +157,73 @@ public class State {
     }
 
     public static class StatePreCalcValue {
-        public StatePreCalcValue(State s, StateHandler sh) {
+        private double pursuerScore;
+        private double evaderScore;
 
+        public StatePreCalcValue(double pursuerScore,double evaderScore) {
+            this.evaderScore = evaderScore;
+            this.pursuerScore = pursuerScore;
+        }
+
+        public double getPursuerScore() {
+            return pursuerScore;
+        }
+
+        public double getEvaderScore() {
+            return evaderScore;
+        }
+
+        public double getEvedorPossible() {
+            return 0;
+        }
+
+        public double getPursuerPossible() {
+            return 0;
         }
     }
 
     public static class StateHandler {
+        private int hashCode=-1;
+        //variables must be in range 0-100 for hashcoding //use screencords
+        int p1x = 0;
+        int p1y = 0;
+        int p2x = 0;
+        int p2y = 0;
+        int p3x = 0;
+        int p3y = 0;
+        int ex = 0;
+        int ey = 0;
+        //int tick = 0;
+
+        State s = null;
+        private final double hashConstant;
+
+        public int hashCode(){
+            if (hashCode != -1) return hashCode;
+            hashCode = calculateHashcode();
+            return hashCode;
+        }
+
+        private int calculateHashcode() throws ArithmeticException{
+            long hash= (long) (((long)p1x*p1y*p2x*p2y*p3x*p3y*ex*(long)ey)/hashConstant);
+            int hash2 = (int) (hash/2);
+            System.out.println("Generated Hash: " + hash2);
+            return hash2;
+        }
+
         public StateHandler(State s) {
             super();
+            this.s = s;
+            //setVariables
+            hashConstant = 2500000;
         }
 
 
         public State getExampleState() {
-            return null;//new State(StateHandler);
+            return s;//new State(StateHandler);
         }
+
+
     }
 
 

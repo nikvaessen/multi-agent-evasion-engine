@@ -9,6 +9,7 @@ import nl.dke.pursuitevasion.game.agents.tasks.AbstractAgentTask;
 import nl.dke.pursuitevasion.game.agents.tasks.WalkToTask;
 import nl.dke.pursuitevasion.gui.KeyboardInputListener;
 import nl.dke.pursuitevasion.gui.editor.ModelView;
+import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 
@@ -22,9 +23,13 @@ public class CoordinatorPursuerKillKillKillEmAll{
     private final Map map;
     private final Floor floor;
     private final Engine engine;
-    List<PursuerKillKillKillEmAll> pursuers = new ArrayList<>(3);
+    private final ArrayList<AbstractAgent> agents;
+    ArrayList<AbstractAgent>  evador  = new ArrayList<>(1);
+    ArrayList<AbstractAgent> pursuers = new ArrayList<>(3);
     private MCTS_2 m;
-    private ModelView viewport;
+    private MapViewPanel viewport;
+    private long lastTime =0;
+    private long lastTimeViewUpdate = 0;
 
 
     public CoordinatorPursuerKillKillKillEmAll(Engine e, Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing, int radius,
@@ -32,7 +37,7 @@ public class CoordinatorPursuerKillKillKillEmAll{
         this.map = map;
         this.floor = startingFloor;
         this.engine = e;
-
+        this.agents = agents;
         PursuerKillKillKillEmAll p1 = new PursuerKillKillKillEmAll( map,  startingFloor,  startLocation,  startsFacing,  radius,
                 visionRange,  visionAngle,0);
         PursuerKillKillKillEmAll p2 = new PursuerKillKillKillEmAll( map,  startingFloor,  startLocation,  startsFacing,  radius,
@@ -40,37 +45,51 @@ public class CoordinatorPursuerKillKillKillEmAll{
         PursuerKillKillKillEmAll p3 = new PursuerKillKillKillEmAll( map,  startingFloor,  startLocation,  startsFacing,  radius,
                 visionRange,  visionAngle,2);
         agents.add(p1);agents.add(p2);agents.add(p3);
+        this.evador.add(agents.get(0));
         this.pursuers.add(p1);this.pursuers.add(p2);this.pursuers.add(p3);
-
+        PursuerKillKillKillEmAll.setCoordinatorPursuer(this);
 
 
     }
 
-    public AbstractAgentTask getNextMove(PursuerKillKillKillEmAll p, List<AbstractAgent> pursuer, List<AbstractAgent> evader, long currentTime){
-        TurnOrder t = new TurnOrder(p,pursuer,evader);
-        State s = new State(engine, map, t, evader, pursuer);
+    public void setViewPort(MapViewPanel panel){
+        viewport = panel;
+    }
+
+    public AbstractAgentTask getNextMove(PursuerKillKillKillEmAll p, long calculationTime){
+        long start = System.currentTimeMillis();
+        System.out.println("Started one MCTS at: " + start + "ms");
+
+        TurnOrder t = new TurnOrder(p,agents);
+        State s = new State(engine, map, t, evador, pursuers);
 
 
-        if (m == null) m = new MCTS_2(s,p, pursuer, evader, t);
-        if (viewport!=null)viewport.showMCTS(m);
+        if (MCTS_2.getLastMCTS() == null) m = new MCTS_2(s,t,calculationTime, 10,false);
+        else m = MCTS_2.getLastMCTS();
+        if (viewport!=null){
+            if ((  start - lastTimeViewUpdate)>2000)  {
+                viewport.setMCTSPreview(m);
+                lastTimeViewUpdate = start;
+            }
+
+        }
+        m.updateState(s);
         Move move = m.start();
-        AbstractAgentTask abstractAgentTask = new WalkToTask(move.getAgent().getLocation(),false);
-        if (!m.hasCalculated) m.calculate(durationInMS);
+
+        AbstractAgentTask abstractAgentTask = new WalkToTask(move.getEndLocation(),false);
+        //if (!m.hasCalculated) m.calculate(durationInMS);
+
+
+        long finish = System.currentTimeMillis();
+        long duration = finish-start;
+        lastTime = finish;
+        System.out.println(m.toString());
+        System.out.println("Finished one MCTS in: " + duration + "ms");
         return abstractAgentTask;
 
-
+      //  Engine start = engine.copy();
     }
-    public void calculateMCTS(long durationInMS){
-        Engine start = engine.copy();
 
-        //do something
-        //do more
-        //MORE!!!
-        //MORE fuckers!!!
-
-
-
-    }
 
 
 

@@ -26,16 +26,18 @@ public class Move {
     private Angle angle;
     private double deltaX;
     private double deltaY;
+    private double finalX;
+    private double finalY;
 
-
+    static HashMap<Move,double[]> moveHashMap = new HashMap<>(2000000,2);
 
 
     public double getDeltaX() {
-        return Math.acos(angle.getRadians())* skale * EngineConstants.WALKING_SPEED;
+        return deltaX;
     }
 
     public double getDeltaY() {
-        return Math.asin(angle.getRadians())* skale * EngineConstants.WALKING_SPEED;
+        return deltaY;
     }
 
     public Move(AbstractAgent agent, Angle angle, double skale) {
@@ -43,6 +45,18 @@ public class Move {
         this.skale = skale;
         this.agent = agent;
 
+        double[] val;
+        val = moveHashMap.get(this);
+        if (val ==null){
+            val = new double[2];
+            val[0] =  Math.cos(angle.getRadians())* skale ;
+            val[1] =  Math.sin(angle.getRadians())* skale ;
+            moveHashMap.put(this,val);
+        }
+        deltaX = val[0];
+        deltaY = val[1];
+        finalX = deltaX + agent.getLocation().getX();
+        finalY = deltaY + agent.getLocation().getY();
 
     }
 
@@ -54,6 +68,16 @@ public class Move {
         this.agent = agent;
         this.skale = skale;
         this.angle = new Angle(angle);
+        double[] val = null;
+       // val = moveHashMap.get(this);
+        if (val ==null){
+            val = new double[2];
+            val[0] =  Math.acos(this.angle.getRadians())* skale * EngineConstants.WALKING_SPEED * EngineConstants.TIMECONSTANT;
+            val[1] =  Math.asin(this.angle.getRadians())* skale * EngineConstants.WALKING_SPEED * EngineConstants.TIMECONSTANT;
+           // moveHashMap.put(this,val);
+        }
+        deltaX = val[0];
+        deltaY = val[1];
     }
 
     public double getSkale() {
@@ -69,9 +93,7 @@ public class Move {
         return "Angle: " + angle.toString() + " Skale: " + skale;
     }
 
-    public AbstractAgent getAgent() {
-        return agent;
-    }
+
 
     public ArrayList<Move> getMoves(AbstractAgent player, State state) {
        if (moves != null) return moves;
@@ -104,16 +126,24 @@ public class Move {
         if (!player.isEvader()){
             //add 16 moves, one for every direction. The length is a fourth of the distance of evader to closest pursuer,
             //with an minimum distance of speed*timeframe and direction 0 is the direct angle closing in to the evader
-            Angle a = new Angle(player,evader);
-            Move n = new Move(player,a,distances[4]);
+            Angle a = new Angle(evader,pursuer.get((int)distances[5]));
+            double OverSixteen = 1./16.*360;
 
-            moves.add(n);
+            for (int j = 0; j < 16; j++) {
+                Angle b = a.clone(); a.rotate((int) OverSixteen);
+                Move n = new Move(player,b,distances[4]);
+
+                moves.add(n);
+            }
+
         }
-        for (Move m: moves) {
+        for (int i = moves.size()-1; i >= 0 ; i--) {
+            Move m = moves.get(i);
             if (!m.isLegal(state.map)) {
                 moves.remove(m);
             }
         }
+
         return moves;
     }
 
@@ -126,7 +156,10 @@ public class Move {
 
         freeMoves = new ArrayList<>();
         ArrayList<Move> allMoves = getMoves(node.getPlayer(),s);
-        Collections.copy(allMoves,freeMoves);
+        for (int i = 0; i < allMoves.size(); i++) {
+            freeMoves.add(allMoves.get(i));
+        }
+
 
 
 
@@ -141,10 +174,21 @@ public class Move {
      */
     private boolean isLegal(Map map) {
         Vector2D v = new Vector2D(this.agent.getLocation());
-        v.add(this.getDeltaX(),this.getDeltaY());
+        v = v.add(this.getDeltaX(),this.getDeltaY());
         if (map.isInsideAndLegal(v)) return true;
         return false;
     }
 
 
+    public Vector2D getStartLocation() {
+        return agent.getLocation();
+    }
+
+    public int getId() {
+        return agent.getId();
+    }
+
+    public Vector2D getEndLocation() {
+        return new Vector2D(finalX,finalY);
+    }
 }

@@ -12,6 +12,7 @@ import java.util.Random;
  * Created by Nibbla on 17.01.2017.
  */
 public class ExtensionStrategy {
+    /*
     State board;
     int[][] weights;
     int weightSum = 0;
@@ -31,6 +32,7 @@ public class ExtensionStrategy {
 
                     System.out.println("Suggestet" + x + " " + y);
                     m = new Move(x, y);
+
                     break outerloop;
                 }
             }
@@ -113,7 +115,7 @@ public class ExtensionStrategy {
 
 
         System.out.println("Angepasst");
-         */
+         */ /*
         for (int x = 0; x < n; x++) {
             for (int y = 0; y < n; y++) {
                 //if ( disttancePlayer[x][y] == 0) disttancePlayer[x][y] = -1;
@@ -186,9 +188,9 @@ public class ExtensionStrategy {
         System.out.println("weights");
         for (int[] w : weights) {
             System.out.println(Arrays.toString(w));
-        }*/
+        }*/  /**
         System.out.println("Freemove: " + freeMove.length + " " );
-      /*  */
+      /*  */  /*
     }
 
     private void calcDistanceMap(int[][] disttancePlayer, boolean[][] visitedPlayer, LinkedList<Cell> playerQueue) {
@@ -242,7 +244,7 @@ public class ExtensionStrategy {
                         if (x!=n-1||x!=0)  playerQueue.add(cells[y][x]);  //checking for x and y that they not included twice
 
                     }*/
-
+ /*
                     visitedEnemy[y][x] = true;
                     visitedPlayer[y][x] = true;
                 } else if (cells[y][x].getStatus() == player.opposite()) {
@@ -298,6 +300,8 @@ public class ExtensionStrategy {
             playerQueue.add(special2);
         }
     }
+
+    */
     }
 
 

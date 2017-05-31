@@ -4,6 +4,7 @@ import nl.dke.pursuitevasion.game.Engine;
 import nl.dke.pursuitevasion.game.EngineConstants;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
+import nl.dke.pursuitevasion.game.agents.impl.MCTS.MCTS_2;
 import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.impl.Map;
 import org.slf4j.Logger;
@@ -25,12 +26,15 @@ public class MapViewPanel
     public final static int X_PADDING = 10; //pixels
     public final static int Y_PADDING = 10; //pixels
     public final static int BORDER_STROKE_WIDTH = 5; //pixels
+    private  MCTS_2 mcts;
+    private MCTS_2.MCTSViewSettings mctsViewSettings = new MCTS_2.MCTSViewSettings();
 
     private Collection<MapPolygon> objects;
 
     private Collection<AbstractAgent> agents;
 
     private Dimension preferredSize;
+
 
     public MapViewPanel(Map map, Collection<AbstractAgent> agents)
     {
@@ -39,6 +43,12 @@ public class MapViewPanel
         this.preferredSize = computePreferredSize();
     }
 
+    public void setMCTSPreview(MCTS_2 mcts){
+        this.mcts = mcts;
+    }
+    public void setMCTSViewSettings(MCTS_2.MCTSViewSettings mctsViewSettings){
+        this.mctsViewSettings = mctsViewSettings;
+    }
 
     @Override
     protected void paintComponent(Graphics g)
@@ -100,6 +110,10 @@ public class MapViewPanel
 
 //            Point left = visionArea.getLeftPoint();
 //            g.drawLine(left.x, left.y, base.x, base.y);
+
+        }
+        if (mcts != null) {
+            mcts.paint(g,mctsViewSettings,this);
         }
     }
 

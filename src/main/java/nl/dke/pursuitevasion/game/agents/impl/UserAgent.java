@@ -31,6 +31,26 @@ public class UserAgent
     private boolean west;
     private boolean east;
 
+    private UserAgent(int id,boolean isEvader) {
+        super(id); this.isEvader = isEvader;
+    }
+
+    @Override
+    public UserAgent clone() {
+        UserAgent ra = new UserAgent(this.getId(), isEvader);
+        ra.map = map;
+        ra.floor = this.floor;
+        ra.location = this.location.copy();
+
+        ra.facing = this.facing.clone();
+        ra.radius = this.radius;
+        ra.visionRange = this.visionRange;
+        ra.visionAngle = this.visionAngle;
+        ra.visionArc = this.getVisionArc().clone();
+
+
+        return ra;
+    }
     public UserAgent(Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing, int radius,
                      double visionRange, double visionAngle, KeyboardInputListener listener, boolean isEvader)
     {

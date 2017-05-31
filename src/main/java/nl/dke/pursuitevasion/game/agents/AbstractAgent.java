@@ -30,10 +30,16 @@ public abstract class AbstractAgent
 {
     private final static Logger logger = LoggerFactory.getLogger(AbstractAgent.class);
 
-    public abstract AbstractAgent clone();
+
+
 
     private final int id;
     private static int idCount = 0;
+
+    public AbstractAgent(int id) {
+        this.id = id;
+    }
+
 
 
 
@@ -49,7 +55,7 @@ public abstract class AbstractAgent
     /**
      * The radius of the agent.
      */
-    private int radius;
+    protected int radius;
 
     /**
      * The location of the agent in the Map
@@ -74,12 +80,12 @@ public abstract class AbstractAgent
     /**
      * The Map environment the Agent exists in.
      */
-    private Map map;
+    protected Map map;
 
     /**
      * The floor the Agent is currently on.
      */
-    private Floor floor;
+    protected Floor floor;
 
     /**
      * The current requested movement in the world. Null if there is no desired movement
@@ -311,7 +317,7 @@ public abstract class AbstractAgent
         return visionArc;
     }
 
-    private VisionArc visionArc;
+    protected VisionArc visionArc;
 
     private Collection<AbstractAgent> visibleAgents = new ArrayList<>();
 
@@ -343,12 +349,33 @@ public abstract class AbstractAgent
 
     }
 
+    public AbstractAgent copy() {
+
+        try {
+            return (AbstractAgent) this.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
+
+
+    }
+
+
     public class VisionArc {
 
         Angle lowerAngle;
         Angle upperAngle;
-        private Collection<AbstractAgent> agents;
 
+        public VisionArc(boolean b) {
+        }
+
+        public VisionArc clone(){
+            VisionArc v = new VisionArc(false);
+            v.lowerAngle = this.lowerAngle.clone();
+            v.upperAngle = this.upperAngle.clone();
+            return v;
+        }
 
         private VisionArc(){
             updateAngles();

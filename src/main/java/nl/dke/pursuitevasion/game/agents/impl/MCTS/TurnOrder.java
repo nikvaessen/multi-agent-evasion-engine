@@ -16,13 +16,12 @@ public class TurnOrder {
     int idEvader = 0;
 
 
-    public TurnOrder( List<AbstractAgent> pursuers, List<AbstractAgent> evaders){
-        int id = evaders.get(0).getId();
-        turnOrder.add(id);
-        idEvader = id;
-        for (int i = 0; i < pursuers.size(); i++) {
-            turnOrder.add(pursuers.get(i).getId());
+    public TurnOrder(AbstractAgent currentPlayer, List<AbstractAgent> agents){
 
+        for (int i = 0; i < agents.size(); i++) {
+            turnOrder.add(agents.get(i).getId());
+            if (currentPlayer.getId()==agents.get(i).getId()) current = i;
+            if (agents.get(i).isEvader()) idEvader = agents.get(i).getId();
         }
 
     }
@@ -35,7 +34,7 @@ public class TurnOrder {
         return turnOrder.get(current);
     }
     public int getIDNext(){
-        return turnOrder.get(current+1%turnOrder.size());
+        return turnOrder.get((current+1)%turnOrder.size());
     }
     public int getIDLast(){
         int i = current-1;
@@ -44,7 +43,7 @@ public class TurnOrder {
     }
 
     public void nextPlayer(){
-        current = current+1%turnOrder.size();
+        current = (current+1)%turnOrder.size();
     }
     public void previousPlayer(){
         current = current-1;

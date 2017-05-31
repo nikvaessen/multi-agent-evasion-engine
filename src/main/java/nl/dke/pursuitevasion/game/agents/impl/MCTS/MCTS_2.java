@@ -1,11 +1,16 @@
 package nl.dke.pursuitevasion.game.agents.impl.MCTS;
 
 
+import nl.dke.pursuitevasion.game.agents.Angle;
+import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
 /**
- * Created by giogio on 1/21/17.
+ * Created by giogio,Nibbla on 1/21/17.
+ *
  */
 public class MCTS_2 implements Strategy{
     private final static Logger log = Logger.getLogger( MCTS_2.class.getName() );
@@ -20,7 +25,12 @@ public class MCTS_2 implements Strategy{
 
 
     private NodeTree_2 root;
-    private NodeTree_2 lastFinalSelectedMove;
+
+    public static NodeTree_2 getLastFinalSelectedMove() {
+        return lastFinalSelectedMove;
+    }
+
+    private static NodeTree_2 lastFinalSelectedMove;
 
     int[][] blueWinboard;
     int[][] bluePlayboard;
@@ -28,13 +38,19 @@ public class MCTS_2 implements Strategy{
     int[][] redWinboard;
     int[][] redPlayboard;
 
+    public static MCTS_2 getLastMCTS() {
+        return lastMCTS;
+    }
 
-    public MCTS_2(State realState, TurnOrder firstPlayer, int maxCalcTimeMilliSeconds, int depthLevel, boolean ExtensionStrategy){
+    private static MCTS_2 lastMCTS;
+
+
+    public MCTS_2(State realState, TurnOrder firstPlayer, long maxCalcTimeMilliSeconds, int depthLevel, boolean ExtensionStrategy){
         this.depthLevel = depthLevel;
         this.realState = realState;
         this.ally = firstPlayer;
 
-        this.maxtTime = maxCalcTimeMilliSeconds;
+        this.maxtTime = (int) maxCalcTimeMilliSeconds;
         this.extensionStrategy = ExtensionStrategy;
 
         /*int s = realState.getSize();
@@ -64,13 +80,13 @@ public class MCTS_2 implements Strategy{
                 expansion(selection(root));
             }
         }
-        printTree(root);
+        //printTree(root);
         System.out.println("Expansions: "+n_expansion);
         NodeTree_2 m = null;
         if (depthLevel==1){ m = getBestValue();}else
         {m = getBestMove();}
 
-
+        lastMCTS = this;
         return m.getMove();
 
     }
@@ -164,7 +180,7 @@ public class MCTS_2 implements Strategy{
         double bestValue = -999999999;
         for(NodeTree_2 child: root.getChildren()){
 
-            double value = child.getWins()/(child.getGames()*1.0);
+            double value = child.getWins()/(child.getMaximalPossiblePoints()*1.0);
             if(value>bestValue) {
                 bestNode = child;
                 bestValue = value;
@@ -271,7 +287,11 @@ public class MCTS_2 implements Strategy{
      * I suppose it works like this, as the active player has always two steps.
      */
     public void setNewRoot(TurnOrder t){
-        if(lastFinalSelectedMove !=null||ally.getIDCurrent()!=t.getIDCurrent()) {
+        if(lastMCTS!=null){
+            State.StateHandler sh = lastMCTS.getBestMove().getState().getStateHandler();
+
+        }
+        if(false &&(lastFinalSelectedMove !=null||ally.getIDCurrent()!=t.getIDCurrent())) {
             //if the mcst has been used before, it now has to be advanced to the new state.
             //the code right now appears to call set New Root again, and by that deletes the factual tree?!?!?!?!
             State copy = lastFinalSelectedMove.getState().clone();
@@ -293,9 +313,15 @@ public class MCTS_2 implements Strategy{
             setNewRoot(t);
         }else {
             //
-            if(root == null) root = new NodeTree_2(null);
-            TurnOrder to = ally.clone();to.nextPlayer();
-            root.setTurn(to);
+           // if(root == null) {
+                root = new NodeTree_2(null);
+                root.setState(realState);
+                //root.setTurn(t);
+                TurnOrder to = t.clone();to.previousPlayer();
+                root.setTurn(to);
+                root.overwriteMove(new Move(root.getPlayer(),new Angle(0),0));
+           // }
+
             root.setState(realState.clone());
         }
     }
@@ -314,10 +340,10 @@ public class MCTS_2 implements Strategy{
 
         ArrayList<Move> moves =  node.getFreeMoves();
         NodeTree_2 newNode = new NodeTree_2(node);
-        ExtensionStrategy es = new ExtensionStrategy(moves,node.getState(),ally);
+       // ExtensionStrategy es = new ExtensionStrategy(moves,node.getState(),ally);
 
 
-        newNode.setMove(es.getSuggestedMove(moves));
+       // newNode.setMove(es.getSuggestedMove(moves));
         n_expansion++;
         if (!newNode.isWinningMove() && !newNode.isLosingMove()){
             simulateQuick(newNode);
@@ -385,9 +411,9 @@ public class MCTS_2 implements Strategy{
         TurnOrder to = node.getTurn();
         //repeat until 4 seconds are full
         //node.getState().evaluate(to);
-        double[] value = Evaluator.calcValues();
-
-        node.incrementWin(value[0],value[1],to);
+        State.StatePreCalcValue value = Evaluator.calcValues(node.getState(),node.getState().getStateHandler());
+        //System.out.println("Evaluated State: " + node.getPlayer().getLocation().toString() + " with:"+ value.getEvaderScore());
+        node.incrementWin(value.getEvaderScore(),value.getPursuerScore(),value.getEvedorPossible(), value.getPursuerPossible(),to);
 
         /*if(node.isEvader() == StatusCell.Blue)
             current = StatusCell.Red;
@@ -542,5 +568,20 @@ public class MCTS_2 implements Strategy{
         realState = state;
     }
 
+    public void paint(Graphics g, MCTSViewSettings mctsViewSettings, MapViewPanel mapViewPanel) {
+        NodeTree_2 root = this.getRoot();
+        if (root == null) return;
+        int height = root.getHeight();
+        LayerView lv = new LayerView(root,mapViewPanel.getPreferredSize(),mctsViewSettings);
 
+        //lv.paintComponent(g);
+        lv.paintOverView(g,mapViewPanel);
+    }
+
+
+    public static class MCTSViewSettings {
+        public MCTSViewSettings(){
+
+        }
+    }
 }

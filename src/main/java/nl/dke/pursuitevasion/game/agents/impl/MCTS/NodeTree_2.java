@@ -15,7 +15,7 @@ public class NodeTree_2 {
     private NodeTree_2 parent;
     private ArrayList<NodeTree_2> children;
     private TurnOrder currentplayer;
-    private int wins,games;
+    private int wins,games,maxPoints;
     private boolean winningMove, losingMove, deadCell;
 
 
@@ -23,6 +23,7 @@ public class NodeTree_2 {
     public NodeTree_2(NodeTree_2 parent){
         if(parent!=null){
             this.parent = parent;
+
             parent.addChildren(this);
             this.currentplayer = parent.currentplayer.clone();
             this.currentplayer.nextPlayer();
@@ -43,14 +44,21 @@ public class NodeTree_2 {
     }
 
 
-    public void incrementWin(double scoreWinning, double scoreLoosing, TurnOrder winningPlayer){
-        if (this.currentplayer.isSameTeam(winningPlayer.getIDCurrent())) this.wins+=scoreWinning;
-        else this.wins+=scoreLoosing;
+    public void incrementWin(double scoreWinning, double scoreLoosing, double WinningPossible, double LoosingPossible, TurnOrder winningPlayer){
+        if (this.currentplayer.isSameTeam(winningPlayer.getIDCurrent())){
+            this.wins+=scoreWinning;
+            this.maxPoints+=WinningPossible;
+        }
+        else {
+            this.wins+=scoreLoosing;
+            this.maxPoints+=LoosingPossible;
+        }
+
         if(parent!=null)
-            parent.incrementWin(scoreWinning, scoreLoosing, winningPlayer);
+            parent.incrementWin(scoreWinning, scoreLoosing, WinningPossible, LoosingPossible, winningPlayer);
     }
     public void incrementGame(){
-        this.games+=1;
+        this.games+=1;//1;
         if(parent!=null)
             parent.incrementGame();
     }
@@ -217,5 +225,22 @@ public class NodeTree_2 {
 
     public TurnOrder getTurn() {
         return currentplayer;
+    }
+
+    public double getMetricalDistanceIfPlayerToRoot(TurnOrder t) {
+        if (this.getParent() == null) return 0;
+        if (t == null) t = this.getTurn().clone();
+        double distanceToParent = 0;
+        if (t.current == getTurn().current) distanceToParent = this.move.getSkale();
+        t.previousPlayer();
+        return distanceToParent + this.getParent().getMetricalDistanceIfPlayerToRoot(t);
+    }
+
+    public void overwriteMove(Move move) {
+        this.move = move;
+    }
+
+    public int getMaximalPossiblePoints() {
+        return maxPoints;
     }
 }
