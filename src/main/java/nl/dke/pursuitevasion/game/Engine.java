@@ -162,6 +162,41 @@ public class Engine
                     // make information available to agents
                 }
 
+                // give pursuers new location of evader
+                //compute mapinfo which stores evader location
+
+
+                LinkedList<Vector2D> locationOfPursuer = new LinkedList<>();
+                for (AbstractAgent agent: pursuers){
+                    locationOfPursuer.add(agent.getLocation());
+                }
+                MapInfo forEvader = new MapInfo(locationOfPursuer);
+
+                for (AbstractAgent agent: evaders){
+                    agent.setMapInfo(forEvader);
+                }
+
+                //give evade new location of pursuer
+                //compute mapinfo whis stores purseur locations
+
+                LinkedList<Vector2D> locationOfEvaders = new LinkedList<>();
+                for(AbstractAgent agent : evaders){
+                    locationOfEvaders.add(agent.getLocation());
+                }
+                MapInfo forPursuer = new MapInfo(locationOfEvaders);
+
+                for (AbstractAgent agent: pursuers){
+                    agent.setMapInfo(forPursuer);
+                }
+
+
+
+                //give pursuers new location of evader
+                //compute mapinfo whis stores evader locations
+                // for(AbstractAgent agent : pursuers){
+                //    agent.setMapInfo(new MapInfo());
+                //}
+
                 // 2. Check agents
                 if(logger.isTraceEnabled())
                 {
@@ -242,40 +277,7 @@ public class Engine
                     }
                 }
 
-                // give pursuers new location of evader
-                //compute mapinfo which stores evader location
 
-
-                LinkedList<Vector2D> locationOfPursuer = new LinkedList<>();
-                for (AbstractAgent agent: pursuers){
-                    locationOfPursuer.add(agent.getLocation());
-                }
-                MapInfo forEvader = new MapInfo(locationOfPursuer);
-
-                for (AbstractAgent agent: evaders){
-                    agent.setMapInfo(forEvader);
-                }
-
-                //give evade new location of pursuer
-                //compute mapinfo whis stores purseur locations
-
-                LinkedList<Vector2D> locationOfEvaders = new LinkedList<>();
-                for(AbstractAgent agent : evaders){
-                    locationOfEvaders.add(agent.getLocation());
-                }
-                MapInfo forPursuer = new MapInfo(locationOfEvaders);
-
-                for (AbstractAgent agent: pursuers){
-                    agent.setMapInfo(forPursuer);
-                }
-
-
-
-                //give pursuers new location of evader
-                //compute mapinfo whis stores evader locations
-                // for(AbstractAgent agent : pursuers){
-                //    agent.setMapInfo(new MapInfo());
-                //}
 
 
 
@@ -283,20 +285,19 @@ public class Engine
                 msPassed = System.currentTimeMillis() - iterationStartTime;
                 if(msPassed < desiredIterationLength)
                 {
-                    /*
+
                     try
                     {
                         if(logger.isDebugEnabled())
                         {
                             logger.debug("waiting for {} ms", desiredIterationLength - msPassed);
                         }
-                        //Thread.sleep(desiredIterationLength - msPassed);
-
+                        Thread.sleep(desiredIterationLength - msPassed);
                     }
                     catch(InterruptedException e)
                     {
                         e.printStackTrace();
-                    }*/
+                    }
                 }
                 else
                 {
