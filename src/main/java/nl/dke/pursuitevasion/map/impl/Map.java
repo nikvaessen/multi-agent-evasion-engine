@@ -1,5 +1,6 @@
 package nl.dke.pursuitevasion.map.impl;
 
+import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.map.AbstractObject;
 import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.builders.MapBuilder;
@@ -228,5 +229,22 @@ public class Map implements Serializable
                 8,
                 false
         )).finish().build();
+    }
+
+    public boolean isInsideAndLegal(Vector2D v) {
+        Collection<Floor> mp = this.getFloors();
+
+        for (Floor f : mp){
+            if (f.getPolygon().contains(v.getX(),v.getY())){
+                for (Obstacle ob : f.getObstacles()){
+                    if (ob.getPolygon().getBounds2D().contains(v.getX(),v.getY())){
+                        if (ob.getPolygon().contains(v.getX(),v.getY()))return false;
+                    }
+                }
+                return true;
+            }
+        }
+
+        return false;
     }
 }

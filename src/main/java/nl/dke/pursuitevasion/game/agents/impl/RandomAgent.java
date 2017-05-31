@@ -29,6 +29,30 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class RandomAgent extends AbstractAgent{
 
+
+
+
+    private RandomAgent(int id) {
+        super(id);
+    }
+
+    @Override
+    public RandomAgent clone() {
+        RandomAgent ra = new RandomAgent(this.getId());
+        ra.map = map;
+        ra.floor = this.floor;
+        ra.location = this.location.copy();
+
+        ra.facing = this.facing.clone();
+        ra.radius = this.radius;
+        ra.visionRange = this.visionRange;
+        ra.visionAngle = this.visionAngle;
+        ra.visionArc = this.getVisionArc().clone();
+
+
+        return ra;
+    }
+
     public RandomAgent(Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing, int radius, double visionRange, double visionAngle){
         super(map, startingFloor, startLocation, startsFacing, radius, visionRange, visionAngle);
     }

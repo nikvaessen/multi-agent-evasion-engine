@@ -28,6 +28,26 @@ public class SimpleAgent
     Vector2D goal = new Vector2D(0, 0);
     private boolean hasRequest;
 
+    private SimpleAgent(int id) {
+        super(id);
+    }
+
+    @Override
+    public SimpleAgent clone() {
+        SimpleAgent ra = new SimpleAgent(this.getId());
+        ra.map = map;
+        ra.floor = this.floor;
+        ra.location = this.location.copy();
+
+        ra.facing = this.facing.clone();
+        ra.radius = this.radius;
+        ra.visionRange = this.visionRange;
+        ra.visionAngle = this.visionAngle;
+        ra.visionArc = this.getVisionArc().clone();
+
+
+        return ra;
+    }
     public SimpleAgent(Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing, int radius,
                        double visionRange, double visionAngle)
     {

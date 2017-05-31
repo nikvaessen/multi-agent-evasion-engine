@@ -1,6 +1,7 @@
 package nl.dke.pursuitevasion.gui.editor;
 
 import nl.dke.pursuitevasion.game.EngineConstants;
+import nl.dke.pursuitevasion.game.agents.impl.MCTS.MCTS_2;
 import nl.dke.pursuitevasion.gui.Voronoi;
 import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.impl.*;
@@ -55,6 +56,7 @@ public class ModelView extends JPanel {
     private ArrayList<MoveObject> allPoints = new ArrayList<>();
     private ArrayList<MoveObject> allPointsUndo = new ArrayList<>();
     private Point pressed; //for moving purposes
+    private MCTS_2 MCTSToShow = null;
 
 
     public void finalizeVoronoi() {
@@ -250,6 +252,10 @@ public class ModelView extends JPanel {
         objects.add(0,new EditorObject(polygon,LastID));
         objects.get(0).setType(ObjectType.FLOOR);
         repaint();
+    }
+
+    public void showMCTS(MCTS_2 m) {
+        this.MCTSToShow = m;
     }
 
     // everything in the editor is an abstractobject
@@ -810,7 +816,7 @@ public class ModelView extends JPanel {
                     break;
             }
 
-          //  g2d.setColor(new Color((float)Math.random(),(float)Math.random(),(float)Math.random()));
+          //  g2d.setTurn(new Color((float)Math.random(),(float)Math.random(),(float)Math.random()));
           //  g2d.fillPolygon(poly);
             g2d.setColor(Color.BLACK);
             g2d.fillOval(p.x-2,p.y-2,4,4);
@@ -833,10 +839,10 @@ public class ModelView extends JPanel {
             int x = this.getWidth();
             int y = this.getHeight();
             g2d.setStroke(new BasicStroke(5));
-            g2d.setColor(Color.cyan);
+            g2d.setTurn(Color.cyan);
             g2d.drawLine(x*1/3,y*1/3,x*2/3,y*2/3);
 
-            g2d.setColor(Color.RED);
+            g2d.setTurn(Color.RED);
             g2d.fillOval((int)lastClickedPoint.getX()-5,(int)lastClickedPoint.getY()-5,10,10);
         }*/
 

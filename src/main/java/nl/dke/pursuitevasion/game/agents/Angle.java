@@ -1,5 +1,7 @@
 package nl.dke.pursuitevasion.game.agents;
 
+import nl.dke.pursuitevasion.game.Vector2D;
+
 /**
  * Represent an angle in degrees
  *
@@ -29,6 +31,22 @@ public class Angle
         rotateTo(direction);
     }
 
+    /**
+     * the angle between two agents
+     * @param first
+     * @param second
+     */
+    public Angle(AbstractAgent first, AbstractAgent second) {
+        double deltaX =  second.getLocation().getX() - first.getLocation().getX();
+        double deltaY =  second.getLocation().getY() - first.getLocation().getY();
+
+        angle = Math.toDegrees(Math.atan2(deltaY,deltaX));
+
+    }
+
+    public Angle clone(){
+        return new Angle(angle);
+    }
     public double getAngle()
     {
         return angle;
