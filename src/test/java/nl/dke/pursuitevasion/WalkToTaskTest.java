@@ -8,7 +8,7 @@ import nl.dke.pursuitevasion.game.agents.impl.SimpleAgent;
 import nl.dke.pursuitevasion.game.agents.tasks.WalkToTask;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
-import org.junit.Test;
+
 
 import java.awt.*;
 
@@ -17,7 +17,7 @@ import java.awt.*;
  */
 public class WalkToTaskTest {
 
-    @Test
+
     public void testAgentCommand()
     {
         Map map = Map.getSimpleMap();

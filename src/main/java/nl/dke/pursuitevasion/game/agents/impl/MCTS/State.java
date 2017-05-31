@@ -102,7 +102,7 @@ public class State {
             if (e.getId()== id) toMove = e;
         }
         if (toMove == null) return;
-        Vector2D delta = toMove.getLocation().add(move.getDeltaX(),move.getDeltaY());
+        Vector2D delta = move.getEndLocation();
         toMove.getLocation().setX(delta.getX());
         toMove.getLocation().setY(delta.getY());
         distancesCalculated = false;
@@ -159,10 +159,14 @@ public class State {
     public static class StatePreCalcValue {
         private double pursuerScore;
         private double evaderScore;
+        private double pursuerPossible;
+        private double evaderPossible;
 
-        public StatePreCalcValue(double pursuerScore,double evaderScore) {
+        public StatePreCalcValue(double pursuerScore,double evaderScore, double pursuerPossible, double evaderPossible) {
             this.evaderScore = evaderScore;
             this.pursuerScore = pursuerScore;
+            this.pursuerPossible = pursuerPossible;
+            this.evaderPossible = evaderPossible;
         }
 
         public double getPursuerScore() {
@@ -174,11 +178,11 @@ public class State {
         }
 
         public double getEvedorPossible() {
-            return 0;
+            return evaderPossible;
         }
 
         public double getPursuerPossible() {
-            return 0;
+            return pursuerPossible;
         }
     }
 

@@ -26,11 +26,11 @@ public class MCTS_2 implements Strategy{
 
     private NodeTree_2 root;
 
-    public static NodeTree_2 getLastFinalSelectedMove() {
-        return lastFinalSelectedMove;
-    }
+    //public static NodeTree_2 getLastFinalSelectedMove() {
+    //    return lastFinalSelectedMove;
+   // }
 
-    private static NodeTree_2 lastFinalSelectedMove;
+   // private static NodeTree_2 lastFinalSelectedMove;
 
     int[][] blueWinboard;
     int[][] bluePlayboard;
@@ -83,7 +83,7 @@ public class MCTS_2 implements Strategy{
         //printTree(root);
         System.out.println("Expansions: "+n_expansion);
         NodeTree_2 m = null;
-        if (depthLevel==1){ m = getBestValue();}else
+        if (depthLevel==10){ m = getBestValue();}else
         {m = getBestMove();}
 
         lastMCTS = this;
@@ -171,22 +171,26 @@ public class MCTS_2 implements Strategy{
                 bestValue = value;
             }
         }
-        lastFinalSelectedMove = bestNode;
+       // lastFinalSelectedMove = bestNode;
         return bestNode;
     }
 
     public NodeTree_2 getBestValue() {
         NodeTree_2 bestNode = null;
         double bestValue = -999999999;
+        System.out.println("gettingthe best for evader?" + ally.isEvader());
+
         for(NodeTree_2 child: root.getChildren()){
 
             double value = child.getWins()/(child.getMaximalPossiblePoints()*1.0);
+            System.out.println(child.getMove());
+            System.out.println("   " + value );
             if(value>bestValue) {
                 bestNode = child;
                 bestValue = value;
             }
         }
-        lastFinalSelectedMove = bestNode;
+        //lastFinalSelectedMove = bestNode;
         return bestNode;
     }
 
@@ -197,19 +201,26 @@ public class MCTS_2 implements Strategy{
     public NodeTree_2 getBestMove(){
         NodeTree_2 bestNode = null;
         double bestValue = -999999999;
-        for(NodeTree_2 child: root.getChildren()){
-           
-            if(child.isWinningMove() || child.isLosingMove()){
-                lastFinalSelectedMove = child;
-                return child ;
+        ArrayList<NodeTree_2> ddd = root.getChildren();
+        System.out.println("info");
+        int i =0;
+        for(NodeTree_2 child: ddd){
+            System.out.println(i++);
+          //  if(child.isWinningMove() || child.isLosingMove()){
+          //      lastFinalSelectedMove = child;
+          //      return child ;
+          //  }
+            if (child == null){
+                System.out.print("eeer");
             }
-            int value = child.getGames();
+            double value = child.getGames();
             if(value>bestValue) {
                 bestNode = child;
                 bestValue = value;
             }
         }
-        lastFinalSelectedMove = bestNode;
+        System.out.println("infoout");
+      //  lastFinalSelectedMove = bestNode;
         return bestNode;
     }
 
@@ -288,10 +299,10 @@ public class MCTS_2 implements Strategy{
      */
     public void setNewRoot(TurnOrder t){
         if(lastMCTS!=null){
-            State.StateHandler sh = lastMCTS.getBestMove().getState().getStateHandler();
+//            State.StateHandler sh = lastMCTS.getBestMove().getState().getStateHandler();
 
         }
-        if(false &&(lastFinalSelectedMove !=null||ally.getIDCurrent()!=t.getIDCurrent())) {
+       /* if(false &&(lastFinalSelectedMove !=null||ally.getIDCurrent()!=t.getIDCurrent())) {
             //if the mcst has been used before, it now has to be advanced to the new state.
             //the code right now appears to call set New Root again, and by that deletes the factual tree?!?!?!?!
             State copy = lastFinalSelectedMove.getState().clone();
@@ -311,7 +322,7 @@ public class MCTS_2 implements Strategy{
             lastFinalSelectedMove = null;
             t.nextPlayer();
             setNewRoot(t);
-        }else {
+        }else {*/
             //
            // if(root == null) {
                 root = new NodeTree_2(null);
@@ -319,11 +330,11 @@ public class MCTS_2 implements Strategy{
                 //root.setTurn(t);
                 TurnOrder to = t.clone();to.previousPlayer();
                 root.setTurn(to);
-                root.overwriteMove(new Move(root.getPlayer(),new Angle(0),0));
+                root.overwriteMove(new Move(root.getPlayer(),new Angle(0),0,realState));
            // }
 
             root.setState(realState.clone());
-        }
+       // }
     }
 
     public void expansion(NodeTree_2 node){
@@ -535,9 +546,9 @@ public class MCTS_2 implements Strategy{
 
     public double UCB1(NodeTree_2 node){
 
-        float vi = (float) node.getWins() / node.getGames();
-        int np = node.getGames();
-        int ni = node.getParent().getGames();
+        float vi = (float) (node.getWins() / node.getMaximalPossiblePoints());
+        double np = node.getGames();
+        double ni = node.getParent().getGames();
         float a = 0.65f;
         double C = Math.sqrt(0.14);
        // if(vi>a)
@@ -559,7 +570,7 @@ public class MCTS_2 implements Strategy{
 
     @Override
     public void resetTree() {
-        lastFinalSelectedMove = null;
+        //lastFinalSelectedMove = null;
         System.out.println("DOOONE ___________________________");
     }
 
@@ -572,7 +583,7 @@ public class MCTS_2 implements Strategy{
         NodeTree_2 root = this.getRoot();
         if (root == null) return;
         int height = root.getHeight();
-        LayerView lv = new LayerView(root,mapViewPanel.getPreferredSize(),mctsViewSettings);
+        LayerView lv = new LayerView(root,this,mapViewPanel.getPreferredSize(),mctsViewSettings);
 
         //lv.paintComponent(g);
         lv.paintOverView(g,mapViewPanel);

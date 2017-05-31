@@ -16,10 +16,32 @@ import nl.dke.pursuitevasion.map.impl.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+
+
+import nl.dke.pursuitevasion.game.Engine;
+import nl.dke.pursuitevasion.game.EngineConstants;
+import nl.dke.pursuitevasion.game.Vector2D;
+import nl.dke.pursuitevasion.game.agents.AbstractAgent;
+import nl.dke.pursuitevasion.game.agents.AgentCommand;
+import nl.dke.pursuitevasion.game.agents.Angle;
+import nl.dke.pursuitevasion.game.agents.Direction;
+import nl.dke.pursuitevasion.game.agents.tasks.AbstractAgentTask;
+import nl.dke.pursuitevasion.game.agents.tasks.RotateTask;
+import nl.dke.pursuitevasion.game.agents.tasks.WalkToTask;
+import nl.dke.pursuitevasion.gui.KeyboardInputListener;
+import nl.dke.pursuitevasion.gui.editor.ModelView;
+import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
+import nl.dke.pursuitevasion.map.impl.Floor;
+import nl.dke.pursuitevasion.map.impl.Map;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * Created by Nibbla on 19.05.2017.
  */
-public class CoordinatorEvaderKillKillKillEmAll {
+public class CoordinatorEvaderKillKillKillEmAll{
     private final Map map;
     private final Floor floor;
     private final Engine engine;
@@ -36,32 +58,35 @@ public class CoordinatorEvaderKillKillKillEmAll {
 
 
     public CoordinatorEvaderKillKillKillEmAll(Engine e, Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing, int radius,
-                                              double visionRange, double visionAngle, ArrayList<AbstractAgent> agents) {
+                                               double visionRange, double visionAngle, ArrayList<AbstractAgent> agents  ) {
         this.map = map;
         this.floor = startingFloor;
         this.engine = e;
         this.agents = agents;
-        EvaderKillKillKillEmAll p1 = new EvaderKillKillKillEmAll( map,  startingFloor,  startLocation,  startsFacing,  radius,
+        EvaderKillKillKillEmAll e1 = new EvaderKillKillKillEmAll( map,  startingFloor,  startLocation,  startsFacing,  radius,
                 visionRange,  visionAngle,0);
 
-        agents.add(p1);
-        this.evador.add(agents.get(0));
-       // this.pursuers.add(p1);this.pursuers.add(p2);this.pursuers.add(p3);
-        EvaderKillKillKillEmAll.setCoordinatorPursuer(this);
-        TurnOrder t = new TurnOrder(p1,agents);
-        State s = new State(engine, map, t, evador, pursuers);
 
-        Thread calctrhead = new Thread(new ThinkThread(p1,s,t,this, EngineConstants.CALCULATION_TIME));
+        this.evador.add(e1);
+
+        this.pursuers.add(agents.get(0));this.pursuers.add(agents.get(1));this.pursuers.add(agents.get(2));
+        EvaderKillKillKillEmAll.setCoordinatorPursuer(this);
+        System.out.println(e1);
+        TurnOrder t = new TurnOrder(e1,agents);
+       // t.previousPlayer();
+        State s = new State(engine, map, t, evador, pursuers);
+        this.agents.add(0,e1);
+        Thread calctrhead = new Thread(new ThinkThread(e1,s,t,this, EngineConstants.CALCULATION_TIME));
+
         calctrhead.start();
 
 
 
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e1) {
-            e1.printStackTrace();
-        }
+       // try {
+        //    Thread.sleep(1000);
+       // } catch (InterruptedException ee) {
+        //    ee.printStackTrace();
+        //}
     }
 
     public void setViewPort(MapViewPanel panel){
@@ -74,6 +99,7 @@ public class CoordinatorEvaderKillKillKillEmAll {
         TurnOrder t = new TurnOrder(p,agents);
         State s = new State(engine, map, t, evador, pursuers);
         hasNewRequest = false;
+        hasRequest.put(p.getId(),false);
         Thread calctrhead = new Thread(new ThinkThread(p,s,t,this,calculationTime));
         calctrhead.start();
 
@@ -81,14 +107,16 @@ public class CoordinatorEvaderKillKillKillEmAll {
 
         return aa;
 
-      //  Engine start = engine.copy();
+        //  Engine start = engine.copy();
     }
 
     public boolean hasNewRequest(EvaderKillKillKillEmAll pursuerKillKillKillEmAll) {
-        return hasNewRequest;
+        Boolean b =  hasRequest.get(pursuerKillKillKillEmAll.getId());
+        if (b==null) return false;
+        return b;
     }
 
-    public AbstractAgentTask getRotationTaks(EvaderKillKillKillEmAll pursuerKillKillKillEmAll) {
+    public AbstractAgentTask getRotationTaks(AbstractAgent pursuerKillKillKillEmAll) {
         Angle a = new Angle(Math.abs(evador.get(0).getFacingAngle() - pursuerKillKillKillEmAll.getFacingAngle()));
         RotateTask rt = new RotateTask(a.getAngle());
         return rt;
@@ -131,6 +159,7 @@ public class CoordinatorEvaderKillKillKillEmAll {
             AbstractAgentTask abstractAgentTask = new WalkToTask(move.getEndLocation(),false);
             //if (!m.hasCalculated) m.calculate(durationInMS);
             Coordinator.hasNewRequest = true;
+            hasRequest.put(p.getId(),true);
             Coordinator.lastAbstractAgentTask.put(p.getId(), abstractAgentTask);
 
             long finish = System.currentTimeMillis();

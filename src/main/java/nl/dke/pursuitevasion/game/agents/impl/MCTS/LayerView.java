@@ -14,16 +14,17 @@ import java.util.*;
  */
 public class LayerView extends JPanel{
     private final Dimension preservedSize;
+    private final MCTS_2 mcts_2;
 
     ArrayList<ArrayList<NodeTree_2>> values;
     private LinkedList<Polygon> polygones  = new LinkedList<>();;
     private HashMap<Polygon, NodeTree_2> messages = new HashMap<>(4000);
     private NodeTree_2 root;
 
-    public LayerView(NodeTree_2 r, Dimension preveredSize, MCTS_2.MCTSViewSettings mctsViewSettings){
+    public LayerView(NodeTree_2 r, MCTS_2 mcts_2, Dimension preveredSize, MCTS_2.MCTSViewSettings mctsViewSettings){
         super(new BorderLayout());
 
-
+        this.mcts_2 = mcts_2;
         setPreferredSize(preveredSize);
         setBackground(Color.white);
 
@@ -268,16 +269,17 @@ public class LayerView extends JPanel{
                     NodeTree_2 np = singleLayer.get(j).getParent();
 
 
-                    drawLine(g,n,np,valuePair);
+                    drawLine(g,n,np,valuePair,new Color(0f,1f,0f,0.5f));
                 }
             }
-
-
+            NodeTree_2 n = mcts_2.getBestMove();
+            double[] valuePair = {lastLayerLeft,lastLayerRight,layerWidth,n.getWins()};
+            drawLine(g,n,n,valuePair,Color.BLUE);
         }
 
     }
 
-    private void drawLine(Graphics g, NodeTree_2 n, NodeTree_2 np, double[] valuePair) {
+    private void drawLine(Graphics g, NodeTree_2 n, NodeTree_2 np, double[] valuePair, Color c) {
         Graphics2D g2 = (Graphics2D)g;
         Stroke stroke = g2.getStroke();
         g2.setStroke(new BasicStroke(4));
@@ -290,10 +292,10 @@ public class LayerView extends JPanel{
             double winRatio = n.getWins()/num;
 
             //Color c = new Color( (float)(1-(1*winRatio)),(float)winRatio,0f,1f);
-            Color c = Color.GREEN;
+
             g.setColor(c);
             g2.drawLine((int)vector1.getX(),(int)vector1.getY(),(int)vector2.getX(),(int)vector2.getY());
-            System.out.println("Draw node with between: " + vector1 +"  " + vector2);
+           // System.out.println("Draw node with between: " + vector1 +"  " + vector2);
         }catch (NullPointerException o){
             System.out.println("no line draw");
         }
@@ -305,7 +307,7 @@ public class LayerView extends JPanel{
     private void drawNode(Graphics g, NodeTree_2 n, double[] valuePair) {
 
         Vector2D vector2D = n.getMove().getEndLocation();
-        System.out.println("Draw node at location: " + vector2D);
+       // System.out.println("Draw node at location: " + vector2D);
         double area = valuePair[3] * 10;
         double radius = Math.sqrt(area/Math.PI);
         double x = vector2D.getX();// - radius;
@@ -316,7 +318,7 @@ public class LayerView extends JPanel{
         double winRatio ;
         if (num != 0) {
             winRatio =  n.getWins()/num;
-            System.out.println("Draw node with winRatio: " + winRatio +" " + n.getWins()+" " + num + " " +area);
+        //    System.out.println("Draw node with winRatio: " + winRatio +" " + n.getWins()+" " + num + " " +area);
         }else{
             radius = 10;
         }
@@ -326,6 +328,6 @@ public class LayerView extends JPanel{
         Color c = Color.GREEN;
         g.setColor(c);
         g.drawOval((int)x,(int)y,(int)radius*2,(int)radius*2);
-        System.out.println("Draw node with radius: " + x+" " + y+" " + radius);
+       // System.out.println("Draw node with radius: " + x+" " + y+" " + radius);
     }
 }

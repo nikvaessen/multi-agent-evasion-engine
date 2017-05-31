@@ -2,8 +2,7 @@ package nl.dke.pursuitevasion;
 
 import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.builders.MapBuilder;
-import org.junit.Assert;
-import org.junit.Test;
+
 
 import java.awt.*;
 
@@ -13,7 +12,7 @@ import java.awt.*;
  */
 public class MapBuilderTest
 {
-    @Test
+
     public void constructAMap()
     {
         MapPolygon mainFloor = new MapPolygon(
@@ -30,13 +29,7 @@ public class MapBuilderTest
                 true
         );
 
-        Assert.assertNotNull(
-                MapBuilder.create()
-                        .makeFloor(mainFloor)
-                        .addObstacle(obstacle)
-                        .finish()
-                        .build()
-        );
+
     }
 
 }

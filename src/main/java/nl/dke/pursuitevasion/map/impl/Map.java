@@ -235,6 +235,7 @@ public class Map implements Serializable
         Collection<Floor> mp = this.getFloors();
 
         for (Floor f : mp){
+
             if (f.getPolygon().contains(v.getX(),v.getY())){
                 for (Obstacle ob : f.getObstacles()){
                     if (ob.getPolygon().getBounds2D().contains(v.getX(),v.getY())){

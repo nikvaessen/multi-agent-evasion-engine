@@ -75,6 +75,6 @@ public class EvaderKillKillKillEmAll extends AbstractAgent{
 
     @Override
     public boolean isEvader() {
-        return false;
+        return true;
     }
 }

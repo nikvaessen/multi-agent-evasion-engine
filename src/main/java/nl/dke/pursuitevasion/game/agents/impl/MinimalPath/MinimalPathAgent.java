@@ -17,6 +17,25 @@ public class MinimalPathAgent extends AbstractAgent{
     private int agentNumber;
 
     public MinimalPathOverseer overseer;
+    private MinimalPathAgent(int id) {
+        super(id);
+    }
+
+    public MinimalPathAgent clone() {
+        MinimalPathAgent ra = new MinimalPathAgent(this.getId());
+        ra.map = map;
+        ra.floor = this.floor;
+        ra.location = this.location.copy();
+
+        ra.facing = this.facing.clone();
+        ra.radius = this.radius;
+        ra.visionRange = this.visionRange;
+        ra.visionAngle = this.visionAngle;
+        ra.visionArc = this.getVisionArc().clone();
+
+
+        return ra;
+    }
 
     public MinimalPathAgent(Map map, Floor floor, Vector2D startLocation, Direction startsFacing, int radius, double visionRange, double visionAngle){
         super(map, floor, startLocation, startsFacing, radius, visionRange, visionAngle);

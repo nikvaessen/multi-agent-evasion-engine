@@ -13,10 +13,10 @@ public class NodeTree_2 {
     private State state;
     private Move move;
     private NodeTree_2 parent;
-    private ArrayList<NodeTree_2> children;
+    private ArrayList<NodeTree_2> children  = new ArrayList<>();;
     private TurnOrder currentplayer;
-    private int wins,games,maxPoints;
-    private boolean winningMove, losingMove, deadCell;
+    private double wins=0,games=0,maxPoints=1;
+    private boolean winningMove = false, losingMove= false, deadCell;
 
 
 
@@ -35,8 +35,8 @@ public class NodeTree_2 {
     public void setMove(Move move){
 
         this.move = move;
-        state = parent.getState().clone();
-        state.executeMove(move);
+        state=move.getAfterState();
+
 
        // state.evaluate(currentplayer); should be done later or every expanded node gets one evaluation.
 
@@ -44,18 +44,24 @@ public class NodeTree_2 {
     }
 
 
-    public void incrementWin(double scoreWinning, double scoreLoosing, double WinningPossible, double LoosingPossible, TurnOrder winningPlayer){
+    public void incrementWin(double scoreEvador, double scorePursuer, double EvadorPossible, double PursuerPossible, TurnOrder winningPlayer){
         if (this.currentplayer.isSameTeam(winningPlayer.getIDCurrent())){
-            this.wins+=scoreWinning;
-            this.maxPoints+=WinningPossible;
+           // this.wins+=scoreEvador;
+            //this.maxPoints+=WinningPossible;
         }
         else {
-            this.wins+=scoreLoosing;
-            this.maxPoints+=LoosingPossible;
+           // this.wins-=scoreLoosing;
+           // this.maxPoints-=LoosingPossible;
         }
-
+        if (this.currentplayer.isEvader()){
+            this.wins+=scoreEvador;
+            this.maxPoints+=EvadorPossible;
+        }else {
+            this.wins+=scorePursuer;
+            this.maxPoints+=PursuerPossible;
+        }
         if(parent!=null)
-            parent.incrementWin(scoreWinning, scoreLoosing, WinningPossible, LoosingPossible, winningPlayer);
+            parent.incrementWin(scoreEvador, scorePursuer, EvadorPossible, PursuerPossible, winningPlayer);
     }
     public void incrementGame(){
         this.games+=1;//1;
@@ -80,9 +86,9 @@ public class NodeTree_2 {
         children.add(child);
     }
 
-    public void setChildren(ArrayList<NodeTree_2> children) {
-        this.children = children;
-    }
+   // public void setChildren(ArrayList<NodeTree_2> children) {
+       // this.children = children;
+    //}
 
     public void setWins(int wins) {
         this.wins = wins;
@@ -123,11 +129,11 @@ public class NodeTree_2 {
 
 
 
-    public int getWins() {
+    public double getWins() {
         return wins;
     }
 
-    public int getGames() {
+    public double getGames() {
         return games;
     }
 
@@ -190,7 +196,7 @@ public class NodeTree_2 {
     }
 
     public  ArrayList<NodeTree_2> breadthFirst(){
-        ArrayList<NodeTree_2> bfsearch = new ArrayList<>(games);
+        ArrayList<NodeTree_2> bfsearch = new ArrayList<>((int)games);
         Queue<NodeTree_2> quey = new LinkedList<NodeTree_2>();
 
         quey.add(this);
@@ -240,7 +246,7 @@ public class NodeTree_2 {
         this.move = move;
     }
 
-    public int getMaximalPossiblePoints() {
+    public double getMaximalPossiblePoints() {
         return maxPoints;
     }
 }
