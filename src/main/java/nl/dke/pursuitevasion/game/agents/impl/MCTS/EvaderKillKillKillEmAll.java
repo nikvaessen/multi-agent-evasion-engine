@@ -4,23 +4,20 @@ import nl.dke.pursuitevasion.game.EngineConstants;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.AgentRequest;
-import nl.dke.pursuitevasion.game.agents.Angle;
 import nl.dke.pursuitevasion.game.agents.Direction;
 import nl.dke.pursuitevasion.game.agents.tasks.AbstractAgentTask;
-import nl.dke.pursuitevasion.game.agents.tasks.RotateTask;
-import nl.dke.pursuitevasion.game.agents.tasks.WalkForwardTask;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 
 /**
  * Created by Nibbla on 19.05.2017.
  */
-public class PursuerKillKillKillEmAll extends AbstractAgent{
-    public static void setCoordinatorPursuer(CoordinatorPursuerKillKillKillEmAll coordinatorPursuer) {
-        CoordinatorPursuer = coordinatorPursuer;
+public class EvaderKillKillKillEmAll extends AbstractAgent{
+    public static void setCoordinatorPursuer(CoordinatorEvaderKillKillKillEmAll coordinatorEvader2) {
+        coordinatorEvader = coordinatorEvader2;
     }
 
-    private static CoordinatorPursuerKillKillKillEmAll CoordinatorPursuer;
+    private static CoordinatorEvaderKillKillKillEmAll coordinatorEvader;
     private int agentnumber;
     /**
      * Create an agent in the given Map
@@ -33,18 +30,18 @@ public class PursuerKillKillKillEmAll extends AbstractAgent{
      * @param visionRange
      * @param visionAngle
      */
-    public PursuerKillKillKillEmAll(Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing, int radius, double visionRange, double visionAngle,int agentNumber) {
+    public EvaderKillKillKillEmAll(Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing, int radius, double visionRange, double visionAngle, int agentNumber) {
         super(map, startingFloor, startLocation, startsFacing, radius, visionRange, visionAngle);
         this.agentnumber = agentNumber;
     }
 
-    private PursuerKillKillKillEmAll(int id) {
+    private EvaderKillKillKillEmAll(int id) {
         super(id);
     }
 
     @Override
-    public PursuerKillKillKillEmAll clone()  {
-        PursuerKillKillKillEmAll b = new PursuerKillKillKillEmAll(this.getId());
+    public EvaderKillKillKillEmAll clone()  {
+        EvaderKillKillKillEmAll b = new EvaderKillKillKillEmAll(this.getId());
 
         b.map = map;
         b.floor = this.floor;
@@ -63,8 +60,8 @@ public class PursuerKillKillKillEmAll extends AbstractAgent{
     protected void completeRequest(AgentRequest request) {
        // if (CoordinatorPursuer == null) CoordinatorPursuer = new CoordinatorPursuerKillKillKillEmAll();
         System.out.println("Ask for move");
-        AbstractAgentTask a =CoordinatorPursuer.getNextMove(this, EngineConstants.CALCULATION_TIME);
-        AbstractAgentTask b = CoordinatorPursuer.getRotationTaks(this);
+        AbstractAgentTask a =coordinatorEvader.getNextMove(this, EngineConstants.CALCULATION_TIME);
+        AbstractAgentTask b = coordinatorEvader.getRotationTaks(this);
         System.out.println("recieved as solution: "+ a);
         request.add(a);
 
@@ -73,7 +70,7 @@ public class PursuerKillKillKillEmAll extends AbstractAgent{
 
     @Override
     protected boolean hasNewRequest() {
-        return CoordinatorPursuer.hasNewRequest(this);
+        return coordinatorEvader.hasNewRequest(this);
     }
 
     @Override

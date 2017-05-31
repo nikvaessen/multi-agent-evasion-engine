@@ -4,26 +4,22 @@ import nl.dke.pursuitevasion.game.Engine;
 import nl.dke.pursuitevasion.game.EngineConstants;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
-import nl.dke.pursuitevasion.game.agents.AgentCommand;
 import nl.dke.pursuitevasion.game.agents.Angle;
 import nl.dke.pursuitevasion.game.agents.Direction;
 import nl.dke.pursuitevasion.game.agents.tasks.AbstractAgentTask;
 import nl.dke.pursuitevasion.game.agents.tasks.RotateTask;
 import nl.dke.pursuitevasion.game.agents.tasks.WalkToTask;
-import nl.dke.pursuitevasion.gui.KeyboardInputListener;
-import nl.dke.pursuitevasion.gui.editor.ModelView;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by Nibbla on 19.05.2017.
  */
-public class CoordinatorPursuerKillKillKillEmAll{
+public class CoordinatorEvaderKillKillKillEmAll {
     private final Map map;
     private final Floor floor;
     private final Engine engine;
@@ -39,37 +35,26 @@ public class CoordinatorPursuerKillKillKillEmAll{
     private boolean hasNewRequest = false;
 
 
-    public CoordinatorPursuerKillKillKillEmAll(Engine e, Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing, int radius,
-                                               double visionRange, double visionAngle, ArrayList<AbstractAgent> agents  ) {
+    public CoordinatorEvaderKillKillKillEmAll(Engine e, Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing, int radius,
+                                              double visionRange, double visionAngle, ArrayList<AbstractAgent> agents) {
         this.map = map;
         this.floor = startingFloor;
         this.engine = e;
         this.agents = agents;
-        PursuerKillKillKillEmAll p1 = new PursuerKillKillKillEmAll( map,  startingFloor,  startLocation,  startsFacing,  radius,
+        EvaderKillKillKillEmAll p1 = new EvaderKillKillKillEmAll( map,  startingFloor,  startLocation,  startsFacing,  radius,
                 visionRange,  visionAngle,0);
-        PursuerKillKillKillEmAll p2 = new PursuerKillKillKillEmAll( map,  startingFloor,  startLocation,  startsFacing,  radius,
-                visionRange,  visionAngle,1);
-        PursuerKillKillKillEmAll p3 = new PursuerKillKillKillEmAll( map,  startingFloor,  startLocation,  startsFacing,  radius,
-                visionRange,  visionAngle,2);
-        agents.add(p1);agents.add(p2);agents.add(p3);
+
+        agents.add(p1);
         this.evador.add(agents.get(0));
-        this.pursuers.add(p1);this.pursuers.add(p2);this.pursuers.add(p3);
-        PursuerKillKillKillEmAll.setCoordinatorPursuer(this);
+       // this.pursuers.add(p1);this.pursuers.add(p2);this.pursuers.add(p3);
+        EvaderKillKillKillEmAll.setCoordinatorPursuer(this);
         TurnOrder t = new TurnOrder(p1,agents);
         State s = new State(engine, map, t, evador, pursuers);
 
         Thread calctrhead = new Thread(new ThinkThread(p1,s,t,this, EngineConstants.CALCULATION_TIME));
         calctrhead.start();
-        TurnOrder t2 = new TurnOrder(p2,agents);
-        State s2 = new State(engine, map, t2, evador, pursuers);
 
-        Thread calctrhead2 = new Thread(new ThinkThread(p2,s2,t2,this,EngineConstants.CALCULATION_TIME));
-        calctrhead2.start();
-        TurnOrder t3 = new TurnOrder(p3,agents);
 
-        State s3 = new State(engine, map, t3, evador, pursuers);
-        Thread calctrhead3 = new Thread(new ThinkThread(p3,s3,t3,this,EngineConstants.CALCULATION_TIME));
-        calctrhead3.start();
 
 
         try {
@@ -83,13 +68,12 @@ public class CoordinatorPursuerKillKillKillEmAll{
         viewport = panel;
     }
 
-    public AbstractAgentTask getNextMove(PursuerKillKillKillEmAll p, long calculationTime){
+    public AbstractAgentTask getNextMove(EvaderKillKillKillEmAll p, long calculationTime){
 
 
         TurnOrder t = new TurnOrder(p,agents);
         State s = new State(engine, map, t, evador, pursuers);
         hasNewRequest = false;
-        hasRequest.put(p.getId(),false);
         Thread calctrhead = new Thread(new ThinkThread(p,s,t,this,calculationTime));
         calctrhead.start();
 
@@ -100,13 +84,11 @@ public class CoordinatorPursuerKillKillKillEmAll{
       //  Engine start = engine.copy();
     }
 
-    public boolean hasNewRequest(PursuerKillKillKillEmAll pursuerKillKillKillEmAll) {
-       Boolean b =  hasRequest.get(pursuerKillKillKillEmAll.getId());
-        if (b==null) return false;
-        return b;
+    public boolean hasNewRequest(EvaderKillKillKillEmAll pursuerKillKillKillEmAll) {
+        return hasNewRequest;
     }
 
-    public AbstractAgentTask getRotationTaks(PursuerKillKillKillEmAll pursuerKillKillKillEmAll) {
+    public AbstractAgentTask getRotationTaks(EvaderKillKillKillEmAll pursuerKillKillKillEmAll) {
         Angle a = new Angle(Math.abs(evador.get(0).getFacingAngle() - pursuerKillKillKillEmAll.getFacingAngle()));
         RotateTask rt = new RotateTask(a.getAngle());
         return rt;
@@ -116,13 +98,13 @@ public class CoordinatorPursuerKillKillKillEmAll{
             implements Runnable
     {
 
-        private final PursuerKillKillKillEmAll p;
+        private final EvaderKillKillKillEmAll p;
         private final State s;
         private final TurnOrder t;
-        private final CoordinatorPursuerKillKillKillEmAll Coordinator;
+        private final CoordinatorEvaderKillKillKillEmAll Coordinator;
         private final long calculationTime;
 
-        public ThinkThread(PursuerKillKillKillEmAll p, State s, TurnOrder t, CoordinatorPursuerKillKillKillEmAll coordinatorPursuerKillKillKillEmAll, long calculationTime) {
+        public ThinkThread(EvaderKillKillKillEmAll p, State s, TurnOrder t, CoordinatorEvaderKillKillKillEmAll coordinatorPursuerKillKillKillEmAll, long calculationTime) {
             this.p = p;
             this.s = s;
             this.t = t;
@@ -149,7 +131,6 @@ public class CoordinatorPursuerKillKillKillEmAll{
             AbstractAgentTask abstractAgentTask = new WalkToTask(move.getEndLocation(),false);
             //if (!m.hasCalculated) m.calculate(durationInMS);
             Coordinator.hasNewRequest = true;
-            hasRequest.put(p.getId(),true);
             Coordinator.lastAbstractAgentTask.put(p.getId(), abstractAgentTask);
 
             long finish = System.currentTimeMillis();
