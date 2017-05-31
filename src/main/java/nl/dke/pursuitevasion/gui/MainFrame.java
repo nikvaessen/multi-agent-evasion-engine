@@ -35,6 +35,7 @@ public class MainFrame extends JFrame
         for(Floor f : map.getFloors())
         {
             floor = f;
+            //commit
             break;
         }
 
