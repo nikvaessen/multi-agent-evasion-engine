@@ -40,7 +40,7 @@ public class MainFrame extends JFrame
         }
 
         //agents.add(new SimpleAgent(new Point(5,5), Direction.SOUTH, 5));
-        agents.add(new UserAgent(map, floor, new Vector2D(10, 10), Direction.SOUTH, 5,
+        agents.add(new UserAgent(map, floor, new Vector2D(200, 310), Direction.SOUTH, 5,
                                  EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, keyboardInputListener,true));
         CoordinatorPursuerKillKillKillEmAll hunter = new CoordinatorPursuerKillKillKillEmAll(engine,map, floor, new Vector2D(20, 20), Direction.SOUTH, 5,
                 EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, agents);
