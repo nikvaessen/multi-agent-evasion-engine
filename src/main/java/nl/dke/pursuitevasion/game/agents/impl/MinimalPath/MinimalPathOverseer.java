@@ -36,7 +36,7 @@ public class MinimalPathOverseer {
     private Map map;
     private Vector2D u;
     private Vector2D v;
-    private List<GraphPath<Vector2D, DefaultWeightedEdge>> paths;
+    public List<GraphPath<Vector2D, DefaultWeightedEdge>> paths;
 
 
     public List<MinimalPathAgent> getAgents(){return agents;}

@@ -9,13 +9,18 @@ import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathAgent;
 import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathOverseer;
 import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.impl.Map;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.graph.DefaultWeightedEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.*;
+import java.util.List;
 
 
 /**
@@ -123,6 +128,28 @@ public class MapViewPanel
         }
         if (mcts != null) {
             mcts.paint(g,mctsViewSettings,this);
+        }
+        try
+        {
+            g.setColor(Color.GREEN);
+            ((Graphics2D) g).setStroke(new BasicStroke());
+            List<GraphPath<Vector2D, DefaultWeightedEdge>> paths =
+                    MinimalPathOverseer.getIntance().paths;
+
+            for(GraphPath<Vector2D, DefaultWeightedEdge> path : paths) {
+                List<Vector2D> points = path.getVertexList();
+                Vector2D lastPoint = points.get(0);
+                for (int i = 1; i < points.size(); i++) {
+                    Vector2D newPoint = points.get(i);
+                    g.drawLine((int) Math.round(lastPoint.getX()), (int) Math.round(lastPoint.getY()),
+                            (int) Math.round(newPoint.getX()), (int) Math.round(newPoint.getY()));
+                    lastPoint = newPoint;
+                }
+            }
+        }
+        catch (NullPointerException e)
+        {
+            //do nothing
         }
 
 
