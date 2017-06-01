@@ -59,7 +59,7 @@ public class DistanceAgent extends AbstractAgent
         int agentIndex=-1;
         for (int i=0; i<agentPoint.size(); i++){
             double distance = Math.abs(agentPoint.get(i).distance(currentLocation));
-            System.out.println("Distnace: "+distance);
+            System.out.println("Distance: "+distance);
             if (distance<shortestDistance){
                 shortestDistance = distance;
                 agentIndex = i;

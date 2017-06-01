@@ -7,6 +7,7 @@ import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.Direction;
 import nl.dke.pursuitevasion.game.agents.impl.MCTS.CoordinatorPursuerKillKillKillEmAll;
 import nl.dke.pursuitevasion.game.agents.impl.DistanceAgent;
+import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathAgent;
 import nl.dke.pursuitevasion.game.agents.impl.SimpleAgent;
 import nl.dke.pursuitevasion.game.agents.impl.UserAgent;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
@@ -40,15 +41,21 @@ public class MainFrame extends JFrame
         }
 
         //agents.add(new SimpleAgent(new Point(5,5), Direction.SOUTH, 5));
-        agents.add(new UserAgent(map, floor, new Vector2D(200, 310), Direction.SOUTH, 5,
-                                 EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, keyboardInputListener,true));
-        CoordinatorPursuerKillKillKillEmAll hunter = new CoordinatorPursuerKillKillKillEmAll(engine,map, floor, new Vector2D(20, 20), Direction.SOUTH, 5,
-                EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, agents);
+        //agents.add(new MinimalPathAgent(map, floor, new Vector2D(20, 20), Direction.SOUTH, 5,
+         //                        EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
+
+        agents.add(new MinimalPathAgent(map, floor, new Vector2D(300.0,50.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
+        agents.add(new MinimalPathAgent(map, floor, new Vector2D(300.0,500.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
+        agents.add(new MinimalPathAgent(map, floor, new Vector2D(25.0,50.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE,  EngineConstants.VISION_ANGLE));
+        agents.add(new DistanceAgent(map, floor, new Vector2D(50, 100), Direction.SOUTH, 5,
+                EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
+//        CoordinatorPursuerKillKillKillEmAll hunter = new CoordinatorPursuerKillKillKillEmAll(engine,map, floor, new Vector2D(20, 20), Direction.SOUTH, 5,
+//                EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, agents);
         //agents.add(new DistanceAgent(map, floor, new Vector2D(20,20), Direction.SOUTH, 5, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
 //        agents.add(new SimpleAgent(map, floor, new Vector2D(15,15), Direction.SOUTH, 5,
 //                EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
 
-        hunter.setViewPort(panel);
+        //hunter.setViewPort(panel);
         // agents.add(new UserAgent(map, floor, new Vector2D(20, 20), Direction.SOUTH, 5,
         //     EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, keyboardInputListener,false));
         //   agents.add(new UserAgent(map, floor, new Vector2D(30, 30), Direction.SOUTH, 5,

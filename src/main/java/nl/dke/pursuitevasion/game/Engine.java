@@ -377,50 +377,6 @@ public class Engine
             return false;
         }
 
-        private boolean containing(Polygon bb, Ellipse2D circle, boolean obstacle)
-        {
-            Point north = new Point((int) (circle.getX() + (circle.getHeight() / 2)), (int) (circle.getY()));
-            Point south = new Point((int) (circle.getX() + (circle.getHeight() / 2)),
-                                    (int) (circle.getY() + circle.getHeight()));
-            Point east = new Point((int) (circle.getX() + (circle.getHeight())),
-                                   (int) (circle.getY() + circle.getHeight() / 2));
-            Point west = new Point((int) (circle.getX()), (int) (circle.getY() + circle.getHeight() / 2));
-            Point southeast = new Point(
-                (int) ((circle.getX() + (circle.getHeight() / 2)) + ((circle.getHeight() / 2) * Math.cos(
-                    0.25 * Math.PI))),
-                (int) ((circle.getY() + (circle.getHeight() / 2)) + ((circle.getHeight() / 2) * Math.sin(
-                    0.25 * Math.PI))));
-            Point southwest = new Point(
-                (int) ((circle.getX() + (circle.getHeight() / 2)) + ((circle.getHeight() / 2) * Math.cos(
-                    0.75 * Math.PI))),
-                (int) ((circle.getY() + (circle.getHeight() / 2)) + ((circle.getHeight() / 2) * Math.sin(
-                    0.75 * Math.PI))));
-            Point northwest = new Point(
-                (int) ((circle.getX() + (circle.getHeight() / 2)) + ((circle.getHeight() / 2) * Math.cos(
-                    1.25 * Math.PI))),
-                (int) ((circle.getY() + (circle.getHeight() / 2)) + ((circle.getHeight() / 2) * Math.sin(
-                    1.25 * Math.PI))));
-            Point northeast = new Point(
-                (int) ((circle.getX() + (circle.getHeight() / 2)) + ((circle.getHeight() / 2) * Math.cos(
-                    1.75 * Math.PI))),
-                (int) ((circle.getY() + (circle.getHeight() / 2)) + ((circle.getHeight() / 2) * Math.sin(
-                    1.75 * Math.PI))));
-            if(obstacle)
-            {
-                if(bb.contains(north) || bb.contains(south) || bb.contains(east) || bb.contains(west) || bb.contains(
-                    southeast) || bb.contains(southwest) || bb.contains(northeast) || bb.contains(northwest))
-                {
-                    return true;
-                }
-            }
-            else if(bb.contains(north) && bb.contains(south) && bb.contains(east) && bb.contains(west) && bb.contains(
-                southeast) && bb.contains(southwest) && bb.contains(northeast) && bb.contains(northwest))
-            {
-                return true;
-            }
-            return false;
-        }
-
         private boolean onBoundary(AbstractObject o, Vector2D point)
         {
             return o.onBoundary(point);
