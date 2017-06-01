@@ -5,6 +5,7 @@ import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.AgentRequest;
 import nl.dke.pursuitevasion.game.agents.tasks.MinimalPathGuardTask;
+import nl.dke.pursuitevasion.game.agents.tasks.WalkToTask;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 
@@ -14,6 +15,7 @@ import java.util.*;
 import org.jgrapht.*;
 import org.jgrapht.alg.interfaces.KShortestPathAlgorithm;
 import org.jgrapht.alg.shortestpath.KShortestPaths;
+import org.jgrapht.alg.shortestpath.PathValidator;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.Subgraph;
 import org.jgrapht.graph.WeightedPseudograph;
@@ -158,21 +160,15 @@ public class MinimalPathOverseer {
     public void getTask(MinimalPathAgent agent, AgentRequest request, MapInfo mapInfo){
         // TODO Make agents guard their path for a minimum amount of iterations.
         GraphPath<Vector2D, DefaultWeightedEdge> path = guardMap.get(agent);
-        if(path == null){
-            // No path for this agent yet.
-            path = getPath(agent, mapInfo);
-        }
         if(mapInfo.getAgentPoints().size() > 0){
             Vector2D evader = mapInfo.getAgentPoints().get(0);
+            if(agent.getAgentNumber() == 3){
+                //request.add(new WalkToTask(evader));
+            }
             if(path != null){
                 request.add(new MinimalPathGuardTask(path, evader));
             }
 
         }
     }
-
-    private GraphPath<Vector2D,DefaultWeightedEdge> getPath(MinimalPathAgent agent, MapInfo mapInfo) {
-        return null;
-    }
-
 }

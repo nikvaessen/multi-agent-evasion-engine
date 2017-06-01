@@ -18,6 +18,8 @@ public class MinimalPathAgent extends AbstractAgent{
 
     public MinimalPathOverseer overseer;
 
+    private MinimalPathAgentState state = MinimalPathAgentState.NO_PATH;
+
     public MinimalPathAgent(Map map, Floor floor, Vector2D startLocation, Direction startsFacing, int radius, double visionRange, double visionAngle){
         super(map, floor, startLocation, startsFacing, radius, visionRange, visionAngle);
         try{
@@ -48,5 +50,8 @@ public class MinimalPathAgent extends AbstractAgent{
         return false;
     }
 
+    public MinimalPathAgentState getState(){return state;}
+
+    public void setState(MinimalPathAgentState newState){state = newState;}
 
 }

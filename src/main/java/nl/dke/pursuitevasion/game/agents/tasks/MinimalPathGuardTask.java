@@ -3,6 +3,8 @@ package nl.dke.pursuitevasion.game.agents.tasks;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.AgentCommand;
+import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathAgent;
+import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathAgentState;
 import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathOverseer;
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -33,6 +35,7 @@ public class MinimalPathGuardTask extends AbstractAgentTask{
             return moveToProjection(agent, maxDistance, maxRotation);
         }
         else{
+            ((MinimalPathAgent )agent).setState(MinimalPathAgentState.MOVING_TO_PATH);
             // if we are not -> move to closest point on path
             return moveToClosestPointOnPath(agent, maxDistance, maxRotation);
         }
@@ -61,6 +64,7 @@ public class MinimalPathGuardTask extends AbstractAgentTask{
             return moveToProjectionLocation(agent, e, maxDistance, maxRotation);
         }
         else{
+            ((MinimalPathAgent)agent).setState(MinimalPathAgentState.MOVING_TO_PROJECTION);
             // else -> move to to the closest node
             return moveToClosestPathVertex(agent, maxDistance, maxRotation);
         }

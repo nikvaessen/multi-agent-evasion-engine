@@ -30,7 +30,8 @@ public class MinimalPathTest {
     public static void main(String[] args) {
         // do init stuff
         //Map map = Map.getMap("simpleMap.ser");
-        Map map = Map.getMap("NikMap.ser");
+        //Map map = Map.getMap("NikMap.ser");
+        Map map = Map.getMap("newMap.ser");
         ArrayList<AbstractAgent> agents = new ArrayList<>();
         JFrame frame = new JFrame();
         Floor floor = map.getFloors().iterator().next();
