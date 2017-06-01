@@ -6,6 +6,7 @@ import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.impl.MCTS.MCTS_2;
 import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathAgent;
+import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathOverseer;
 import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.impl.Map;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.*;
 
 
@@ -122,6 +124,18 @@ public class MapViewPanel
         if (mcts != null) {
             mcts.paint(g,mctsViewSettings,this);
         }
+
+
+        for(MinimalPathAgent agent : MinimalPathOverseer.getIntance().getAgents()){
+            if(agent.projectionLocation != null){
+                g.setColor(Color.BLACK);
+                Point2D p = agent.projectionLocation.toPoint();
+                g.drawOval((int)Math.round(p.getX()), (int)Math.round(p.getY()), 3,3);
+            }
+        }
+
+
+
     }
 
     @Override

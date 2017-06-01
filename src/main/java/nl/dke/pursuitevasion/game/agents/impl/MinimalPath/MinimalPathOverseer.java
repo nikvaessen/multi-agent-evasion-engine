@@ -39,6 +39,7 @@ public class MinimalPathOverseer {
     private List<GraphPath<Vector2D, DefaultWeightedEdge>> paths;
 
 
+    public List<MinimalPathAgent> getAgents(){return agents;}
     private MinimalPathOverseer(Map map){
         this.map = map;
         // Build visibility graph
@@ -153,7 +154,6 @@ public class MinimalPathOverseer {
         }*/
         // TODO: implement mechanism to determine whether an agent should make a new request
         return true;
-
     }
 
     // Determines what request an agent should make.
