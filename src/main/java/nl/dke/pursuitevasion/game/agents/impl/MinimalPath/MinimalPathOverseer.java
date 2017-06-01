@@ -171,4 +171,19 @@ public class MinimalPathOverseer {
 
         }
     }
+
+    private void findSubPolygons()
+    {
+        // Step 1: Create the 2 walks from u to v to create sP1 and sP2
+
+        // Step 2: add the shortest to both sP1 and sP2
+
+        // Step 3: for all obstacles who have a vertex in the shortest path:
+        //          see if another vertex of the obstacle lie inside sP1 or sP2
+        //          and add the obstacle according to the position of that vertex
+
+        // Step 4: for all other obstacles:
+        //          see if a vertex lies inside sP1 or sP2 and add accordingly
+
+    }
 }
