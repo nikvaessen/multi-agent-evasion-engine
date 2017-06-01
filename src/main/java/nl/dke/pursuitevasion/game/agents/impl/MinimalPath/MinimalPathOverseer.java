@@ -163,7 +163,7 @@ public class MinimalPathOverseer {
         if(mapInfo.getAgentPoints().size() > 0){
             Vector2D evader = mapInfo.getAgentPoints().get(0);
             if(agent.getAgentNumber() == 3){
-                //request.add(new WalkToTask(evader));
+                request.add(new WalkToTask(evader));
             }
             if(path != null){
                 request.add(new MinimalPathGuardTask(path, evader));
