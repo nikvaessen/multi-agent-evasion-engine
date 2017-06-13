@@ -5,10 +5,8 @@ import nl.dke.pursuitevasion.map.AbstractObject;
 import nl.dke.pursuitevasion.map.ObjectType;
 import nl.dke.pursuitevasion.map.MapPolygon;
 import org.jgrapht.*;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.DefaultWeightedEdge;
-import org.jgrapht.graph.SimpleGraph;
-import org.jgrapht.graph.SimpleWeightedGraph;
+import org.jgrapht.alg.NeighborIndex;
+import org.jgrapht.graph.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +16,7 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.*;
+import java.util.List;
 
 /**
  * A floor is a 2d level in which agents can walk
@@ -366,15 +365,74 @@ public class Floor extends AbstractObject
         return v.equals(e1) || v.equals(e2);
     }
 
-    private boolean lineIntersectsPolygon(Polygon p, Line2D line)
+    /**
+     * Calculates the subfloors created by using a path to divide the main polygon up in
+     * two subpolygons
+     *
+     * @param path the path dividing the floor into two subpolygons
+     * @return Arraylist of size 2 with the subfloors
+     * @throws IllegalArgumentException when the given path cannot divide the floor
+     */
+    public ArrayList<Floor> getSubFloors(GraphPath<Vector2D, ? extends DefaultEdge> path)
+            throws IllegalArgumentException
     {
-        // step 1: check if u and v
+        // Step 1: Create the 2 walks from u to v to create sP1 and sP2
+        MapPolygon mainPolygon = this.getPolygon();
 
-        for (int i = 0; i < p.npoints; i++)
+        Vector2D u = path.getStartVertex();
+        Vector2D v = path.getEndVertex();
+
+        //check if both u and v are vertexes in main floor and different from each other
+        if(!mainPolygon.getPoints().contains(u) || !mainPolygon.getPoints().contains(v) || u.equals(v))
         {
-            new Vector2D(p.xpoints[i], p.ypoints[i]);
+            throw new IllegalArgumentException("The given path cannot divide the floor in two subfloors");
         }
-        return false;
+
+        NeighborIndex<Vector2D, DefaultEdge> mainPolygonGraphNeighbourList = this.getNeigbourList();
+        List<Vector2D> neighboursU = mainPolygonGraphNeighbourList.neighborListOf(u);
+        if(neighboursU.size() != 2)
+        {
+            throw new IllegalArgumentException("This floor cannot be divided in two subfloors");
+        }
+
+        ArrayList<Vector2D> path1 = constructWalksFromUToV(mainPolygonGraphNeighbourList, neighboursU.get(0), v);
+
+        ArrayList<Vector2D> path2 = constructWalksFromUToV(mainPolygonGraphNeighbourList, neighboursU.get(1), v);
+
+
+        // Step 2: add the path to both sP1 and sP2
+
+        // Step 3: for all obstacles who have a vertex in the shortest path:
+        //          see if another vertex of the obstacle lie inside sP1 or sP2
+        //          and add the obstacle according to the position of that vertex
+
+        // Step 4: for all other obstacles:
+        //          see if a vertex lies inside sP1 or sP2 and add accordingly
+
+    }
+
+    private ArrayList<Vector2D> constructWalksFromUToV(NeighborIndex<Vector2D, DefaultEdge> neighborIndex,
+                                                       Vector2D u, Vector2D v)
+    {
+        ArrayList<Vector2D> list = new ArrayList<>();
+        list.add(u);
+        return constructWalksFromUToV(neighborIndex, u, v, list);
+    }
+
+    private ArrayList<Vector2D> constructWalksFromUToV(NeighborIndex<Vector2D, DefaultEdge> neighborIndex,
+                                                       Vector2D u, Vector2D v, ArrayList<Vector2D> previousVertexes)
+    {
+        if(u.equals(v))
+        {
+            previousVertexes.remove(v);
+            return previousVertexes;
+        }
+        else
+        {
+            Vector2D neighbour = neighborIndex.neighborListOf(u).get(0);
+            previousVertexes.add(neighbour);
+            return constructWalksFromUToV(neighborIndex, neighbour, v, previousVertexes);
+        }
     }
 
     /**

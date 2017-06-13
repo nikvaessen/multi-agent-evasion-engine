@@ -6,11 +6,14 @@ import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.AgentRequest;
 import nl.dke.pursuitevasion.game.agents.tasks.MinimalPathGuardTask;
 import nl.dke.pursuitevasion.game.agents.tasks.WalkToTask;
+import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 
+import java.awt.*;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.List;
 
 import org.jgrapht.*;
 import org.jgrapht.alg.interfaces.KShortestPathAlgorithm;
@@ -172,9 +175,15 @@ public class MinimalPathOverseer {
         }
     }
 
-    private void findSubPolygons()
+    private Floor[] findSubFloors(Floor f,  GraphPath<Vector2D, DefaultWeightedEdge> path)
     {
         // Step 1: Create the 2 walks from u to v to create sP1 and sP2
+        Polygon mainPolygon = f.getPolygon();
+
+        Vector2D u = path.getStartVertex();
+        Vector2D v = path.getEndVertex();
+
+
 
         // Step 2: add the shortest to both sP1 and sP2
 
