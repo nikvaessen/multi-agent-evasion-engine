@@ -4,6 +4,7 @@ import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.map.AbstractObject;
 import nl.dke.pursuitevasion.map.ObjectType;
 import nl.dke.pursuitevasion.map.MapPolygon;
+import nl.dke.pursuitevasion.map.builders.FloorBuilder;
 import org.jgrapht.*;
 import org.jgrapht.alg.NeighborIndex;
 import org.jgrapht.graph.*;
@@ -395,12 +396,19 @@ public class Floor extends AbstractObject
             throw new IllegalArgumentException("This floor cannot be divided in two subfloors");
         }
 
-        ArrayList<Vector2D> path1 = constructWalksFromUToV(mainPolygonGraphNeighbourList, neighboursU.get(0), v);
+        ArrayList<Vector2D> walk1 = constructWalksFromUToV(mainPolygonGraphNeighbourList, neighboursU.get(0), v);
 
-        ArrayList<Vector2D> path2 = constructWalksFromUToV(mainPolygonGraphNeighbourList, neighboursU.get(1), v);
+        ArrayList<Vector2D> walk2 = constructWalksFromUToV(mainPolygonGraphNeighbourList, neighboursU.get(1), v);
 
 
         // Step 2: add the path to both sP1 and sP2
+        List<Vector2D> reversedPath = path.getVertexList(); Collections.reverse(reversedPath);
+
+        walk1.addAll(reversedPath);
+        walk2.addAll(reversedPath);
+
+        System.out.printf("polygon 1: %s%n", walk1.toString());
+        System.out.printf("polygon 2: %s%n", walk2.toString());
 
         // Step 3: for all obstacles who have a vertex in the shortest path:
         //          see if another vertex of the obstacle lie inside sP1 or sP2
@@ -409,6 +417,7 @@ public class Floor extends AbstractObject
         // Step 4: for all other obstacles:
         //          see if a vertex lies inside sP1 or sP2 and add accordingly
 
+        return new ArrayList<>();
     }
 
     private ArrayList<Vector2D> constructWalksFromUToV(NeighborIndex<Vector2D, DefaultEdge> neighborIndex,
