@@ -132,8 +132,6 @@ public abstract class AbstractAgent
         this.visionRange = visionRange;
         this.visionAngle = visionAngle;
         this.visionArc = new VisionArc();
-
-
     }
 
     public void setMapInfo(MapInfo mapInfo){
