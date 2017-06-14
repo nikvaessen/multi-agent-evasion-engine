@@ -103,7 +103,7 @@ public class MinimalPathGuardTask extends AbstractAgentTask{
         }
         else{
             // else -> move to the startNode
-           return path.getStartVertex();
+           return subPath.getStartVertex();
         }
     }
 
