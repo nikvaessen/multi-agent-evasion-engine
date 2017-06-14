@@ -40,11 +40,13 @@ public class MinimalPathTest {
         KeyboardInputListener l = new KeyboardInputListener();
         frame.addKeyListener(l);
 
-        agents.add(new MinimalPathAgent(map, floor, new Vector2D(50.0,50.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
-        agents.add(new MinimalPathAgent(map, floor, new Vector2D(75.0,50.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
-        agents.add(new MinimalPathAgent(map, floor, new Vector2D(25.0,50.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE,  EngineConstants.VISION_ANGLE));
+        MinimalPathOverseer overseer = new MinimalPathOverseer(map, new Vector2D(10, 10));
+        for(int i = 0 ; i < overseer.getAmountOfAgents(); i++)
+        {
+            agents.add(overseer.getAgent(i));
+        }
         //agents.add(new RandomAgent(map, floor, new Vector2D(200.0, 100.0), Direction.NORTH, 5, 100, 120));
-        agents.add(new UserAgent(map, floor, new Vector2D(200.0, 30.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE,  EngineConstants.VISION_ANGLE, l, true));
+        agents.add(new UserAgent(map, floor, new Vector2D(200.0, 500.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE,  EngineConstants.VISION_ANGLE, l, true));
 
         Engine simulationEngine = new Engine(map, agents, panel, 60);
 
