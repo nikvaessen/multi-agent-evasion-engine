@@ -27,9 +27,15 @@ public class MinimalPathAgent extends AbstractAgent{
      */
     private MinimalPathAgentState state;
 
-    public Vector2D projectionLocation = null;
+    /**
+     * The projection of the evader on the path this agent is currently guarding
+     * null if not guarding a path
+     */
+    private Vector2D projectionLocation = null;
 
-    public MinimalPathAgent(Map map, Floor floor, Vector2D startLocation, Direction startsFacing, int radius, double visionRange, double visionAngle){
+    public MinimalPathAgent(Map map, Floor floor, Vector2D startLocation, Direction startsFacing, int radius,
+                            double visionRange, double visionAngle, MinimalPathOverseer overseer, int agentNumber)
+    {
         super(map, floor, startLocation, startsFacing, radius, visionRange, visionAngle);
         this.overseer = overseer;
         this.agentNumber = agentNumber;
@@ -61,4 +67,13 @@ public class MinimalPathAgent extends AbstractAgent{
 
     public void setState(MinimalPathAgentState newState){state = newState;}
 
+    public Vector2D getProjectionLocation()
+    {
+        return projectionLocation;
+    }
+
+    public void setProjectionLocation(Vector2D projectionLocation)
+    {
+        this.projectionLocation = projectionLocation;
+    }
 }

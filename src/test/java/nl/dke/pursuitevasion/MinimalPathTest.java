@@ -42,25 +42,23 @@ public class MinimalPathTest {
         frame.addKeyListener(l);
 
         MinimalPathOverseer overseer = new MinimalPathOverseer(map, new Vector2D(10, 10));
+        panel.setMinimalPathOverseer(overseer);
         for(int i = 0 ; i < overseer.getAmountOfAgents(); i++)
         {
             agents.add(overseer.getAgent(i));
         }
         //agents.add(new RandomAgent(map, floor, new Vector2D(200.0, 100.0), Direction.NORTH, 5, 100, 120));
-        agents.add(new UserAgent(map, floor, new Vector2D(200.0, 30.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE,  EngineConstants.VISION_ANGLE, l, true));
+        agents.add(new UserAgent(map, floor, new Vector2D(200.0, 500.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE,  EngineConstants.VISION_ANGLE, l, true));
 
         Engine simulationEngine = new Engine(map, agents, panel, 60);
-
 
         frame.getContentPane().add(panel);
         frame.pack();
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setVisible(true);
         simulationEngine.start();
-        /*
 
         //drawFrame(frame, map, visibilityGraph, null);
-*/
     }
 
     private static void drawGraph(JFrame frame, Floor floor, Graph<Vector2D, DefaultWeightedEdge> vgraph){

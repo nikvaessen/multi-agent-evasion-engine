@@ -76,7 +76,7 @@ public class MinimalPathGuardTask extends AbstractAgentTask
     {
         // get the location of the projection
         Vector2D e = findProjection(agent);
-        ((MinimalPathAgent)agent).projectionLocation = e;
+        ((MinimalPathAgent)agent).setProjectionLocation(e);
         // check if the agent is on the same path edge as the projection
         if(onProjectionPathSegment(agent.getLocation(), e))
         {

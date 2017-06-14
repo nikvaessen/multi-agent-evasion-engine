@@ -218,36 +218,31 @@ public class MinimalPathOverseer
     void getTask(MinimalPathAgent agent, AgentRequest request, MapInfo mapInfo)
     {
         // TODO Make agents guard their path for a minimum amount of iterations.
-        GraphPath<Vector2D, DefaultWeightedEdge> path = guardMap.get(agent);
-        if(path == null)
-        {
-            return;
-        }
         if(mapInfo.getAgentPoints().size() > 0)
         {
             Vector2D evader = mapInfo.getAgentPoints().get(0);
-            if(agent.getAgentNumber() == 3){
-                Counts++;
-                if(Counts>300){
-                    request.add(new WalkToTask(evader));
-                }
             if(agent.getAgentNumber() == 3)
             {
-                request.add(new WalkToTask(evader));
+                Counts++;
+                if(Counts > 300)
+                {
+                    request.add(new WalkToTask(evader));
+                }
             }
             else
             {
+                GraphPath<Vector2D, DefaultWeightedEdge> path = guardMap.get(agent);
+                if(path == null)
+                {
+                    return;
+                }
                 request.add(new MinimalPathGuardTask(path, evader));
             }
         }
     }
 
-
-    public List<MinimalPathAgent> getAgents() {
-        return agents;
-    }
-
-    public Collection<GraphPath<Vector2D, DefaultWeightedEdge>> getPaths(){
+    public List<GraphPath<Vector2D, DefaultWeightedEdge>> getPaths()
+    {
         return paths;
     }
 }
