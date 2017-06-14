@@ -100,7 +100,7 @@ public class MinimalPathOverseer
             MinimalPathAgent agent;
             agents.add(agent =
                            new MinimalPathAgent(map, this.completeFloor,
-                                                startLocation.add(new Vector2D(i * (radius + 1), 0)),
+                                                startLocation.add(new Vector2D(i * (2*radius + 1), 0)),
                                                 Direction.NORTH, radius, EngineConstants.VISION_RANGE,
                                                 EngineConstants.VISION_ANGLE,
                                                 this, i));
@@ -197,7 +197,8 @@ public class MinimalPathOverseer
     boolean getShouldDoSomething(MinimalPathAgent agent)
     {
         GraphPath<Vector2D, DefaultWeightedEdge> path = guardMap.get(agent);
-        if(path == null){
+        if(path == null)
+        {
             return false;
         }
         // TODO: implement mechanism to determine whether an agent should make a new request

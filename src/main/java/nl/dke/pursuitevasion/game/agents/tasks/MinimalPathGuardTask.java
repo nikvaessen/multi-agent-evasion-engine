@@ -7,46 +7,58 @@ import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathAgent;
 import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathAgentState;
 import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathOverseer;
 import org.jgrapht.Graph;
+
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.interfaces.KShortestPathAlgorithm;
 import org.jgrapht.alg.shortestpath.KShortestPaths;
 import org.jgrapht.graph.DefaultWeightedEdge;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+ import java.util.Comparator;import java.util.List;
 
 /**
  * Created by Jan on 25-5-2017.
  */
-public class MinimalPathGuardTask extends AbstractAgentTask{
+public class MinimalPathGuardTask extends AbstractAgentTask
+{
+
+    private static Logger logger = LoggerFactory.getLogger(MinimalPathGuardTask.class);
 
     private GraphPath<Vector2D, DefaultWeightedEdge> path;
     private Vector2D evaderLocation;
 
-    public MinimalPathGuardTask(GraphPath<Vector2D, DefaultWeightedEdge> path, Vector2D location){
+    public MinimalPathGuardTask(GraphPath<Vector2D, DefaultWeightedEdge> path, Vector2D location)
+    {
         this.path = path;
         this.evaderLocation = location;
     }
 
     @Override
-    protected AgentCommand computeAgentCommand(AbstractAgent agent, double maxDistance, double maxRotation) {
+    protected AgentCommand computeAgentCommand(AbstractAgent agent, double maxDistance, double maxRotation)
+    {
         // check if we are on the path
-        if(onPath(agent, path)){
+        if(onPath(agent, path))
+        {
+            logger.trace("Moving to projection");
             // if we are -> move to projection of evader on path
             return moveToProjection(agent, maxDistance, maxRotation);
         }
-        else{
-            ((MinimalPathAgent )agent).setState(MinimalPathAgentState.MOVING_TO_PATH);
+        else
+        {
+            logger.trace("Moving to closest point on path");
+            ((MinimalPathAgent) agent).setState(MinimalPathAgentState.MOVING_TO_PATH);
             // if we are not -> move to closest point on path
             return moveToClosestPointOnPath(agent, maxDistance, maxRotation);
         }
 
     }
 
-    private AgentCommand moveToClosestPointOnPath(AbstractAgent agent, double maxDistance, double maxRotation) {
+    private AgentCommand moveToClosestPointOnPath(AbstractAgent agent, double maxDistance, double maxRotation)
+    {
         Vector2D agentLocation = agent.getLocation();
         Vector2D closestVertex = closestPathVertex(agentLocation);
         Line2D closestSegment = closestLineSegment(closestVertex, agentLocation, agent);
@@ -54,17 +66,20 @@ public class MinimalPathGuardTask extends AbstractAgentTask{
         return new WalkToTask(destination).computeAgentCommand(agent, maxDistance, maxRotation);
     }
 
-    private AgentCommand moveToClosestPathVertex(AbstractAgent agent, double maxDistance, double maxRotation) {
-         Vector2D destination = closestPathVertex(agent.getLocation());
-         return new WalkToTask(destination).computeAgentCommand(agent, maxDistance, maxRotation);
+    private AgentCommand moveToClosestPathVertex(AbstractAgent agent, double maxDistance, double maxRotation)
+    {
+        Vector2D destination = closestPathVertex(agent.getLocation());
+        return new WalkToTask(destination).computeAgentCommand(agent, maxDistance, maxRotation);
     }
 
-    private AgentCommand moveToProjection(AbstractAgent agent, double maxDistance, double maxRotation) {
+    private AgentCommand moveToProjection(AbstractAgent agent, double maxDistance, double maxRotation)
+    {
         // get the location of the projection
         Vector2D e = findProjection(agent);
         ((MinimalPathAgent)agent).projectionLocation = e;
         // check if the agent is on the same path edge as the projection
-        if(onProjectionPathSegment(agent.getLocation(), e)){
+        if(onProjectionPathSegment(agent.getLocation(), e))
+        {
             // if it is -> move to the projection location
             // If we can make it to the projection location
             if(agent.getLocation().distance(e) <= maxDistance + agent.getRadius()*2){
@@ -77,8 +92,9 @@ public class MinimalPathGuardTask extends AbstractAgentTask{
             }
             return moveToProjectionLocation(agent, e, maxDistance, maxRotation);
         }
-        else{
-            ((MinimalPathAgent)agent).setState(MinimalPathAgentState.MOVING_TO_PROJECTION);
+        else
+        {
+            ((MinimalPathAgent) agent).setState(MinimalPathAgentState.MOVING_TO_PROJECTION);
             // else -> Follow path to the node closest to the projection.
             Vector2D destination = getPathTo(e, agent);
             return new WalkToTask(destination).computeAgentCommand(agent, maxDistance, maxRotation);
@@ -107,32 +123,37 @@ public class MinimalPathGuardTask extends AbstractAgentTask{
         }
     }
 
-    private AgentCommand moveToProjectionLocation(AbstractAgent agent, Vector2D e, double maxDistance, double maxRotation) {
+    private AgentCommand moveToProjectionLocation(AbstractAgent agent, Vector2D e, double maxDistance,
+                                                  double maxRotation)
+    {
         WalkToTask t = new WalkToTask(e);
         return t.computeAgentCommand(agent, maxDistance, maxRotation);
     }
 
     /**
-     *
      * @param agentLocation
      * @param ePrime
      * @return
      */
-    private boolean onProjectionPathSegment(Vector2D agentLocation, Vector2D ePrime) {
+    private boolean onProjectionPathSegment(Vector2D agentLocation, Vector2D ePrime)
+    {
         // get the path segment of the projection
         ArrayList<Line2D> lines = linesFromPath(path);
         Point2D point = ePrime.toPoint();
         double minDist = Double.MAX_VALUE;
         Line2D pathSegment = null;
         // get the closest line segment
-        for(Line2D line : lines){
+        for(Line2D line : lines)
+        {
             double distance = line.ptSegDist(point);
-            if (distance < minDist){
+            if(distance < minDist)
+            {
                 pathSegment = line;
                 minDist = distance;
             }
         }
-        if (pathSegment == null) {
+        if(pathSegment == null)
+        {
             throw new NullPointerException("Projection not on path!");
         }
 
@@ -144,8 +165,7 @@ public class MinimalPathGuardTask extends AbstractAgentTask{
      * Finds the projection of the evaderLocation on the path.
      * @param agent
      * @return
-     */
-    private Vector2D findProjection(AbstractAgent agent) {
+     */private Vector2D findProjection(AbstractAgent agent) {
 
 //        Graph<Vector2D, DefaultWeightedEdge> g = path.getGraph();
 //        List<DefaultWeightedEdge> edgeList = path.getEdgeList();
@@ -217,11 +237,13 @@ public class MinimalPathGuardTask extends AbstractAgentTask{
      * @param agent
      * @return
      */
-    private Line2D closestLineSegment(Vector2D closestNode, Vector2D location, AbstractAgent agent) {
+    private Line2D closestLineSegment(Vector2D closestNode, Vector2D location, AbstractAgent agent)
+    {
         List<Line2D> segments = adjacentLineSegments(closestNode);
         Point2D e = location.toPoint();
         Line2D firstSegment = segments.get(0);
-        try{
+        try
+        {
             // try to get the second segment
             Line2D secondSegment = segments.get(1);
             double firstDistance = firstSegment.ptSegDist(e);
@@ -232,67 +254,80 @@ public class MinimalPathGuardTask extends AbstractAgentTask{
                 Point2D agentLocation = agent.getLocation().toPoint();
                 return firstSegment.ptSegDist(agentLocation) < secondSegment.ptSegDist(agentLocation) ? firstSegment : secondSegment;
             }
-            return firstSegment.ptSegDist(e) < secondSegment.ptSegDist(e) ? firstSegment : secondSegment;
+            return firstSegment.ptSegDist(e) < secondSegment.ptSegDist(e) ?
+                firstSegment :
+                secondSegment;
         }
         // If there is no second segment
-        catch (IndexOutOfBoundsException exception){
+        catch(IndexOutOfBoundsException exception)
+        {
             // the first one is always the closest
             return firstSegment;
         }
     }
 
-    private List<Line2D> adjacentLineSegments(Vector2D closestNode) {
+    private List<Line2D> adjacentLineSegments(Vector2D closestNode)
+    {
         List<Vector2D> verteces = path.getVertexList();
         int index = verteces.indexOf(closestNode);
         List<Vector2D> segmentEnds = new ArrayList<>(2);
         // TODO: Yes I know this is ugly...
-        if(index == 0){
+        if(index == 0)
+        {
             segmentEnds.add(verteces.get(1));
         }
-        else if(index == verteces.size() -1){
-            segmentEnds.add(verteces.get(index -1));
+        else if(index == verteces.size() - 1)
+        {
+            segmentEnds.add(verteces.get(index - 1));
         }
-        else{
-            segmentEnds.add(verteces.get(index+1));
-            segmentEnds.add(verteces.get(index-1));
+        else
+        {
+            segmentEnds.add(verteces.get(index + 1));
+            segmentEnds.add(verteces.get(index - 1));
         }
 
         List<Line2D> adjacentSegments = new ArrayList<>(2);
-        for (Vector2D segmentEnd: segmentEnds){
+        for(Vector2D segmentEnd : segmentEnds)
+        {
             adjacentSegments.add(new Line2D.Double(closestNode.toPoint(), segmentEnd.toPoint()));
         }
 
         return adjacentSegments;
     }
 
-    private Vector2D closestPathVertex(Vector2D vector){
+    private Vector2D closestPathVertex(Vector2D vector)
+    {
         double min = Double.MAX_VALUE;
         Vector2D closest = null;
-        for (Vector2D vertex : path.getVertexList()){
+        for(Vector2D vertex : path.getVertexList())
+        {
             double distance = vector.distance(vertex);
-            if(distance < min){
+            if(distance < min)
+            {
                 closest = vertex;
                 min = distance;
             }
         }
 
-        if(closest == null){
+        if(closest == null)
+        {
             throw new IllegalArgumentException("Could not find closest vertex.");
         }
         return closest;
     }
 
-    public Vector2D getClosestPointOnSegment(Line2D line, Vector2D point){
+    public Vector2D getClosestPointOnSegment(Line2D line, Vector2D point)
+    {
         // Calculate line coefficient
         double ydiff = line.getY1() - line.getY2();
         double xdiff = line.getX1() - line.getX2();
-        double linecoeff = ydiff/xdiff;
+        double linecoeff = ydiff / xdiff;
         double b1 = line.getY1() - linecoeff * line.getX1();
 
         double intersectcoeff = -1/linecoeff;
         double b2 = point.getY() - intersectcoeff * point.getX();
 
-        double xIntersect = (b2 - b1)/(linecoeff - intersectcoeff);
+        double xIntersect = (b2 - b1) / (linecoeff - intersectcoeff);
         double yIntersect = linecoeff * xIntersect + b1;
 
         return new Vector2D(xIntersect, yIntersect);
@@ -307,50 +342,55 @@ public class MinimalPathGuardTask extends AbstractAgentTask{
 
     public Vector2D getClosestPointOnSegment(Line2D line, Vector2D point)
     {
-        Vector2D start = Vector2D.fromPoint2D(line.getP1());
-        Vector2D end = Vector2D.fromPoint2D(line.getP2());
-        double xDelta = end.getX() - start.getX();
-        double yDelta = end.getY() - start.getX();
+    Vector2D start = Vector2D.fromPoint2D(line.getP1());
+    Vector2D end = Vector2D.fromPoint2D(line.getP2());
+    double xDelta = end.getX() - start.getX();
+    double yDelta = end.getY() - start.getX();
 
-        if ((xDelta == 0) && (yDelta == 0))
-        {
-            throw new IllegalArgumentException("Segment start equals segment end");
-        }
+    if ((xDelta == 0) && (yDelta == 0))
+    {
+    throw new IllegalArgumentException("Segment start equals segment end");
+    }
 
-        double u = ((point.getX() - start.getX()) * xDelta + (point.getY() - start.getY()) * yDelta) / (xDelta * xDelta + yDelta * yDelta);
+    double u = ((point.getX() - start.getX()) * xDelta + (point.getY() - start.getY()) * yDelta) / (xDelta * xDelta +
+    yDelta * yDelta);
 
-        Vector2D closestPoint;
-        if (u < 0)
-        {
-            closestPoint = new Vector2D(start);
-        }
-        else if (u > 1)
-        {
-            closestPoint = new Vector2D(end);
-        }
-        else
-        {
-            closestPoint = new Vector2D(start.getX() + u * xDelta, start.getY() + u * yDelta);
-        }
+    Vector2D closestPoint;
+    if (u < 0)
+    {
+    closestPoint = new Vector2D(start);
+    }
+    else if (u > 1)
+    {
+    closestPoint = new Vector2D(end);
+    }
+    else
+    {
+    closestPoint = new Vector2D(start.getX() + u * xDelta, start.getY() + u * yDelta);
+    }
 
-        return closestPoint;
+    return closestPoint;
     }*/
 
     /**
      * Checks whether the agent is on the path.
      * Returns true when an agents is close (<0.02)
      * to any of the line segments of the path
+     *
      * @param agent
      * @return boolean describing whether an agent is close
      */
-    private boolean onPath(AbstractAgent agent, GraphPath<Vector2D, DefaultWeightedEdge> graphPath) {
+    private boolean onPath(AbstractAgent agent, GraphPath<Vector2D, DefaultWeightedEdge> graphPath)
+    {
         Point2D location = agent.getLocation().toPoint();
         ArrayList<Line2D> lines = linesFromPath(graphPath);
         // Check if the agent is close to any of the lines
         // includes a small error margin in the form of minDist
         double minDist = 0.2;
-        for (Line2D line : lines) {
-            if(line.ptSegDist(location) < minDist){
+        for(Line2D line : lines)
+        {
+            if(line.ptSegDist(location) < minDist)
+            {
                 return true;
             }
         }
@@ -377,16 +417,20 @@ public class MinimalPathGuardTask extends AbstractAgentTask{
         }
     }
 
-    private ArrayList<Line2D> linesFromPath(GraphPath<Vector2D, DefaultWeightedEdge> graphPath) {
+    private ArrayList<Line2D> linesFromPath(GraphPath<Vector2D, DefaultWeightedEdge> graphPath)
+    {
         ArrayList<Line2D> lines = new ArrayList<>();
         List<Vector2D> points = graphPath.getVertexList();
         // Contruct lines from the path
         Vector2D firstVector = null;
-        for(Vector2D vector : points) {
-            if(firstVector == null){
+        for(Vector2D vector : points)
+        {
+            if(firstVector == null)
+            {
                 firstVector = vector;
             }
-            else{
+            else
+            {
                 lines.add(new Line2D.Double(firstVector.toPoint(), vector.toPoint()));
                 firstVector = vector;
             }
@@ -395,7 +439,8 @@ public class MinimalPathGuardTask extends AbstractAgentTask{
     }
 
     @Override
-    protected boolean completesTask(AgentCommand command) {
+    protected boolean completesTask(AgentCommand command)
+    {
         // TODO: Ask the overseer
         return true;
     }
