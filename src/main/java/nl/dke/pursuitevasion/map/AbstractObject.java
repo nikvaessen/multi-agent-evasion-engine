@@ -253,20 +253,7 @@ public abstract class AbstractObject implements Serializable
      */
     public boolean contains(Vector2D v)
     {
-        boolean vInsideP = polygon.contains(v.toPoint());
-
-        if(!vInsideP)
-        {
-            for (Line2D line : this.polygon.getLines())
-            {
-                if (line.ptSegDist(v.toPoint()) == 0)
-                {
-                    vInsideP = true;
-                }
-            }
-        }
-
-        return vInsideP;
+        return this.polygon.contains(v);
     }
 
     /**

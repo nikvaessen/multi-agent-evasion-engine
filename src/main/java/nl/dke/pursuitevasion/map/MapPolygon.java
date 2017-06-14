@@ -84,6 +84,45 @@ public class MapPolygon extends java.awt.Polygon
         return lines;
     }
 
+
+    /**
+     * Check if the given vector location is inside or on the boundaries of this object
+     *
+     * @param p the location
+     * @return true is it's inside or on the boundary of this object, false otherwise
+     */
+    @Override
+    public boolean contains(Point2D p)
+    {
+        boolean vInsideP = super.contains(p);
+
+        if(!vInsideP)
+        {
+            for (Line2D line : this.getLines())
+            {
+                if (line.ptSegDist(p) == 0)
+                {
+                    vInsideP = true;
+                }
+            }
+        }
+
+        return vInsideP;
+    }
+
+    /**
+     * Check if the given vector location is inside or on the boundaries of this object
+     *
+     * @param v the location
+     * @return true is it's inside or on the boundary of this object, false otherwise
+     */
+    public boolean contains(Vector2D v)
+    {
+        return this.contains(v.toPoint());
+    }
+
+
+
     @Override
     public String toString()
     {
@@ -93,6 +132,7 @@ public class MapPolygon extends java.awt.Polygon
             builder.append(String.format("(%d,%d),", xpoints[i], ypoints[i]));
         }
         builder.deleteCharAt(builder.lastIndexOf(","));
+        builder.append("]");
         return builder.toString();
     }
 }

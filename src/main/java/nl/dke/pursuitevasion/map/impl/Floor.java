@@ -533,8 +533,8 @@ public class Floor extends AbstractObject
     {
         for(Vector2D v : o.getPolygon().getPoints())
         {
-            boolean vInsideP = super.contains(v);
-
+            boolean vInsideP = polygon.contains(v);
+            logger.trace("{} inside {}: {}", v, polygon, vInsideP);
             if(!vInsideP)
             {
                 return false;
