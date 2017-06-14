@@ -1,9 +1,11 @@
 package nl.dke.pursuitevasion.game.agents.impl.MinimalPath;
 
+import nl.dke.pursuitevasion.game.EngineConstants;
 import nl.dke.pursuitevasion.game.MapInfo;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.AgentRequest;
+import nl.dke.pursuitevasion.game.agents.Direction;
 import nl.dke.pursuitevasion.game.agents.tasks.MinimalPathGuardTask;
 import nl.dke.pursuitevasion.game.agents.tasks.WalkToTask;
 import nl.dke.pursuitevasion.map.MapPolygon;
@@ -27,50 +29,139 @@ import org.jgrapht.graph.WeightedPseudograph;
  * Oversees 3 MinimalPathAgents
  */
 public class MinimalPathOverseer {
-    // The instance of the singleton
-    private static MinimalPathOverseer instance;
-    // agents that are supervised by the overseer
-    static List<MinimalPathAgent> agents = new ArrayList<>(3);
-    // maps agents to guardpaths
-    private HashMap<MinimalPathAgent, GraphPath> guardMap = new HashMap<>();
 
+    /**
+     * The list of MinimalPathAgents this overseer controls. Currently designed
+     * to hold 3 agents
+     */
+    private List<MinimalPathAgent> agents;
+
+    /**
+     * Maps the agents held in the agents list to the  paths the agents need to guard
+     */
+    private HashMap<MinimalPathAgent, GraphPath> guardMap;
+
+    /**
+     * The complete floor the pursuit-evasion game is played out on.
+     * During pursuit, smaller subfloors will be created as areas are guarenteed
+     * wherein the evader cannot escape from
+     */
+    private Floor completeFloor;
+
+    /**
+     * The visibility graph of the floor which is used to compute the paths
+     * agents will need to guard
+     */
     private WeightedGraph<Vector2D, DefaultWeightedEdge> visibilityGraph;
-    private Map map;
+
+    /**
+     * At the start of pursuit, 2 anchor points u and v are selected. They are the 2 points on the floor
+     * lying the most distance away from each other
+     * These points are used to compute the initial path(s)
+     */
     private Vector2D u;
     private Vector2D v;
+
+    /**
+     * Current paths selected by the algorithm to be needed to be guarded
+     */
     private List<GraphPath<Vector2D, DefaultWeightedEdge>> paths;
 
+    /**
+     * Create MinimalPathOverseer, which creates 3 agents it will control
+     *
+     * @param map the map the agents will play pursuit-evasion in
+     * @param startLocation the startLocation of the first agent on the floor of the map
+     */
+    public MinimalPathOverseer(Map map, Vector2D startLocation)
+    {
+        // Set the known member variables
 
-    private MinimalPathOverseer(Map map){
-        this.map = map;
-        // Build visibility graph
+        // Information about the environment
+        this.completeFloor = map.getFloors().iterator().next();
+        this.visibilityGraph = map.getFloors().iterator().next().getVisibilityGraph();
 
-        visibilityGraph = map.getFloors().iterator().next().getVisibilityGraph();
-
-
-        // get u and v
+        // The anchor points u and v
         Vector2D[] uv = getFurthestPoints();
         this.u = uv[0];
         this.v = uv[1];
-        // Calculate minimal paths between u and v
-        paths = calculateMinimalPaths();
-    }
 
-    public Graph<Vector2D, DefaultWeightedEdge> pruneVisibilityGraph(){
-        return null;
-    }
+        // Calculate the initial shortest minimal path between u and v
+        this.paths = calculateMinimalPaths(this.visibilityGraph, 1, this.u, this.v);
 
-    public List<GraphPath<Vector2D, DefaultWeightedEdge>> calculateMinimalPaths(){
-        KShortestPathAlgorithm<Vector2D, DefaultWeightedEdge> a = new KShortestPaths<>(visibilityGraph, 2);
-        return a.getPaths(u, v);
+        // Initialize the agents and set the first agent to guard the first path
+        this.guardMap = new HashMap<>();
+        this.agents = new LinkedList<>();
+
+        for(int i = 0; i < 3; i++)
+        {
+            int radius = EngineConstants.AGENT_RADIUS;
+            MinimalPathAgent agent;
+            agents.add(agent =
+                    new MinimalPathAgent(map, this.completeFloor,
+                            startLocation.add(new Vector2D(i * (radius + 1), 0)),
+                            Direction.NORTH, radius, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE,
+                            this, i));
+
+            if (i == 0)
+            {
+                guardMap.put(agent, paths.get(0));
+            }
+            else
+            {
+                guardMap.put(agent, null);
+            }
+        }
     }
 
     /**
-     * Gets the 2 points furthest away from each other.
-     * @return Vector2D[] : size 2 array holding the points
+     * Get the amount of agents controlled by this overseer
+     *
+     * @return the amount of agents controlled by this overseer
      */
-    public Vector2D[] getFurthestPoints() {
-        Floor floor = map.getFloors().iterator().next();
+    public int getAmountOfAgents()
+    {
+        return agents.size();
+    }
+
+    /**
+     * Get an agent controlled by this overseer
+     *
+     * @param i number of agent
+     * @return the ith agent controlled by this overseer
+     */
+    public MinimalPathAgent getAgent(int i)
+    {
+        if(i < 0 || i >= agents.size())
+        {
+            throw new IllegalArgumentException(String.format("Agent number %d does not exist", i));
+        }
+        return agents.get(i);
+    }
+
+    /**
+     * Calculate k shortest paths on a given graph with weighted edges between u and v
+     *
+     * @param g the graph
+     * @param k the amount of paths requested
+     * @param u start location of the paths
+     * @param v the end location of the paths
+     * @return a list with k paths between u and v, which are ordered by shortest distance to longest distance
+     */
+    private List<GraphPath<Vector2D, DefaultWeightedEdge>> calculateMinimalPaths(Graph<Vector2D, DefaultWeightedEdge> g,
+                                                                                 int k, Vector2D u, Vector2D v)
+    {
+        KShortestPathAlgorithm<Vector2D, DefaultWeightedEdge> algorithm = new KShortestPaths<>(g, k);
+        return algorithm.getPaths(u, v);
+    }
+
+    /**
+     * Gets the 2 points furthest away from each other on the completeFloor
+     *
+     * @return size 2 array holding the points
+     */
+    private Vector2D[] getFurthestPoints() {
+        Floor floor = this.completeFloor;
         Vector2D[] uv = new Vector2D[2];
         // iterate over all points
         // get the distance from point to all other points
@@ -88,20 +179,6 @@ public class MinimalPathOverseer {
             }
         }
         return uv;
-    }
-
-    // The overseer is a Singleton
-    public static MinimalPathOverseer getInstance(){
-        if(instance == null){
-            throw new NullPointerException("No instance created yet. Use the init function");
-        }
-        return instance;
-    }
-
-    // Creates the overseer singleton with a map.
-    public static MinimalPathOverseer init(Map map){
-        instance = new MinimalPathOverseer(map);
-        return instance;
     }
 
     // Assigns agents 1 and 2 to the first 2 minimal paths.
@@ -158,20 +235,6 @@ public class MinimalPathOverseer {
         }
     }
 
-    private void findSubPolygons()
-    {
-        // Step 1: Create the 2 walks from u to v to create sP1 and sP2
-
-        // Step 2: add the shortest to both sP1 and sP2
-
-        // Step 3: for all obstacles who have a vertex in the shortest path:
-        //          see if another vertex of the obstacle lie inside sP1 or sP2
-        //          and add the obstacle according to the position of that vertex
-
-        // Step 4: for all other obstacles:
-        //          see if a vertex lies inside sP1 or sP2 and add accordingly
-
-    }
 
     public List<MinimalPathAgent> getAgents() {
         return agents;

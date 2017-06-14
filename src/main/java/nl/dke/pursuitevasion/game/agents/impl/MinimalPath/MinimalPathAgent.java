@@ -12,23 +12,30 @@ import nl.dke.pursuitevasion.map.impl.Map;
  */
 public class MinimalPathAgent extends AbstractAgent{
 
+    /**
+     * Each minimalPathAgent has a number which is used by the overseer to give it tasks
+     */
     private int agentNumber;
 
-    public MinimalPathOverseer overseer;
+    /**
+     * The overseer this agents need to rely on to get the tasks it needs to complete
+     */
+    private MinimalPathOverseer overseer;
 
-    private MinimalPathAgentState state = MinimalPathAgentState.NO_PATH;
+    /**
+     * The state the agent is in
+     */
+    private MinimalPathAgentState state;
 
     public Vector2D projectionLocation = null;
 
     public MinimalPathAgent(Map map, Floor floor, Vector2D startLocation, Direction startsFacing, int radius, double visionRange, double visionAngle){
         super(map, floor, startLocation, startsFacing, radius, visionRange, visionAngle);
-        try{
-            overseer = MinimalPathOverseer.getInstance();
-        }
-        catch (NullPointerException e){
-            overseer = MinimalPathOverseer.init(map);
-        }
-        agentNumber = overseer.registerAgent(this);
+        this.overseer = overseer;
+        this.agentNumber = agentNumber;
+
+        //initial state
+        state = MinimalPathAgentState.NO_PATH;
     }
 
     public int getAgentNumber(){return agentNumber;}
