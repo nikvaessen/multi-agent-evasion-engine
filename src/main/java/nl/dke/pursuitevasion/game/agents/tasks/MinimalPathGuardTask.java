@@ -3,10 +3,8 @@ package nl.dke.pursuitevasion.game.agents.tasks;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.AgentCommand;
-import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathAgent;
-import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathAgentState;
-import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathOverseer;
-import org.jgrapht.Graph;
+import nl.dke.pursuitevasion.game.agents.impl.minimalPath.MinimalPathAgent;
+import nl.dke.pursuitevasion.game.agents.impl.minimalPath.MinimalPathAgentState;
 
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.interfaces.KShortestPathAlgorithm;
@@ -18,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
- import java.util.Comparator;import java.util.List;
+import java.util.List;
 
 /**
  * Created by Jan on 25-5-2017.

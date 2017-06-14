@@ -572,4 +572,16 @@ public class Floor extends AbstractObject
         return lines;
     }
 
+    @Override
+    public String toString()
+    {
+        StringBuilder builder = new StringBuilder("Floor[");
+        builder.append(String.format("mainPolygon: %s,", this.getPolygonGraph().vertexSet()));
+        for(Obstacle o: this.getObstacles())
+        {
+            builder.append(String.format("\n\tobstacle: %s \n", o.getPolygonGraph().vertexSet()));
+        }
+        builder.append("]");
+        return builder.toString();
+    }
 }

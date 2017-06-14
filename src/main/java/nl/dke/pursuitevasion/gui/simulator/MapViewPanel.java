@@ -4,8 +4,8 @@ import nl.dke.pursuitevasion.game.EngineConstants;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.impl.MCTS.MCTS_2;
-import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathAgent;
-import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathOverseer;
+import nl.dke.pursuitevasion.game.agents.impl.minimalPath.MinimalPathAgent;
+import nl.dke.pursuitevasion.game.agents.impl.minimalPath.MinimalPathOverseer;
 import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.impl.Map;
 import org.slf4j.Logger;
@@ -157,13 +157,10 @@ public class MapViewPanel
         }
         if(minimalPathOverseer != null)
         {
-
-            System.err.println("Hello");
             g.setColor(Color.GREEN);
             ((Graphics2D) g).setStroke(new BasicStroke());
             Collection<GraphPath<Vector2D, DefaultWeightedEdge>> paths = minimalPathOverseer.getPaths();
 
-            System.err.println("paths = null??? " + paths == null);
             if(paths != null)
             {
 

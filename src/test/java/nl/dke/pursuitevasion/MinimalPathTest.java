@@ -5,9 +5,7 @@ import nl.dke.pursuitevasion.game.EngineConstants;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.Direction;
-import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathAgent;
-import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathOverseer;
-import nl.dke.pursuitevasion.game.agents.impl.RandomAgent;
+import nl.dke.pursuitevasion.game.agents.impl.minimalPath.MinimalPathOverseer;
 import nl.dke.pursuitevasion.game.agents.impl.UserAgent;
 import nl.dke.pursuitevasion.gui.KeyboardInputListener;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
@@ -19,8 +17,6 @@ import org.jgrapht.graph.*;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by Jan on 24-5-2017.
