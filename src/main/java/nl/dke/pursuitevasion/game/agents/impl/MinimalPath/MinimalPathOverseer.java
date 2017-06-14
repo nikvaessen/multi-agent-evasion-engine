@@ -187,40 +187,19 @@ public class MinimalPathOverseer
         return uv;
     }
 
-    // Assigns agents 1 and 2 to the first 2 minimal paths.
-    private void assignPaths()
-    {
-        guardMap.put(agents.get(0), paths.get(0));
-        guardMap.put(agents.get(1), paths.get(1));
-    }
 
-    // Registers an agent with the overseer
-    public int registerAgent(MinimalPathAgent agent)
+    /**
+     * Determines whether an agent needs to currently do a task
+     *
+     * @param agent the agent to check for
+     * @return true if the agent needs to do something, false otherwise
+     */
+    boolean getShouldDoSomething(MinimalPathAgent agent)
     {
-        if(agents.size() < 3)
-        {
-            agents.add(agent);
-            guardMap.put(agent, null);
-            if(agents.size() == 3)
-            {
-                assignPaths();
-            }
-            return agents.size();
-        }
-        else
-        {
-            throw new IllegalStateException("There are already 3 agents instantiated");
-        }
-    }
-
-    // Checks whether an agent should be making a new request.
-    public boolean getShouldDoSomething(MinimalPathAgent agent)
-    {
-        // check whether the agent already has an assigned path.
-    /*    GraphPath<Vector2D, DefaultWeightedEdge> path = guardMap.get(agent);
+        GraphPath<Vector2D, DefaultWeightedEdge> path = guardMap.get(agent);
         if(path == null){
-
-        }*/
+            return false;
+        }
         // TODO: implement mechanism to determine whether an agent should make a new request
         return true;
 
