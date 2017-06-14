@@ -517,7 +517,6 @@ public class ModelView extends JPanel {
                         System.out.print("button 2");
                         if (selectedObject == null) {
                             Polygon poly = new Polygon();
-                            poly.addPoint(click.x, click.y);
                             EditorObject p = new EditorObject(poly, LastID++);
                             p.setType(ObjectType.FLOOR);
                             selectedObject = p;

@@ -100,7 +100,6 @@ public class Engine
                     pursuers.push(agent);
                 }
             }
-
             // start the game loop
             loop();
         }
@@ -307,6 +306,7 @@ public class Engine
                     allowedMeters -= command.getMovedDistance();
 
                     allowedRotation -= command.getRotatedDistance();
+                    
 
                     if(logger.isTraceEnabled())
                     {

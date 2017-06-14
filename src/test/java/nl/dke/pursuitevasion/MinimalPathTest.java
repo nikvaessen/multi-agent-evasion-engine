@@ -29,9 +29,10 @@ public class MinimalPathTest {
 
     public static void main(String[] args) {
         // do init stuff
+        Map map = Map.getMap("MinPathTest.ser");
         //Map map = Map.getMap("simpleMap.ser");
         //Map map = Map.getMap("NikMap.ser");
-        Map map = Map.getMap("newMap.ser");
+        //Map map = Map.getMap("newMap.ser");
         ArrayList<AbstractAgent> agents = new ArrayList<>();
         JFrame frame = new JFrame();
         Floor floor = map.getFloors().iterator().next();
@@ -40,11 +41,11 @@ public class MinimalPathTest {
         KeyboardInputListener l = new KeyboardInputListener();
         frame.addKeyListener(l);
 
-        agents.add(new MinimalPathAgent(map, floor, new Vector2D(50.0,50.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
-        agents.add(new MinimalPathAgent(map, floor, new Vector2D(75.0,50.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
+        agents.add(new MinimalPathAgent(map, floor, new Vector2D(150.0,150.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
+        agents.add(new MinimalPathAgent(map, floor, new Vector2D(175.0,150.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
         agents.add(new MinimalPathAgent(map, floor, new Vector2D(25.0,50.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE,  EngineConstants.VISION_ANGLE));
         //agents.add(new RandomAgent(map, floor, new Vector2D(200.0, 100.0), Direction.NORTH, 5, 100, 120));
-        agents.add(new UserAgent(map, floor, new Vector2D(200.0, 30.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE,  EngineConstants.VISION_ANGLE, l, true));
+        agents.add(new UserAgent(map, floor, new Vector2D(200.0, 300.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE,  EngineConstants.VISION_ANGLE, l, true));
 
         Engine simulationEngine = new Engine(map, agents, panel, 60);
 

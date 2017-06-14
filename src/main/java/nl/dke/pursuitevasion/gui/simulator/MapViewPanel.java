@@ -1,11 +1,11 @@
 package nl.dke.pursuitevasion.gui.simulator;
 
-import nl.dke.pursuitevasion.game.Engine;
 import nl.dke.pursuitevasion.game.EngineConstants;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.impl.MCTS.MCTS_2;
 import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathAgent;
+import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathOverseer;
 import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.impl.Map;
 import org.slf4j.Logger;
@@ -13,7 +13,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.*;
+import java.util.List;
+
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.GraphPath;
 
 
 /**
@@ -86,6 +91,27 @@ public class MapViewPanel
                     new Long(Math.round(vLocation.getY())).intValue()
             );
 
+            // Draw the agent numbers for the MinimalPathAgents.
+            if(agent instanceof MinimalPathAgent){
+                g.drawString(Integer.toString(((MinimalPathAgent) agent).getAgentNumber()),
+                        (int)Math.round(vLocation.getX()), (int)Math.round(vLocation.getY()) + 10);
+                Color color;
+                switch (((MinimalPathAgent)agent).getState()){
+                    case MOVING_TO_PATH:
+                        color = Color.ORANGE;
+                        break;
+                    case MOVING_TO_PROJECTION:
+                        color = Color.YELLOW;
+                        break;
+                    case ON_PROJECTION:
+                        color = Color.GREEN;
+                        break;
+                    default:
+                        color = EngineConstants.ENTRY_PURSUER_COLOR;
+                        break;
+                }
+                g.setColor(color);
+            }
             int radius = agent.getRadius();
             g.fillOval(location.x - radius, location.y - radius,radius * 2, radius * 2);
             logger.trace("painting agent at {}", location);
@@ -94,11 +120,6 @@ public class MapViewPanel
             Vector2D base = visionArc.getBasePoint();
             logger.trace("the eyes of the agent are at {}",base);
 
-            // Draw the agent numbers for the MinimalPathAgents.
-            if(agent instanceof MinimalPathAgent){
-                g.drawString(Integer.toString(((MinimalPathAgent) agent).getAgentNumber()),
-                        (int)Math.round(vLocation.getX()), (int)Math.round(vLocation.getY()) + 10);
-            }
             // Draw vision arcs
             g.setColor(EngineConstants.VISION_ARC_COLOR);
 
@@ -122,6 +143,44 @@ public class MapViewPanel
         if (mcts != null) {
             mcts.paint(g,mctsViewSettings,this);
         }
+        try
+        {
+            g.setColor(Color.GREEN);
+            ((Graphics2D) g).setStroke(new BasicStroke());
+            Collection<GraphPath<Vector2D, DefaultWeightedEdge>> paths =
+                    MinimalPathOverseer.getInstance().getPaths();
+
+            for(GraphPath<Vector2D, DefaultWeightedEdge> path : paths) {
+                List<Vector2D> points = path.getVertexList();
+                Vector2D lastPoint = points.get(0);
+                for (int i = 1; i < points.size(); i++) {
+                    Vector2D newPoint = points.get(i);
+                    g.drawLine((int) Math.round(lastPoint.getX()), (int) Math.round(lastPoint.getY()),
+                            (int) Math.round(newPoint.getX()), (int) Math.round(newPoint.getY()));
+                    lastPoint = newPoint;
+                }
+            }
+        }
+        catch (NullPointerException e)
+        {
+            //do nothing
+        }
+
+        try {
+            for (MinimalPathAgent agent : MinimalPathOverseer.getInstance().getAgents()) {
+                if (agent.projectionLocation != null) {
+                    g.setColor(Color.BLACK);
+                    Point2D p = agent.projectionLocation.toPoint();
+                    g.drawOval((int) Math.round(p.getX()), (int) Math.round(p.getY()), 3, 3);
+                }
+            }
+        }
+        catch (NullPointerException e){
+
+        }
+
+
+
     }
 
     @Override

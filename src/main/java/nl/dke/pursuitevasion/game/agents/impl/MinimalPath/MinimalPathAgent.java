@@ -7,8 +7,6 @@ import nl.dke.pursuitevasion.game.agents.Direction;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 
-import java.util.Collection;
-
 /**
  * Created by Jan on 24-5-2017.
  */
@@ -20,10 +18,12 @@ public class MinimalPathAgent extends AbstractAgent{
 
     private MinimalPathAgentState state = MinimalPathAgentState.NO_PATH;
 
+    public Vector2D projectionLocation = null;
+
     public MinimalPathAgent(Map map, Floor floor, Vector2D startLocation, Direction startsFacing, int radius, double visionRange, double visionAngle){
         super(map, floor, startLocation, startsFacing, radius, visionRange, visionAngle);
         try{
-            overseer = MinimalPathOverseer.getIntance();
+            overseer = MinimalPathOverseer.getInstance();
         }
         catch (NullPointerException e){
             overseer = MinimalPathOverseer.init(map);

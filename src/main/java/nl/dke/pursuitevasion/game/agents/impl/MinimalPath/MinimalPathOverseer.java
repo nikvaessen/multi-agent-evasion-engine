@@ -18,7 +18,6 @@ import java.util.List;
 import org.jgrapht.*;
 import org.jgrapht.alg.interfaces.KShortestPathAlgorithm;
 import org.jgrapht.alg.shortestpath.KShortestPaths;
-import org.jgrapht.alg.shortestpath.PathValidator;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.Subgraph;
 import org.jgrapht.graph.WeightedPseudograph;
@@ -90,30 +89,9 @@ public class MinimalPathOverseer {
         }
         return uv;
     }
-    private static WeightedPseudograph<Vector2D, DefaultWeightedEdge> constructVisibilityGraph(Map map) {
-        WeightedPseudograph<Vector2D, DefaultWeightedEdge> g = new WeightedPseudograph<>(
-                DefaultWeightedEdge.class);
-        // simple polygon. So all vertexes can see each other.
-        Floor f = map.getFloors().iterator().next();
-        Collection<Vector2D> points = f.getPolygon().getPoints();
-        for (Vector2D point : points) {
-            g.addVertex(point);
-        }
-
-        for (Vector2D point1 : points) {
-            for (Vector2D point2: points) {
-                g.addEdge(point1, point2);
-                DefaultWeightedEdge e = g.getEdge(point1, point2);
-                g.setEdgeWeight(e, point1.distance(point2));
-            }
-        }
-        return g;
-
-    }
-
 
     // The overseer is a Singleton
-    public static MinimalPathOverseer getIntance(){
+    public static MinimalPathOverseer getInstance(){
         if(instance == null){
             throw new NullPointerException("No instance created yet. Use the init function");
         }
@@ -159,6 +137,8 @@ public class MinimalPathOverseer {
 
     }
 
+    int Counts = 0;
+
     // Determines what request an agent should make.
     public void getTask(MinimalPathAgent agent, AgentRequest request, MapInfo mapInfo){
         // TODO Make agents guard their path for a minimum amount of iterations.
@@ -166,7 +146,10 @@ public class MinimalPathOverseer {
         if(mapInfo.getAgentPoints().size() > 0){
             Vector2D evader = mapInfo.getAgentPoints().get(0);
             if(agent.getAgentNumber() == 3){
-                request.add(new WalkToTask(evader));
+                Counts++;
+                if(Counts>300){
+                    request.add(new WalkToTask(evader));
+                }
             }
             if(path != null){
                 request.add(new MinimalPathGuardTask(path, evader));
@@ -175,4 +158,26 @@ public class MinimalPathOverseer {
         }
     }
 
+    private void findSubPolygons()
+    {
+        // Step 1: Create the 2 walks from u to v to create sP1 and sP2
+
+        // Step 2: add the shortest to both sP1 and sP2
+
+        // Step 3: for all obstacles who have a vertex in the shortest path:
+        //          see if another vertex of the obstacle lie inside sP1 or sP2
+        //          and add the obstacle according to the position of that vertex
+
+        // Step 4: for all other obstacles:
+        //          see if a vertex lies inside sP1 or sP2 and add accordingly
+
+    }
+
+    public List<MinimalPathAgent> getAgents() {
+        return agents;
+    }
+
+    public Collection<GraphPath<Vector2D, DefaultWeightedEdge>> getPaths(){
+        return paths;
+    }
 }
