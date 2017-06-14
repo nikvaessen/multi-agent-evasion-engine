@@ -28,7 +28,8 @@ import org.jgrapht.graph.WeightedPseudograph;
  * Created by Jan on 24-5-2017.
  * Oversees 3 MinimalPathAgents
  */
-public class MinimalPathOverseer {
+public class MinimalPathOverseer
+{
 
     /**
      * The list of MinimalPathAgents this overseer controls. Currently designed
@@ -43,7 +44,7 @@ public class MinimalPathOverseer {
 
     /**
      * The complete floor the pursuit-evasion game is played out on.
-     * During pursuit, smaller subfloors will be created as areas are guarenteed
+     * During pursuit, smaller subfloors will be created as areas are guaranteed
      * wherein the evader cannot escape from
      */
     private Floor completeFloor;
@@ -70,7 +71,7 @@ public class MinimalPathOverseer {
     /**
      * Create MinimalPathOverseer, which creates 3 agents it will control
      *
-     * @param map the map the agents will play pursuit-evasion in
+     * @param map           the map the agents will play pursuit-evasion in
      * @param startLocation the startLocation of the first agent on the floor of the map
      */
     public MinimalPathOverseer(Map map, Vector2D startLocation)
@@ -98,12 +99,13 @@ public class MinimalPathOverseer {
             int radius = EngineConstants.AGENT_RADIUS;
             MinimalPathAgent agent;
             agents.add(agent =
-                    new MinimalPathAgent(map, this.completeFloor,
-                            startLocation.add(new Vector2D(i * (radius + 1), 0)),
-                            Direction.NORTH, radius, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE,
-                            this, i));
+                           new MinimalPathAgent(map, this.completeFloor,
+                                                startLocation.add(new Vector2D(i * (radius + 1), 0)),
+                                                Direction.NORTH, radius, EngineConstants.VISION_RANGE,
+                                                EngineConstants.VISION_ANGLE,
+                                                this, i));
 
-            if (i == 0)
+            if(i == 0)
             {
                 guardMap.put(agent, paths.get(0));
             }
@@ -160,7 +162,8 @@ public class MinimalPathOverseer {
      *
      * @return size 2 array holding the points
      */
-    private Vector2D[] getFurthestPoints() {
+    private Vector2D[] getFurthestPoints()
+    {
         Floor floor = this.completeFloor;
         Vector2D[] uv = new Vector2D[2];
         // iterate over all points
@@ -168,10 +171,13 @@ public class MinimalPathOverseer {
         // keep points with biggest distance
         double maxDistance = 0;
         Collection<Vector2D> vectors = floor.getPolygon().getPoints();
-        for(Vector2D u : vectors){
-            for(Vector2D v : vectors){
+        for(Vector2D u : vectors)
+        {
+            for(Vector2D v : vectors)
+            {
                 Double vectorDistance = u.distance(v);
-                if(vectorDistance > maxDistance){
+                if(vectorDistance > maxDistance)
+                {
                     uv[0] = u;
                     uv[1] = v;
                     maxDistance = vectorDistance;
@@ -182,28 +188,34 @@ public class MinimalPathOverseer {
     }
 
     // Assigns agents 1 and 2 to the first 2 minimal paths.
-    private void assignPaths(){
+    private void assignPaths()
+    {
         guardMap.put(agents.get(0), paths.get(0));
         guardMap.put(agents.get(1), paths.get(1));
     }
 
     // Registers an agent with the overseer
-    public int registerAgent(MinimalPathAgent agent){
-        if(agents.size() < 3){
+    public int registerAgent(MinimalPathAgent agent)
+    {
+        if(agents.size() < 3)
+        {
             agents.add(agent);
             guardMap.put(agent, null);
-            if(agents.size() == 3){
+            if(agents.size() == 3)
+            {
                 assignPaths();
             }
             return agents.size();
         }
-        else{
+        else
+        {
             throw new IllegalStateException("There are already 3 agents instantiated");
         }
     }
 
     // Checks whether an agent should be making a new request.
-    public boolean getShouldDoSomething(MinimalPathAgent agent){
+    public boolean getShouldDoSomething(MinimalPathAgent agent)
+    {
         // check whether the agent already has an assigned path.
     /*    GraphPath<Vector2D, DefaultWeightedEdge> path = guardMap.get(agent);
         if(path == null){
@@ -216,22 +228,37 @@ public class MinimalPathOverseer {
 
     int Counts = 0;
 
-    // Determines what request an agent should make.
-    public void getTask(MinimalPathAgent agent, AgentRequest request, MapInfo mapInfo){
+    /**
+     * Completes the request for a given agent
+     *
+     * @param agent the agent to complete the request for
+     * @param request the request to complete
+     * @param mapInfo the current state of the environment
+     */
+    void getTask(MinimalPathAgent agent, AgentRequest request, MapInfo mapInfo)
+    {
         // TODO Make agents guard their path for a minimum amount of iterations.
         GraphPath<Vector2D, DefaultWeightedEdge> path = guardMap.get(agent);
-        if(mapInfo.getAgentPoints().size() > 0){
+        if(path == null)
+        {
+            return;
+        }
+        if(mapInfo.getAgentPoints().size() > 0)
+        {
             Vector2D evader = mapInfo.getAgentPoints().get(0);
             if(agent.getAgentNumber() == 3){
                 Counts++;
                 if(Counts>300){
                     request.add(new WalkToTask(evader));
                 }
+            if(agent.getAgentNumber() == 3)
+            {
+                request.add(new WalkToTask(evader));
             }
-            if(path != null){
+            else
+            {
                 request.add(new MinimalPathGuardTask(path, evader));
             }
-
         }
     }
 
