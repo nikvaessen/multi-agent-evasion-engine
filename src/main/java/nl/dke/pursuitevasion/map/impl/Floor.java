@@ -69,7 +69,7 @@ public class Floor extends AbstractObject
      * and of the obstacles. Edges represents line-of-sight visibility between the two endpoints.
      * The weight is the distance between the two vertexes in the floor
      */
-    private WeightedGraph<Vector2D, DefaultWeightedEdge> visibilityGraph;
+    private SimpleWeightedGraph<Vector2D, DefaultWeightedEdge> visibilityGraph;
 
     /**
      * Create a floor object
@@ -191,13 +191,38 @@ public class Floor extends AbstractObject
     }
 
     /**
-     * Compute the visibility graph of this floor
+     * Get the visibility graph of the floor including a list of vertexes which should also be included into
+     * the graph
+     *
+     * @param additionalVertexes the list of vertexes which should also be included into the graph
+     * @return the visibility graph of the floor, where each vertex is a vertex of the polygon and
+     * also included the vertexes given. All edges mean there is visibility between the two vertexes
+     */
+    public WeightedGraph<Vector2D, DefaultWeightedEdge> getVisibilityGraph(List<Vector2D> additionalVertexes)
+    {
+        return computeVisibilityGraph(additionalVertexes);
+    }
 
+    /**
+     * Compute the visibility graph of this floor
+     *
      * @return the visibility graph
      */
-    private WeightedGraph<Vector2D, DefaultWeightedEdge> computeVisibilityGraph()
+    private SimpleWeightedGraph<Vector2D, DefaultWeightedEdge> computeVisibilityGraph()
     {
-        WeightedGraph<Vector2D, DefaultWeightedEdge> g
+        return this.computeVisibilityGraph(null);
+    }
+
+
+    /**
+     * Compute the visibility graph of this floor
+     *
+     * @param toInclude list of vertexes which should also be included into the vertex
+     * @return the visibility graph
+     */
+    private SimpleWeightedGraph<Vector2D, DefaultWeightedEdge> computeVisibilityGraph(List<Vector2D> toInclude)
+    {
+        SimpleWeightedGraph<Vector2D, DefaultWeightedEdge> g
                 = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
 
         // Get all subgraphs
@@ -214,7 +239,15 @@ public class Floor extends AbstractObject
             }
         }
 
-        //add the rest of the edges
+        // also include the extra vertexes
+        if(toInclude != null)
+        {
+            for (Vector2D v : toInclude) {
+                g.addVertex(v);
+            }
+        }
+
+        //add the edges
         Set<Vector2D> vertexes = g.vertexSet();
         for(Vector2D v : vertexes)
         {
@@ -290,6 +323,7 @@ public class Floor extends AbstractObject
         // case 1: They are both vertexes on a non-solid polygon (both vertexes of floor)
         //         Check for intersection with solid-polygons inside floor and non-solid
         //         polygon excluding lines with one endpoint being either vertex
+        //         If this is the case, there is no visibility
         if(bothInObject(this, u, v))
         {
             for(Line2D line: lines)
@@ -331,6 +365,10 @@ public class Floor extends AbstractObject
                 }
             }
         }
+
+        // case 5: The line connecting u and v is outside of the polygon
+
+
         return true;
     }
 

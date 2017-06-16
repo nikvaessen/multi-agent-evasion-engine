@@ -321,7 +321,7 @@ public class MinimalPathOverseer
     private void giveCatchTask(MinimalPathAgent agent, AgentRequest request, MapInfo mapInfo)
     {
         Vector2D evaderLocation = mapInfo.getAgentPoints().get(0);
-        request.add(new WalkToTask(evaderLocation));
+        request.add(new WalkToTask(evaderLocation, true));
     }
 
     /**
