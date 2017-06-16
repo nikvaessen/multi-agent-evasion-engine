@@ -224,6 +224,7 @@ public class Floor extends AbstractObject
                 boolean vertexesEqual = v.equals(u);
                 boolean edgeExists = g.getEdge(u, v) != null;
                 boolean vertexesLineOfSight = isLineOfSight(v, u, obstacles);
+                boolean edgeInsidePolygon = insidePolygon(v, u);
 
                 //log
                 if(logger.isTraceEnabled())
@@ -236,7 +237,7 @@ public class Floor extends AbstractObject
                 }
 
                 //add edge if vertexes not equal, edge doesn't exist, and there is line of sight between the vertexes
-                if(!vertexesEqual && !edgeExists && vertexesLineOfSight)
+                if(!vertexesEqual && !edgeExists && vertexesLineOfSight && edgeInsidePolygon)
                 {
                     DefaultWeightedEdge e = new DefaultWeightedEdge();
                     g.addEdge(v, u, e);
@@ -246,6 +247,11 @@ public class Floor extends AbstractObject
         }
 
         return g;
+    }
+
+    private boolean insidePolygon(Vector2D v, Vector2D u) {
+        Vector2D midPoint = v.add(u).scale(0.5);
+        return this.getPolygon().contains(midPoint);
     }
 
     /**

@@ -320,11 +320,23 @@ public class MinimalPathGuardTask extends AbstractAgentTask
         double ydiff = line.getY1() - line.getY2();
         double xdiff = line.getX1() - line.getX2();
         double linecoeff = ydiff / xdiff;
+
+        double intersectcoeff;
+        if(linecoeff == -0.0 || linecoeff == 0.0){
+            intersectcoeff = 100_000_000;
+        }
+        else if(Double.isInfinite(linecoeff)){
+            intersectcoeff = 0;
+            linecoeff = 100_000_000;
+        }
+        else{
+            intersectcoeff = -1/linecoeff;
+        }
+
         double b1 = line.getY1() - linecoeff * line.getX1();
 
-        double intersectcoeff = -1/linecoeff;
-        double b2 = point.getY() - intersectcoeff * point.getX();
 
+        double b2 = point.getY() - intersectcoeff * point.getX();
         double xIntersect = (b2 - b1) / (linecoeff - intersectcoeff);
         double yIntersect = linecoeff * xIntersect + b1;
 

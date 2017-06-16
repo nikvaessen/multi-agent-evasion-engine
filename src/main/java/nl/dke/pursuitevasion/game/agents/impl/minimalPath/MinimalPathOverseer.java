@@ -274,7 +274,7 @@ public class MinimalPathOverseer
                 }
                 else
                 {
-                    giveEvictTask(agent, request, mapInfo);
+                    //giveEvictTask(agent, request, mapInfo);
                 }
                 break;
             case THIRD_AGENT_CHASING:
@@ -284,7 +284,7 @@ public class MinimalPathOverseer
                 }
                 else
                 {
-                    giveCatchTask(agent, request, mapInfo);
+                    //giveCatchTask(agent, request, mapInfo);
                 }
                 break;
         }
@@ -333,7 +333,7 @@ public class MinimalPathOverseer
      */
     private void giveEvictTask(MinimalPathAgent agent, AgentRequest request, MapInfo mapInfo)
     {
-        //todo implement
+        //TODO implement
     }
 
     /**

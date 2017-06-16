@@ -428,7 +428,7 @@ public class Engine
 
         private boolean inside(AbstractObject o, Vector2D point)
         {
-            return o.inside(point);
+            return o.getPolygon().contains(point);
         }
 
         private void removeCaughtEvaders()

@@ -100,7 +100,7 @@ public class MapPolygon extends java.awt.Polygon
         {
             for (Line2D line : this.getLines())
             {
-                if (line.ptSegDist(p) == 0)
+                if (line.ptSegDist(p) < 0.001)
                 {
                     vInsideP = true;
                 }
