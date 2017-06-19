@@ -7,6 +7,7 @@ import nl.dke.pursuitevasion.game.agents.AgentRequest;
 import nl.dke.pursuitevasion.game.agents.Direction;
 import nl.dke.pursuitevasion.game.agents.tasks.MinimalPathGuardTask;
 import nl.dke.pursuitevasion.game.agents.tasks.WalkToTask;
+import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 
@@ -459,6 +460,68 @@ public class MinimalPathOverseer
         // recalculate the 3 shortest path and give the second shortest-path to agent 2
         this.paths = calculateMinimalPaths(this.visibilityGraph, 3, this.u, this.v);
         this.guardMap.put(this.getAgent(1), paths.get(1));
+    }
+
+    /**
+     * In any iteration of the minimal-path algorithm, the 1st shortest path divides a
+     * polygon up into two subPolygons. One of these subPolygons contains the evader.
+     * The polygon with the evader will be further divided by the 2nd shortest path in the
+     * evader subPolygon. This second path will also divide the subPolygon with the evader into
+     * two distinct polygons. One of these polygons will be bounded by the two paths, the other
+     * will be bounded by the second path and the polygon
+     *
+     * This method will be given the two subFloors created by dividing the subPolygon of the evader
+     * up into two smaller subFloors and will return 0 when the evader is inside the subPolygon which
+     * is bounded by one path and the polygon, 1 when bounded by 2 paths and this polygon is the
+     * first given and 2 when it's bounded by the 2 paths and is the second given
+     *
+     * @param subFloor1 the first floor created by the second path
+     * @param subFloor2 the second floor created by the second floor
+     * @param p1 the 1st shortest-path
+     * @param p2 the 2nd shortest-path
+     * @param evader the location of the evader
+     * @return 0 when evader is inside subfloor bounded by only 1 path,
+     * 1 when the evader is in the 1st given floor and this floor is bounded by both given paths
+     * 2 when the evader is in the 2nd given floor and this floor is bounded by both given paths
+     */
+    private int has2BoundingPaths(Floor subFloor1, Floor subFloor2, GraphPath<Vector2D, DefaultWeightedEdge> p1,
+                                  GraphPath<Vector2D, DefaultWeightedEdge> p2, Vector2D evader)
+    {
+        // the 3 important polygons
+        MapPolygon polygon1 = subFloor1.getPolygon();
+        MapPolygon polygon2 = subFloor2.getPolygon();
+        MapPolygon boundedPolygon = new MapPolygon();
+
+        // create the bounded polygon
+        LinkedList<Vector2D> vertexes = new LinkedList<>();
+        // first add the first path
+        vertexes.addAll(p1.getVertexList());
+        // then include the second path in reverse, without the start and end vertex
+        List<Vector2D> p2VertexList = p2.getVertexList();
+        for (int i = p2VertexList.size() - 2; i > 0; i--)
+        {
+            vertexes.add(p2VertexList.get(i));
+        }
+
+        // and create the MapPolygon
+        for (Vector2D v : vertexes)
+        {
+            boundedPolygon.addPoint(new Double(v.getX()).intValue(), new Double(v.getY()).intValue());
+        }
+
+        // check if any polygon equals the bounded polygon and if the evader is inside that polygon
+        if (polygon1.equals(boundedPolygon) && polygon1.contains(evader))
+        {
+            return 1;
+        }
+        else if (polygon2.equals(boundedPolygon) && polygon2.contains(evader))
+        {
+            return 2;
+        }
+        else
+        {
+            return 0;
+        }
     }
 
 }
