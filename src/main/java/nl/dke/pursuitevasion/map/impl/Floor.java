@@ -1114,8 +1114,46 @@ public class Floor extends AbstractObject
         return new Polygon(xpoints, ypoints, 3);
     }
 
-    public void isCompletelyInsidePolygon(Polygon triangle, ArrayList<Point> newPolygon, Line2D line){
-        Rectangle tri = triangle.getBounds();
+    public Point getIntersectionPoints(Line2D line1, Line2D line2){
+
+        if (line1.intersectsLine(line2)){
+
+            double x1 = line1.getX1();
+            double x2 = line1.getX2();
+            double y1 = line1.getY1();
+            double y2 = line1.getY2();
+
+            double x3 = line2.getX1();
+            double x4 = line2.getX2();
+            double y3 = line2.getY1();
+            double y4 = line2.getY2();
+
+            double a1 = (y2-y1)/(x2-x1);
+            double b1 = y1 - a1*x1;
+            double a2 = (y4-y3)/(x4-x3);
+            double b2 = y3 - a2*x3;
+
+            int x0 = (int) (-(b1-b2)/(a1-a2));
+
+//            double deltaX = (line2.getX2()-line2.getX1());
+//            double deltaY = (line2.getY2()-line2.getY1());
+//            double ratio = deltaY/deltaX;
+//            double b = line2.getY1() - (ratio*line2.getX1());
+
+            int y0 = (int) (a1*x0 + b1);
+
+            System.out.println("Intersection point: "+ new Point(x0, y0));
+
+            return new Point(x0, y0);
+        }
+        return null;
+    }
+
+    public boolean isMiddlePointInside(Line2D foundDiagonal, ArrayList<Point> newPolygon){
+        int middlePointX = (int) ((foundDiagonal.getX1()+foundDiagonal.getX2())/2);
+        int middlePointY = (int) ((foundDiagonal.getY1()+foundDiagonal.getY2())/2);
+        Point middlePoint = new Point(middlePointX, middlePointY);
+        System.out.println("Middle point: " + middlePoint);
 
         int[] xpoints = new int[newPolygon.size()];
         int[] ypoints = new int[newPolygon.size()];
@@ -1125,11 +1163,49 @@ public class Floor extends AbstractObject
         }
         Polygon p = new Polygon(xpoints, ypoints, newPolygon.size());
 
-        //        System.out.println("flo.contains(tri): "+flo.contains(tri));
-        System.out.println("p.contains(tri): "+p.contains(tri));
-        //System.out.println("p.contains(line): "+ p.con);
+        if(p.contains(middlePoint)){
+            return true;
+        }
+        return false;
 
-        // it's due to the definition of "inside" which (to oversimplify) includes the top and left edges, but excludes bottom and right edges
+
+    }
+
+    public ArrayList<Line2D> getPolygonLines(ArrayList<Point> polygon){
+        ArrayList<Line2D> linesOfPolygon = new ArrayList<>();
+        for(int j=0; j<polygon.size()-1;j++){
+            linesOfPolygon.add(new Line2D.Double(polygon.get(j), polygon.get(j+1)));
+        }
+        linesOfPolygon.add(new Line2D.Double(polygon.get(polygon.size()-1), polygon.get(0)));
+        return linesOfPolygon;
+    }
+
+    public boolean liesCompletelyInside(Point viminus, Point vi, Point viplus, ArrayList<Point> polygon,
+                                        ArrayList<Line2D> linesOfPolygon, ArrayList<Polygon> triangles){
+    Line2D diagonal = new Line2D.Double(viminus, viplus);
+        System.out.println();
+        System.out.println("Diagonal: " + diagonal.getP1() + "," + diagonal.getP2());
+        System.out.println("isMiddlePointInside: " + isMiddlePointInside(diagonal, polygon));
+        if (isMiddlePointInside(diagonal, polygon)){
+            //loop over the lines
+            ArrayList<Point> intersectionPoints = new ArrayList<>();
+            for(int j=0; j<linesOfPolygon.size(); j++) {
+                System.out.println("line from polygon: " + linesOfPolygon.get(j).getP1() + ","+linesOfPolygon.get(j).getP2());
+                intersectionPoints.add(getIntersectionPoints(diagonal, linesOfPolygon.get(j)));
+            }
+            boolean allIntersectionsAreCornerpoints = true;
+            for (int j=0; j< intersectionPoints.size(); j++){
+                for (int k=0; k<linesOfPolygon.size(); k++){
+                    if (!intersectionPoints.get(j).equals(linesOfPolygon.get(k))){
+                        allIntersectionsAreCornerpoints = false;
+                    }
+                }
+            }
+            if(allIntersectionsAreCornerpoints){
+                return true;
+            }
+        }
+        return false;
     }
 
     public ArrayList<Polygon> getTriangles(ArrayList<Point> polygon){
@@ -1144,82 +1220,73 @@ public class Floor extends AbstractObject
         Point vi = new Point();
         Point viplus = new Point();
 
+        ArrayList<Line2D> linesOfPolygon = getPolygonLines(polygon);
+
         while (polygon.size()>3){
-            for (int i=0; i<=polygon.size(); i++){
+            for (int i=0; i<polygon.size(); i++){
                 System.out.println("i: "+i);
                 if (i!=polygon.size() && i!=0){
                     viminus = new Point(polygon.get(i-1));
                     vi = new Point(polygon.get(i));
                     viplus = new Point(polygon.get(i+1));
 
-                    Polygon toBeAdded = createNewTriangle(viminus, vi, viplus);
+                    if (liesCompletelyInside(viminus, vi, viplus, polygon, linesOfPolygon, triangles)) {
+                        Polygon toBeAdded = createNewTriangle(viminus, vi, viplus);
+                        triangles.add(toBeAdded);
+                        polygon.remove(i);
+                    }
+
+
 
                     //if line between viminus and viplus lies COMPLETELY inside polygon, add the triangle...
                     System.out.println();
                     System.out.println(polygon.size());
-                    System.out.println("BOOLEAN:");
+                    System.out.println("BOOLEAN: " + liesCompletelyInside(viminus, vi, viplus, polygon, linesOfPolygon, triangles));
                     System.out.println("viminus: " + viminus.x + "," + viminus.y);
                     System.out.println("vi: " + vi.x + "," + vi.y);
                     System.out.println("viplus: " + viplus.x + "," + viplus.y);
-                    Line2D line = new Line2D.Double(viminus, viplus);
-                    isCompletelyInsidePolygon(toBeAdded, newSimplePolygon1, line);
 
 
-                    //adding
 
-                    triangles.add(toBeAdded);
-
-                    // remove middle part of triangle, so vi
-                    polygon.remove(i);
-
-                } else if (i==polygon.size()){
+                } else if (i==polygon.size()-1){
 
                     viminus = new Point(polygon.get(i-1));
                     vi = new Point(polygon.get(i));
                     viplus = new Point(polygon.get(0));
 
-                    Polygon toBeAdded = createNewTriangle(viminus, vi, viplus);
+                    if (liesCompletelyInside(viminus, vi, viplus, polygon, linesOfPolygon, triangles)) {
+                        Polygon toBeAdded = createNewTriangle(viminus, vi, viplus);
+                        triangles.add(toBeAdded);
+                        polygon.remove(i);
+                    }
 
                     //if line between viminus and viplus lies COMPLETELY inside polygon, add the triangle...
                     System.out.println();
                     System.out.println(polygon.size());
-                    System.out.println("BOOLEAN:");
+                    System.out.println("BOOLEAN: " + liesCompletelyInside(viminus, vi, viplus, polygon, linesOfPolygon, triangles));
                     System.out.println("viminus: " + viminus.x + "," + viminus.y);
                     System.out.println("vi: " + vi.x + "," + vi.y);
                     System.out.println("viplus: " + viplus.x + "," + viplus.y);
-                    Line2D line = new Line2D.Double(viminus, viplus);
-                    isCompletelyInsidePolygon(toBeAdded, newSimplePolygon1, line);
 
-                    //adding
-
-                    triangles.add(toBeAdded);
-
-                    // remove middle part of triangel, so vi
-                    polygon.remove(i);
 
                 } else {
                     viminus = new Point(polygon.get(polygon.size()-1));
                     vi = new Point(polygon.get(i));
                     viplus = new Point(polygon.get(i+1));
 
-                    Polygon toBeAdded = createNewTriangle(viminus, vi, viplus);
-
+                    if (liesCompletelyInside(viminus, vi, viplus, polygon, linesOfPolygon, triangles)) {
+                        Polygon toBeAdded = createNewTriangle(viminus, vi, viplus);
+                        triangles.add(toBeAdded);
+                        polygon.remove(i);
+                    }
                     //if line between viminus and viplus lies COMPLETELY inside polygon, add the triangle...
                     System.out.println();
                     System.out.println(polygon.size());
-                    System.out.println("BOOLEAN:");
+                    System.out.println("BOOLEAN: " + liesCompletelyInside(viminus, vi, viplus, polygon, linesOfPolygon, triangles));
                     System.out.println("viminus: " + viminus.x + "," + viminus.y);
                     System.out.println("vi: " + vi.x + "," + vi.y);
                     System.out.println("viplus: " + viplus.x + "," + viplus.y);
-                    Line2D line = new Line2D.Double(viminus, viplus);
-                    isCompletelyInsidePolygon(toBeAdded, newSimplePolygon1, line);
 
-                    //adding
-
-                    triangles.add(toBeAdded);
-
-                    // remove middle part of triangel, so vi
-                    polygon.remove(i);
                 }
             }
         }
