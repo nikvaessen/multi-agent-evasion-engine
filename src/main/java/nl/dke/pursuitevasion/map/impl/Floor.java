@@ -1142,9 +1142,16 @@ public class Floor extends AbstractObject
 
             int y0 = (int) (a1*x0 + b1);
 
-            System.out.println("Intersection point: "+ new Point(x0, y0));
+            double d = (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4);
+            if (d == 0) return null;
 
-            return new Point(x0, y0);
+            int xi = (int) (((x3-x4)*(x1*y2-y1*x2)-(x1-x2)*(x3*y4-y3*x4))/d);
+            int yi = (int) (((y3-y4)*(x1*y2-y1*x2)-(y1-y2)*(x3*y4-y3*x4))/d);
+
+
+            System.out.println("Intersection point: "+ new Point(xi, yi));
+
+            return new Point(xi, yi);
         }
         return null;
     }
@@ -1190,13 +1197,18 @@ public class Floor extends AbstractObject
             //loop over the lines
             ArrayList<Point> intersectionPoints = new ArrayList<>();
             for(int j=0; j<linesOfPolygon.size(); j++) {
-                System.out.println("line from polygon: " + linesOfPolygon.get(j).getP1() + ","+linesOfPolygon.get(j).getP2());
-                intersectionPoints.add(getIntersectionPoints(diagonal, linesOfPolygon.get(j)));
+                Point intersection = getIntersectionPoints(diagonal, linesOfPolygon.get(j));
+                if (intersection!=null){
+                    intersectionPoints.add(intersection);
+                }
             }
             boolean allIntersectionsAreCornerpoints = true;
             for (int j=0; j< intersectionPoints.size(); j++){
                 for (int k=0; k<linesOfPolygon.size(); k++){
-                    if (!intersectionPoints.get(j).equals(linesOfPolygon.get(k))){
+                    System.out.println("equal boolean: " + !intersectionPoints.get(j).equals(linesOfPolygon.get(k)));
+                    System.out.println("intersectionPoints.get(j): " + intersectionPoints.get(j));
+                    System.out.println("linesOfPolygon.get(k): "+linesOfPolygon.get(k).getP1() +"," + linesOfPolygon.get(k).getP2());
+                    if (!intersectionPoints.get(j).equals(linesOfPolygon.get(k).getP1()) || !intersectionPoints.get(j).equals(linesOfPolygon.get(k).getP2())){
                         allIntersectionsAreCornerpoints = false;
                     }
                 }
