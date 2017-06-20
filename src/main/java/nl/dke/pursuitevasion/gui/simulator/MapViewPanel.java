@@ -157,6 +157,9 @@ public class MapViewPanel
         }
         if(minimalPathOverseer != null)
         {
+            g.setColor(Color.RED);
+            g.drawPolygon(minimalPathOverseer.Pe.getPolygon());
+
             g.setColor(Color.GREEN);
             ((Graphics2D) g).setStroke(new BasicStroke());
             Collection<GraphPath<Vector2D, DefaultWeightedEdge>> paths = minimalPathOverseer.getPaths();
@@ -166,14 +169,16 @@ public class MapViewPanel
 
                 for(GraphPath<Vector2D, DefaultWeightedEdge> path : paths)
                 {
-                    List<Vector2D> points = path.getVertexList();
-                    Vector2D lastPoint = points.get(0);
-                    for(int i = 1; i < points.size(); i++)
-                    {
-                        Vector2D newPoint = points.get(i);
-                        g.drawLine((int) Math.round(lastPoint.getX()), (int) Math.round(lastPoint.getY()),
-                                   (int) Math.round(newPoint.getX()), (int) Math.round(newPoint.getY()));
-                        lastPoint = newPoint;
+                    if(path != null){
+                        List<Vector2D> points = path.getVertexList();
+                        Vector2D lastPoint = points.get(0);
+                        for(int i = 1; i < points.size(); i++)
+                        {
+                            Vector2D newPoint = points.get(i);
+                            g.drawLine((int) Math.round(lastPoint.getX()), (int) Math.round(lastPoint.getY()),
+                                    (int) Math.round(newPoint.getX()), (int) Math.round(newPoint.getY()));
+                            lastPoint = newPoint;
+                        }
                     }
                 }
             }

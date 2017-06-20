@@ -4,6 +4,8 @@ import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.map.AbstractObject;
 import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.builders.MapBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -24,6 +26,8 @@ import java.util.Collections;
  */
 public class Map implements Serializable
 {
+    private static Logger logger = LoggerFactory.getLogger(Map.class);
+
     /**
      * Every map needs a name
      */
@@ -190,6 +194,39 @@ public class Map implements Serializable
 
     }
 
+    public static Map getTestMap(){
+        MapBuilder bob = MapBuilder.create();
+        MapPolygon p = new MapPolygon(
+                new int[]{2, 466, 462, 9},
+                new int[]{5, 6, 386, 380},
+                4, false);
+        return bob.makeFloor(p)
+                .addObstacle(
+                        new MapPolygon(
+                                new int[]{132, 228, 141},
+                                new int[]{70, 85, 160},
+                                3, true)
+                )
+                .addObstacle(
+                        new MapPolygon(
+                                new int[]{372,413,421,428,411,398},
+                                new int[]{60,59,105,165,173,171},
+                                6, true)
+                )
+                .addObstacle(
+                        new MapPolygon(
+                                new int[]{319, 349, 221, 238},
+                                new int[]{133, 303, 326, 248},
+                                4, true)
+                )
+                .addObstacle(
+                        new MapPolygon(
+                                new int[]{78, 134, 115, 91, 76},
+                                new int[]{248, 295, 330, 333, 314},
+                                5, true)
+                ).finish().build();
+    }
+
     public static Map getMap(String path) {
 
         try {
@@ -199,6 +236,9 @@ public class Map implements Serializable
             return m;
         }
         catch (IOException | ClassNotFoundException e){
+            if(logger.isErrorEnabled()){
+                logger.error("Error loading map: {}", e);
+            }
             MapPolygon mainFloor = new MapPolygon(
                     new int[] {   0, 600, 600,   0},
                     new int[] {   0,   0, 600, 600},

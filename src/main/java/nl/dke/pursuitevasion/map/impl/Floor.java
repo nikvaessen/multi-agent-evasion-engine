@@ -445,7 +445,7 @@ public class Floor extends AbstractObject
         }
 
         ArrayList<Vector2D> walk1 = constructWalkFromUToV(mainPolygonGraphNeighbourList, u, v, new ArrayList<>());
-        ArrayList<Vector2D> walk2 = constructWalkFromUToV(mainPolygonGraphNeighbourList, u, v, walk1);
+        ArrayList<Vector2D> walk2 = constructWalkFromUToV(mainPolygonGraphNeighbourList, u, v, new ArrayList<>(walk1));
 
         // Step 2: add the path to both sP1 and sP2
         List<Vector2D> reversedPath = path.getVertexList();
@@ -545,6 +545,7 @@ public class Floor extends AbstractObject
             }
 
             previousVertexes.add(neighbor);
+            notAllowed.add(u);
             return constructWalkFromUToV(neighborIndex, neighbor, v, notAllowed, previousVertexes);
         }
     }

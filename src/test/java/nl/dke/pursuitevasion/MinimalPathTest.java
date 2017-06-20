@@ -25,11 +25,7 @@ public class MinimalPathTest {
 
     public static void main(String[] args) {
         // do init stuff
-//        Map map = Map.getMap("MinPathTest.ser");
-        Map map = Map.getSimpleMap();
-        //Map map = Map.getMap("simpleMap.ser");
-        //Map map = Map.getMap("NikMap.ser");
-        //Map map = Map.getMap("newMap.ser");
+        Map map = Map.getTestMap();
         ArrayList<AbstractAgent> agents = new ArrayList<>();
         JFrame frame = new JFrame();
         Floor floor = map.getFloors().iterator().next();
@@ -38,14 +34,14 @@ public class MinimalPathTest {
         KeyboardInputListener l = new KeyboardInputListener();
         frame.addKeyListener(l);
 
-        MinimalPathOverseer overseer = new MinimalPathOverseer(map, new Vector2D(10, 10));
+        MinimalPathOverseer overseer = new MinimalPathOverseer(map, new Vector2D(50, 50));
         panel.setMinimalPathOverseer(overseer);
         for(int i = 0 ; i < overseer.getAmountOfAgents(); i++)
         {
             agents.add(overseer.getAgent(i));
         }
         //agents.add(new RandomAgent(map, floor, new Vector2D(200.0, 100.0), Direction.NORTH, 5, 100, 120));
-        agents.add(new UserAgent(map, floor, new Vector2D(200.0, 500.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE,  EngineConstants.VISION_ANGLE, l, true));
+        agents.add(new UserAgent(map, floor, new Vector2D(200.0, 320.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE,  EngineConstants.VISION_ANGLE, l, true));
 
         Engine simulationEngine = new Engine(map, agents, panel, 60);
 

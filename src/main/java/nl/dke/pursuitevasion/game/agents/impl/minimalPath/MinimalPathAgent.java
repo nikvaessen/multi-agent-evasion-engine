@@ -76,4 +76,5 @@ public class MinimalPathAgent extends AbstractAgent{
     {
         this.projectionLocation = projectionLocation;
     }
+
 }

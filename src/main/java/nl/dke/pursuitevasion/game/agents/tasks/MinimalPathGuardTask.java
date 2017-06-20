@@ -6,13 +6,17 @@ import nl.dke.pursuitevasion.game.agents.AgentCommand;
 import nl.dke.pursuitevasion.game.agents.impl.minimalPath.MinimalPathAgent;
 import nl.dke.pursuitevasion.game.agents.impl.minimalPath.MinimalPathAgentState;
 
+import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.interfaces.KShortestPathAlgorithm;
 import org.jgrapht.alg.shortestpath.KShortestPaths;
 import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleWeightedGraph;
+import org.jgrapht.graph.Subgraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.annotation.XmlType;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -31,6 +35,9 @@ public class MinimalPathGuardTask extends AbstractAgentTask
 
     public MinimalPathGuardTask(GraphPath<Vector2D, DefaultWeightedEdge> path, Vector2D location)
     {
+        if(path == null){
+            throw new NullPointerException("path is null");
+        }
         this.path = path;
         this.evaderLocation = location;
     }
@@ -38,16 +45,17 @@ public class MinimalPathGuardTask extends AbstractAgentTask
     @Override
     protected AgentCommand computeAgentCommand(AbstractAgent agent, double maxDistance, double maxRotation)
     {
+        int agentNumber = ((MinimalPathAgent)agent).getAgentNumber();
         // check if we are on the path
         if(onPath(agent, path))
         {
-            logger.trace("Moving to projection");
+            logger.debug("Agent {} moving to projection", agentNumber);
             // if we are -> move to projection of evader on path
             return moveToProjection(agent, maxDistance, maxRotation);
         }
         else
         {
-            logger.trace("Moving to closest point on path");
+            logger.debug("Agent {} moving to closest point on path", agentNumber);
             ((MinimalPathAgent) agent).setState(MinimalPathAgentState.MOVING_TO_PATH);
             // if we are not -> move to closest point on path
             return moveToClosestPointOnPath(agent, maxDistance, maxRotation);
@@ -61,7 +69,7 @@ public class MinimalPathGuardTask extends AbstractAgentTask
         Vector2D closestVertex = closestPathVertex(agentLocation);
         Line2D closestSegment = closestLineSegment(closestVertex, agentLocation, agent);
         Vector2D destination = getClosestPointOnSegment(closestSegment, agentLocation);
-        return new WalkToTask(destination).computeAgentCommand(agent, maxDistance, maxRotation);
+        return new WalkToTask(destination, true).computeAgentCommand(agent, maxDistance, maxRotation);
     }
 
     private AgentCommand moveToClosestPathVertex(AbstractAgent agent, double maxDistance, double maxRotation)
@@ -88,6 +96,9 @@ public class MinimalPathGuardTask extends AbstractAgentTask
                 // Else set it to MOVE_TO_PROJECTION
                 ((MinimalPathAgent)agent).setState(MinimalPathAgentState.MOVING_TO_PROJECTION);
             }
+            if(e.equals(agent.getLocation())){
+                return new AgentCommand(agent, agent.getLocation());
+            }
             return moveToProjectionLocation(agent, e, maxDistance, maxRotation);
         }
         else
@@ -106,11 +117,14 @@ public class MinimalPathGuardTask extends AbstractAgentTask
             return startVertex;
         }
         // get Path from closest node to the node closest to the evader
-        KShortestPathAlgorithm<Vector2D, DefaultWeightedEdge> k = new KShortestPaths<>(path.getGraph(), 1);
+        // prune the original graph to only have the path edges
+
+        Graph<Vector2D, DefaultWeightedEdge> pathGraph = createPathGraph(path);
+        KShortestPathAlgorithm<Vector2D, DefaultWeightedEdge> k = new KShortestPaths<>(pathGraph, 1);
         GraphPath<Vector2D, DefaultWeightedEdge> subPath = k.getPaths(startVertex, evaderVertex).get(0);
         // check if we are already on the path
         if(onPath(agent, subPath)) {
-            // if we are -> find the targetVertex of the edge we are on
+            // if we are -> find the target Vertex of the edge we are on
             Line2D edge = closestPathEdge(subPath, agent.getLocation());
             Vector2D target = Vector2D.fromPoint2D(edge.getP2());
             return target;
@@ -121,10 +135,25 @@ public class MinimalPathGuardTask extends AbstractAgentTask
         }
     }
 
+    private Graph<Vector2D, DefaultWeightedEdge> createPathGraph(GraphPath<Vector2D, DefaultWeightedEdge> path) {
+        Graph<Vector2D, DefaultWeightedEdge> pathGraph = path.getGraph();
+        SimpleWeightedGraph<Vector2D, DefaultWeightedEdge> g = new SimpleWeightedGraph<Vector2D, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+        // Add all vertexes to the graph
+        for (Vector2D vertex : path.getVertexList()) {
+            g.addVertex(vertex);
+        }
+        // Add all the edges to the graph
+        for (DefaultWeightedEdge edge : path.getEdgeList()) {
+            g.addEdge(pathGraph.getEdgeSource(edge), pathGraph.getEdgeTarget(edge),edge);
+        }
+        return g;
+    }
+
     private AgentCommand moveToProjectionLocation(AbstractAgent agent, Vector2D e, double maxDistance,
                                                   double maxRotation)
     {
-        WalkToTask t = new WalkToTask(e);
+
+        WalkToTask t = new WalkToTask(e, true);
         return t.computeAgentCommand(agent, maxDistance, maxRotation);
     }
 

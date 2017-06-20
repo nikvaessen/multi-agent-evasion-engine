@@ -7,8 +7,8 @@ import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
+import java.util.List;
 
 /**
  * Created by nik on 26/02/17.
@@ -36,6 +36,10 @@ public class MapPolygon extends java.awt.Polygon
     public boolean isSolid()
     {
         return solid;
+    }
+
+    public void addPoint(Vector2D point){
+        addPoint((int)Math.round(point.getX()), (int)Math.round(point.getY()));
     }
 
     public Collection<Vector2D> getPoints(){
@@ -134,5 +138,22 @@ public class MapPolygon extends java.awt.Polygon
         builder.deleteCharAt(builder.lastIndexOf(","));
         builder.append("]");
         return builder.toString();
+    }
+
+    public double getArea()
+    {
+
+        List<Vector2D> polygon = new ArrayList<Vector2D>(getPoints());
+        int N = polygon.size();
+        int i,j;
+        double area = 0;
+        for (i=0;i < N;i++)
+        {
+            j = (i + 1) % N;
+            area += polygon.get(i).getX() * polygon.get(j).getY();
+            area -= polygon.get(i).getY() * polygon.get(j).getX();
+        }
+        area /= 2;
+        return(area < 0 ? -area : area);
     }
 }

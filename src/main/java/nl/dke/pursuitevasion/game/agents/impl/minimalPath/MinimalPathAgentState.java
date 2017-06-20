@@ -7,5 +7,6 @@ public enum MinimalPathAgentState {
     NO_PATH,
     MOVING_TO_PATH,
     MOVING_TO_PROJECTION,
-    ON_PROJECTION
+    ON_PROJECTION,
+    CHASING
 }
