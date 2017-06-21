@@ -257,8 +257,6 @@ public class Floor extends AbstractObject
                 boolean vertexesEqual = v.equals(u);
                 boolean edgeExists = g.getEdge(u, v) != null;
                 boolean vertexesLineOfSight = isLineOfSight(v, u, obstacles);
-                boolean edgeInsidePolygon = insidePolygon(this.getPolygon(),
-                        v, u);
 
                 //log
                 if(logger.isTraceEnabled())
@@ -272,8 +270,7 @@ public class Floor extends AbstractObject
 
                 //add edge if vertexes not equal, edge doesn't exist,
                 // and there is line of sight between the vertexes
-                if(!vertexesEqual && !edgeExists && vertexesLineOfSight
-                        && edgeInsidePolygon)
+                if(!vertexesEqual && !edgeExists && vertexesLineOfSight)
                 {
                     DefaultWeightedEdge e = new DefaultWeightedEdge();
                     g.addEdge(v, u, e);
@@ -358,7 +355,7 @@ public class Floor extends AbstractObject
         //         that is checked in step 1
         for(Obstacle o : obstacles)
         {
-            if(bothInObject(o, u, v) && !insidePolygon(o.getPolygon(), u, v))
+            if(bothInObject(o, u, v) && insidePolygon(o.getPolygon(), u, v))
             {
                 return false;
             }
@@ -381,8 +378,15 @@ public class Floor extends AbstractObject
         }
 
         // case 5: The line connecting u and v is outside of the polygon
-
-        return true;
+        boolean edgeInsidePolygon = insidePolygon(this.getPolygon(), v, u);
+        if(edgeInsidePolygon)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     /**
