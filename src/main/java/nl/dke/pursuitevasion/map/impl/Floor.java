@@ -577,11 +577,13 @@ public class Floor extends AbstractObject
     private MapPolygon createMapPolygon(ArrayList<Vector2D> vertexes, boolean solid)
     {
         MapPolygon p = new MapPolygon();
+        vertexes.removeIf(v -> Collections.frequency(vertexes, v) > 1);
         for(Vector2D v : vertexes)
         {
-            p.addPoint(new Double(v.getX()).intValue(), new Double(v.getY()).intValue());
+            p.addPoint(new Double(v.getX()).intValue(),
+                       new Double(v.getY()).intValue());
         }
-        return p;
+        return new MapPolygon(p, solid);
     }
 
     /**
