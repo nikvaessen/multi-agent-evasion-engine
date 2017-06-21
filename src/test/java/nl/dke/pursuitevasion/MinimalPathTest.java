@@ -43,7 +43,7 @@ public class MinimalPathTest {
         agents.add(new MinimalPathAgent(map, floor, new Vector2D(75.0,50.0), Direction.NORTH, 5, 100000, 360));
         agents.add(new MinimalPathAgent(map, floor, new Vector2D(25.0,50.0), Direction.NORTH, 5, 100000, 360));
         //agents.add(new RandomAgent(map, floor, new Vector2D(200.0, 100.0), Direction.NORTH, 5, 100, 120));
-        agents.add(new UserAgent(map, floor, new Vector2D(200.0, 30.0), Direction.NORTH, 5, 100, 120, l, true));
+        agents.add(new UserAgent(map, floor, new Vector2D(500.0, 130.0), Direction.NORTH, 5, 100, 120, l, true));
 
         Engine simulationEngine = new Engine(map, agents, panel, 60);
 
