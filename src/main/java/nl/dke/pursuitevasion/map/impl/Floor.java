@@ -30,6 +30,7 @@ public class Floor extends AbstractObject
 
     public ArrayList<Point> newSimplePolygon1 = new ArrayList<>();
     public ArrayList<Point> newSimplePolygon2 = new ArrayList<>();
+    public ArrayList<Polygon> trianglesToDraw = new ArrayList<>();
 
     /**
      * The logger of this class
@@ -735,7 +736,21 @@ public class Floor extends AbstractObject
         polygon1 = findLastPartOfFloor(floorVertices, firstConnection1, secondConnection1, conns, polygon1);
         newSimplePolygon1=polygon1;
 
-        triangles = getTriangles(newSimplePolygon1);
+        ArrayList<Point> toBeTriangulatedPolygon = newSimplePolygon1;
+
+        triangles = getTriangles(toBeTriangulatedPolygon);
+
+        trianglesToDraw = getTriangles(toBeTriangulatedPolygon);
+
+        System.out.println();
+        System.out.println("TrianglesToDraw");
+        for (Polygon p: trianglesToDraw){
+            System.out.println("triangle:");
+            for (int i=0; i<p.xpoints.length; i++){
+                System.out.println(p.xpoints[i]);
+                System.out.println(p.ypoints[i]);
+            }
+        }
 /*
         System.out.println();
         System.out.println("Polygon 2");
@@ -1133,14 +1148,9 @@ public class Floor extends AbstractObject
             double a2 = (y4-y3)/(x4-x3);
             double b2 = y3 - a2*x3;
 
-            int x0 = (int) (-(b1-b2)/(a1-a2));
-
-//            double deltaX = (line2.getX2()-line2.getX1());
-//            double deltaY = (line2.getY2()-line2.getY1());
-//            double ratio = deltaY/deltaX;
-//            double b = line2.getY1() - (ratio*line2.getX1());
-
-            int y0 = (int) (a1*x0 + b1);
+            if (a1==0 && a2==0){
+                return null;
+            }
 
             double d = (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4);
             if (d == 0) return null;
@@ -1190,7 +1200,6 @@ public class Floor extends AbstractObject
     public boolean liesCompletelyInside(Point viminus, Point vi, Point viplus, ArrayList<Point> polygon,
                                         ArrayList<Line2D> linesOfPolygon, ArrayList<Polygon> triangles){
     Line2D diagonal = new Line2D.Double(viminus, viplus);
-        System.out.println();
         System.out.println("Diagonal: " + diagonal.getP1() + "," + diagonal.getP2());
         System.out.println("isMiddlePointInside: " + isMiddlePointInside(diagonal, polygon));
         if (isMiddlePointInside(diagonal, polygon)){
@@ -1202,20 +1211,23 @@ public class Floor extends AbstractObject
                     intersectionPoints.add(intersection);
                 }
             }
-            boolean allIntersectionsAreCornerpoints = true;
+            ArrayList<Boolean> allIntersectionsAreCornerpoints = new ArrayList<>();
+//            boolean allIntersectionsAreCornerpoints = false;
             for (int j=0; j< intersectionPoints.size(); j++){
-                for (int k=0; k<linesOfPolygon.size(); k++){
-                    System.out.println("equal boolean: " + !intersectionPoints.get(j).equals(linesOfPolygon.get(k)));
-                    System.out.println("intersectionPoints.get(j): " + intersectionPoints.get(j));
-                    System.out.println("linesOfPolygon.get(k): "+linesOfPolygon.get(k).getP1() +"," + linesOfPolygon.get(k).getP2());
-                    if (!intersectionPoints.get(j).equals(linesOfPolygon.get(k).getP1()) || !intersectionPoints.get(j).equals(linesOfPolygon.get(k).getP2())){
-                        allIntersectionsAreCornerpoints = false;
+                for (int k=0; k<polygon.size(); k++){
+
+                    if ( (intersectionPoints.get(j).x == polygon.get(k).x) && (intersectionPoints.get(j).y == polygon.get(k).y))
+                    {
+                        allIntersectionsAreCornerpoints.add(new Boolean(true));
                     }
                 }
             }
-            if(allIntersectionsAreCornerpoints){
-                return true;
+            for (Boolean b: allIntersectionsAreCornerpoints){
+                if (b.booleanValue() == false){
+                    return false;
+                }
             }
+            return true;
         }
         return false;
     }
@@ -1235,15 +1247,21 @@ public class Floor extends AbstractObject
         ArrayList<Line2D> linesOfPolygon = getPolygonLines(polygon);
 
         while (polygon.size()>3){
-            for (int i=0; i<polygon.size(); i++){
+            for (int i=0; i<polygon.size()-1; i++){
+                System.out.println();
                 System.out.println("i: "+i);
                 if (i!=polygon.size() && i!=0){
                     viminus = new Point(polygon.get(i-1));
                     vi = new Point(polygon.get(i));
                     viplus = new Point(polygon.get(i+1));
 
-                    if (liesCompletelyInside(viminus, vi, viplus, polygon, linesOfPolygon, triangles)) {
+                    boolean liesInside = liesCompletelyInside(viminus, vi, viplus, polygon, linesOfPolygon, triangles);
+                    if (liesInside) {
                         Polygon toBeAdded = createNewTriangle(viminus, vi, viplus);
+                        System.out.println("POLYGON toBeAdded");
+                        for(int l=0; l<toBeAdded.xpoints.length; l++){
+                            System.out.println(toBeAdded.xpoints[l]+","+toBeAdded.ypoints[l]);
+                        }
                         triangles.add(toBeAdded);
                         polygon.remove(i);
                     }
@@ -1251,9 +1269,8 @@ public class Floor extends AbstractObject
 
 
                     //if line between viminus and viplus lies COMPLETELY inside polygon, add the triangle...
-                    System.out.println();
                     System.out.println(polygon.size());
-                    System.out.println("BOOLEAN: " + liesCompletelyInside(viminus, vi, viplus, polygon, linesOfPolygon, triangles));
+                    System.out.println("BOOLEAN: " + liesInside);
                     System.out.println("viminus: " + viminus.x + "," + viminus.y);
                     System.out.println("vi: " + vi.x + "," + vi.y);
                     System.out.println("viplus: " + viplus.x + "," + viplus.y);
@@ -1265,17 +1282,16 @@ public class Floor extends AbstractObject
                     viminus = new Point(polygon.get(i-1));
                     vi = new Point(polygon.get(i));
                     viplus = new Point(polygon.get(0));
-
-                    if (liesCompletelyInside(viminus, vi, viplus, polygon, linesOfPolygon, triangles)) {
+                    boolean liesInside = liesCompletelyInside(viminus, vi, viplus, polygon, linesOfPolygon, triangles);
+                    if (liesInside) {
                         Polygon toBeAdded = createNewTriangle(viminus, vi, viplus);
                         triangles.add(toBeAdded);
                         polygon.remove(i);
                     }
 
                     //if line between viminus and viplus lies COMPLETELY inside polygon, add the triangle...
-                    System.out.println();
                     System.out.println(polygon.size());
-                    System.out.println("BOOLEAN: " + liesCompletelyInside(viminus, vi, viplus, polygon, linesOfPolygon, triangles));
+                    System.out.println("BOOLEAN: " + liesInside);
                     System.out.println("viminus: " + viminus.x + "," + viminus.y);
                     System.out.println("vi: " + vi.x + "," + vi.y);
                     System.out.println("viplus: " + viplus.x + "," + viplus.y);
@@ -1286,15 +1302,15 @@ public class Floor extends AbstractObject
                     vi = new Point(polygon.get(i));
                     viplus = new Point(polygon.get(i+1));
 
-                    if (liesCompletelyInside(viminus, vi, viplus, polygon, linesOfPolygon, triangles)) {
+                    boolean liesInside = liesCompletelyInside(viminus, vi, viplus, polygon, linesOfPolygon, triangles);
+                    if (liesInside) {
                         Polygon toBeAdded = createNewTriangle(viminus, vi, viplus);
                         triangles.add(toBeAdded);
                         polygon.remove(i);
                     }
                     //if line between viminus and viplus lies COMPLETELY inside polygon, add the triangle...
-                    System.out.println();
                     System.out.println(polygon.size());
-                    System.out.println("BOOLEAN: " + liesCompletelyInside(viminus, vi, viplus, polygon, linesOfPolygon, triangles));
+                    System.out.println("BOOLEAN: " + liesInside);
                     System.out.println("viminus: " + viminus.x + "," + viminus.y);
                     System.out.println("vi: " + vi.x + "," + vi.y);
                     System.out.println("viplus: " + viplus.x + "," + viplus.y);
@@ -1302,6 +1318,21 @@ public class Floor extends AbstractObject
                 }
             }
         }
+        Polygon remainingPolygon = createNewTriangle(polygon.get(0), polygon.get(1), polygon.get(2));
+        triangles.add(remainingPolygon);
+        polygon=null;
+        System.out.println("FINAL triangles");
+        for (int i=0; i<triangles.size(); i++){
+            System.out.println("triangle: "+ i);
+            Polygon p = triangles.get(i);
+            for (int j=0; j<triangles.get(i).xpoints.length; j++){
+                int x = p.xpoints[j];
+                int y = p.ypoints[j];
+                System.out.println(x+","+y);
+            }
+        }
+
+
         return triangles;
     }
 }

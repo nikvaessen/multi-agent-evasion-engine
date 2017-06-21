@@ -224,6 +224,16 @@ public class MapViewPanel
             g.drawLine(polygonPoints1.get(i).x, polygonPoints1.get(i).y,
                     polygonPoints1.get(i+1).x, polygonPoints1.get(i+1).y);
         }
+        g.drawLine(polygonPoints1.get(polygonPoints1.size()-1).x, polygonPoints1.get(polygonPoints1.size()-1).y,
+                polygonPoints1.get(0).x, polygonPoints1.get(0).y);
+
+        //draw triangles
+        ((Graphics2D) g).setStroke(new BasicStroke(2));
+        ArrayList<Polygon> triangles = floor.trianglesToDraw;
+        g.setColor(Color.blue);
+        for(Polygon p: triangles){
+            g.drawPolygon(p);
+        }
 
     }
 
