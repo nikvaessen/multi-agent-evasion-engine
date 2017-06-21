@@ -257,7 +257,8 @@ public class Floor extends AbstractObject
                 boolean vertexesEqual = v.equals(u);
                 boolean edgeExists = g.getEdge(u, v) != null;
                 boolean vertexesLineOfSight = isLineOfSight(v, u, obstacles);
-                boolean edgeInsidePolygon = insidePolygon(v, u);
+                boolean edgeInsidePolygon = insidePolygon(this.getPolygon(),
+                        v, u);
 
                 //log
                 if(logger.isTraceEnabled())
@@ -269,8 +270,10 @@ public class Floor extends AbstractObject
                                  vertexesLineOfSight);
                 }
 
-                //add edge if vertexes not equal, edge doesn't exist, and there is line of sight between the vertexes
-                if(!vertexesEqual && !edgeExists && vertexesLineOfSight && edgeInsidePolygon)
+                //add edge if vertexes not equal, edge doesn't exist,
+                // and there is line of sight between the vertexes
+                if(!vertexesEqual && !edgeExists && vertexesLineOfSight
+                        && edgeInsidePolygon)
                 {
                     DefaultWeightedEdge e = new DefaultWeightedEdge();
                     g.addEdge(v, u, e);
@@ -282,9 +285,20 @@ public class Floor extends AbstractObject
         return g;
     }
 
-    private boolean insidePolygon(Vector2D v, Vector2D u) {
+    /**
+     * Check whether the mid point of the line between u and v
+     * is inside the given polygon p
+     *
+     * @param p the polygon
+     * @param v a location v, the start point of the line
+     * @param u another location, the end point of the line
+     * @return true when the midpoint of the line between u and v
+     *         is inside the given polygon, false otherwise
+     */
+    private boolean insidePolygon(MapPolygon p, Vector2D v, Vector2D u)
+    {
         Vector2D midPoint = v.add(u).scale(0.5);
-        return this.getPolygon().contains(midPoint);
+        return p.contains(midPoint);
     }
 
     /**
@@ -320,7 +334,7 @@ public class Floor extends AbstractObject
                 new Point2D.Double(u.getX(), u.getY()));
 
         // Knowing that they are not neighbours:
-        // case 1: They are both vertexes on a non-solid polygon (both vertexes of floor)
+        // cas@e 1: They are both vertexes on a non-solid polygon (both vertexes of floor)
         //         Check for intersection with solid-polygons inside floor and non-solid
         //         polygon excluding lines with one endpoint being either vertex
         //         If this is the case, there is no visibility
@@ -344,7 +358,7 @@ public class Floor extends AbstractObject
         //         that is checked in step 1
         for(Obstacle o : obstacles)
         {
-            if(bothInObject(o, u, v))
+            if(bothInObject(o, u, v) && !insidePolygon(o.getPolygon(), u, v))
             {
                 return false;
             }
@@ -367,7 +381,6 @@ public class Floor extends AbstractObject
         }
 
         // case 5: The line connecting u and v is outside of the polygon
-
 
         return true;
     }
