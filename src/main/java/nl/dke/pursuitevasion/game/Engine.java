@@ -441,8 +441,10 @@ public class Engine
                 {
                     if(agentsOverlap(evader, pursuer))
                     {
-                        agents.remove(evader);
-                        evaders.remove(evader);
+                        if(!EngineConstants.GOD_MODE){
+                            agents.remove(evader);
+                            evaders.remove(evader);
+                        }
                     }
                 }
             }

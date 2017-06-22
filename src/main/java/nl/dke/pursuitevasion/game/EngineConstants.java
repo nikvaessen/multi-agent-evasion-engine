@@ -18,6 +18,7 @@ public class EngineConstants
 
     //if this is true, the game loop will never end!
     public final static boolean ALWAYS_LOOP = false;
+    public final static boolean GOD_MODE = false;
 
 
     public final static Color FLOOR_COLOR = new Color(153,204,255);

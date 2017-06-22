@@ -260,7 +260,7 @@ public class Floor extends AbstractObject
                 boolean vertexesLineOfSight = isLineOfSight(v, u, obstacles);
                 boolean edgeInsidePolygon = insidePolygon(this.getPolygon(),
                         v, u);
-
+                boolean edgeInsideObstacle = insideObstacle(u,v, obstacles);
                 //log
                 if(logger.isTraceEnabled())
                 {
@@ -274,7 +274,7 @@ public class Floor extends AbstractObject
                 //add edge if vertexes not equal, edge doesn't exist,
                 // and there is line of sight between the vertexes
                 if(!vertexesEqual && !edgeExists && vertexesLineOfSight
-                        && edgeInsidePolygon)
+                        && edgeInsidePolygon && !edgeInsideObstacle)
                 {
                     DefaultWeightedEdge e = new DefaultWeightedEdge();
                     g.addEdge(v, u, e);
@@ -284,6 +284,16 @@ public class Floor extends AbstractObject
         }
 
         return g;
+    }
+
+    private boolean insideObstacle(Vector2D u, Vector2D v, Collection<Obstacle> obstacles) {
+        for (Obstacle obstacle : obstacles) {
+
+            if(insidePolygon(obstacle.getPolygon(), u,v)){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -448,12 +458,18 @@ public class Floor extends AbstractObject
             throw new IllegalArgumentException("The given path cannot divide the floor in two subfloors");
         }
 
-        NeighborIndex<Vector2D, DefaultEdge> mainPolygonGraphNeighbourList = this.getNeigbourList();
-        for (Vector2D w : mainPolygon.getPoints())
+
+        // remove the "handles" from the floor.
+        Subgraph<Vector2D, DefaultEdge, SimpleGraph<Vector2D, DefaultEdge>> g = removeHandles(this.getPolygonGraph());
+        // TODO: recalculate u and v
+        // walk the path until you reach a vertex in the graph in both directions.
+        NeighborIndex<Vector2D, DefaultEdge> mainPolygonGraphNeighbourList = new NeighborIndex<>(g);
+        for (Vector2D w : g.vertexSet())
         {
             List<Vector2D> neighbors = mainPolygonGraphNeighbourList.neighborListOf(w);
             if (neighbors.size() != 2)
             {
+
                 throw new IllegalArgumentException("Cannot divide main polygon");
             }
         }
@@ -464,7 +480,6 @@ public class Floor extends AbstractObject
         // Step 2: add the path to both sP1 and sP2
         List<Vector2D> reversedPath = path.getVertexList();
         Collections.reverse(reversedPath);
-        // remove the common vertexes from both paths before adding
         walk1.addAll(reversedPath);
         walk2.addAll(reversedPath);
 
@@ -503,6 +518,52 @@ public class Floor extends AbstractObject
         floors.add(f2);
 
         return floors;
+    }
+
+    public boolean isSimple(){
+        if(obstacles.size() == 0){
+            return true;
+        }
+        int obstaclesSharingVertex = 0;
+        Collection<Vector2D> polygonVertexes = this.getPolygon().getPoints();
+        for (Obstacle obstacle : obstacles) {
+            for (Vector2D obstacleVertex : obstacle.getPolygon().getPoints()) {
+                if(polygonVertexes.contains(obstacleVertex)){
+                    obstaclesSharingVertex ++;
+                    break;
+                }
+            }
+        }
+        if(obstaclesSharingVertex == obstacles.size()){
+            return true;
+        }
+        return false;
+    }
+
+    private Subgraph<Vector2D, DefaultEdge, SimpleGraph<Vector2D, DefaultEdge>> removeHandles(SimpleGraph<Vector2D, DefaultEdge> polygonGraph) {
+        NeighborIndex<Vector2D, DefaultEdge> neighbourList = getNeigbourList();
+        Subgraph<Vector2D, DefaultEdge, SimpleGraph<Vector2D, DefaultEdge>> newGraph =
+                new Subgraph<Vector2D, DefaultEdge, SimpleGraph<Vector2D, DefaultEdge>>(polygonGraph);
+
+        ArrayList<Vector2D> removedVertexes = new ArrayList<>();
+        boolean done = false;
+        while(!done){
+            boolean changed = false;
+            for (Vector2D vector : polygonGraph.vertexSet()) {
+                if(neighbourList.neighborsOf(vector).size() == 1 && !removedVertexes.contains(vector)){
+                    changed = true;
+                    newGraph.removeVertex(vector);
+                    removedVertexes.add(vector);
+                }
+            }
+            if(changed){
+                done = false;
+            }
+            else{
+                done = true;
+            }
+        }
+        return newGraph;
     }
 
     /**
@@ -574,7 +635,7 @@ public class Floor extends AbstractObject
     private MapPolygon createMapPolygon(ArrayList<Vector2D> vertexes, boolean solid)
     {
         MapPolygon p = new MapPolygon();
-        vertexes.removeIf(v -> Collections.frequency(vertexes, v) > 1);
+        //vertexes.removeIf(v -> Collections.frequency(vertexes, v) > 1);
         for(Vector2D v : vertexes)
         {
             p.addPoint(new Double(v.getX()).intValue(),

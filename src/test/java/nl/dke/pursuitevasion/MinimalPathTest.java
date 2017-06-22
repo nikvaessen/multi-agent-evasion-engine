@@ -5,6 +5,7 @@ import nl.dke.pursuitevasion.game.EngineConstants;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.Direction;
+import nl.dke.pursuitevasion.game.agents.impl.RandomAgent;
 import nl.dke.pursuitevasion.game.agents.impl.minimalPath.MinimalPathOverseer;
 import nl.dke.pursuitevasion.game.agents.impl.UserAgent;
 import nl.dke.pursuitevasion.gui.KeyboardInputListener;
@@ -41,7 +42,8 @@ public class MinimalPathTest {
             agents.add(overseer.getAgent(i));
         }
         //agents.add(new RandomAgent(map, floor, new Vector2D(200.0, 100.0), Direction.NORTH, 5, 100, 120));
-        agents.add(new UserAgent(map, floor, new Vector2D(200.0, 320.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE,  EngineConstants.VISION_ANGLE, l, true));
+        //agents.add(new UserAgent(map, floor, new Vector2D(200.0, 320.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE,  EngineConstants.VISION_ANGLE, l, true));
+        agents.add(new RandomAgent(map, floor, new Vector2D(200.0, 320.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
 
         Engine simulationEngine = new Engine(map, agents, panel, 60);
 

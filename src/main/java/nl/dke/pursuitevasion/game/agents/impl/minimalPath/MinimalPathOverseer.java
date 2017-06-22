@@ -361,8 +361,7 @@ public class MinimalPathOverseer
             if(situationStable()){
                 // if holes -> Make agent guard new path in Pe
                 // if no holes -> Evict E
-                if(Pe.getObstacles().size() > 0 //|| PeCannotShrink(evaderLocation)
-                ){
+                if(Pe.getObstacles().size() > 0 && !Pe.isSimple()){
                     // shrink
                     logger.info("shrinking with agent {}", agent.getAgentNumber());
                     shrink(agent, request, mapInfo);
@@ -492,13 +491,15 @@ public class MinimalPathOverseer
         guardMap.put(agent, path);
         // TODO recalculate Pe when u or v change so there are no "handles" on the polygon
         getNewUV(evaderLocation);
+        Floor newPe;
         try {
-            Pe = pruneFloor(path, evaderLocation, Pe);
+            newPe = pruneFloor(path, evaderLocation, Pe);
         }
         // Pe does not contain E anymore
         catch (IllegalStateException e){
-            Pe = recalculatePe(evaderLocation);
+            newPe = recalculatePe(evaderLocation);
         }
+        Pe = newPe;
         // Setting the state here to make the situation "unstable"
         agent.setState(MinimalPathAgentState.MOVING_TO_PATH);
         boundingAgents.add(agent);
