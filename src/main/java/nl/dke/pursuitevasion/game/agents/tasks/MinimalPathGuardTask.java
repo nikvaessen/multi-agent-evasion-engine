@@ -72,12 +72,6 @@ public class MinimalPathGuardTask extends AbstractAgentTask
         return new WalkToTask(destination, true).computeAgentCommand(agent, maxDistance, maxRotation);
     }
 
-    private AgentCommand moveToClosestPathVertex(AbstractAgent agent, double maxDistance, double maxRotation)
-    {
-        Vector2D destination = closestPathVertex(agent.getLocation());
-        return new WalkToTask(destination).computeAgentCommand(agent, maxDistance, maxRotation);
-    }
-
     private AgentCommand moveToProjection(AbstractAgent agent, double maxDistance, double maxRotation)
     {
         // get the location of the projection
@@ -126,8 +120,7 @@ public class MinimalPathGuardTask extends AbstractAgentTask
         if(onPath(agent, subPath)) {
             // if we are -> find the target Vertex of the edge we are on
             Line2D edge = closestPathEdge(subPath, agent.getLocation());
-            Vector2D target = Vector2D.fromPoint2D(edge.getP2());
-            return target;
+            return Vector2D.fromPoint2D(edge.getP2());
         }
         else{
             // else -> move to the startNode
@@ -137,7 +130,7 @@ public class MinimalPathGuardTask extends AbstractAgentTask
 
     private Graph<Vector2D, DefaultWeightedEdge> createPathGraph(GraphPath<Vector2D, DefaultWeightedEdge> path) {
         Graph<Vector2D, DefaultWeightedEdge> pathGraph = path.getGraph();
-        SimpleWeightedGraph<Vector2D, DefaultWeightedEdge> g = new SimpleWeightedGraph<Vector2D, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+        SimpleWeightedGraph<Vector2D, DefaultWeightedEdge> g = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
         // Add all vertexes to the graph
         for (Vector2D vertex : path.getVertexList()) {
             g.addVertex(vertex);
@@ -158,9 +151,9 @@ public class MinimalPathGuardTask extends AbstractAgentTask
     }
 
     /**
-     * @param agentLocation
-     * @param ePrime
-     * @return
+     * @param agentLocation location of the agent
+     * @param ePrime evader projection on path
+     * @return whether the agent is on the same line segment of the path as the projection.
      */
     private boolean onProjectionPathSegment(Vector2D agentLocation, Vector2D ePrime)
     {
@@ -190,8 +183,8 @@ public class MinimalPathGuardTask extends AbstractAgentTask
 
     /**
      * Finds the projection of the evaderLocation on the path.
-     * @param agent
-     * @return
+     * @param agent agent
+     * @return projection of evader on path
      */private Vector2D findProjection(AbstractAgent agent) {
 
 //        Graph<Vector2D, DefaultWeightedEdge> g = path.getGraph();
@@ -259,10 +252,10 @@ public class MinimalPathGuardTask extends AbstractAgentTask
 
     /**
      *
-     * @param closestNode
-     * @param location
-     * @param agent
-     * @return
+     * @param closestNode Node closest to the target
+     * @param location location of the target
+     * @param agent agent to move to the target
+     * @return line segment close to the evader and the pursuer
      */
     private Line2D closestLineSegment(Vector2D closestNode, Vector2D location, AbstractAgent agent)
     {
@@ -343,7 +336,7 @@ public class MinimalPathGuardTask extends AbstractAgentTask
         return closest;
     }
 
-    public Vector2D getClosestPointOnSegment(Line2D line, Vector2D point)
+    private Vector2D getClosestPointOnSegment(Line2D line, Vector2D point)
     {
         // Calculate line coefficient
         double ydiff = line.getY1() - line.getY2();
@@ -374,7 +367,7 @@ public class MinimalPathGuardTask extends AbstractAgentTask
 
     }
 
-    /**
+    /*
      * Returns closest point on segment to point
      *
      * @return closets point on segment to point
@@ -416,7 +409,7 @@ public class MinimalPathGuardTask extends AbstractAgentTask
      * Returns true when an agents is close (<0.02)
      * to any of the line segments of the path
      *
-     * @param agent
+     * @param agent agent
      * @return boolean describing whether an agent is close
      */
     private boolean onPath(AbstractAgent agent, GraphPath<Vector2D, DefaultWeightedEdge> graphPath)
@@ -480,7 +473,6 @@ public class MinimalPathGuardTask extends AbstractAgentTask
     @Override
     protected boolean completesTask(AgentCommand command)
     {
-        // TODO: Ask the overseer
         return true;
     }
 }

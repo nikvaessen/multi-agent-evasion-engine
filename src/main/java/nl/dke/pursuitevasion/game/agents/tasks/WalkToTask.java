@@ -10,15 +10,13 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sound.sampled.Line;
-import java.awt.*;
 import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.List;
 
 /**
  * Created by nik on 03/03/17.
+ *
  */
 public class WalkToTask
     extends AbstractAgentTask

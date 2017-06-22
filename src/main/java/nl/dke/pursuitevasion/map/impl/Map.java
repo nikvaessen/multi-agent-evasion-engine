@@ -209,9 +209,9 @@ public class Map implements Serializable
                 )
                 .addObstacle(
                         new MapPolygon(
-                                new int[]{372,413,421,428,411,398},
-                                new int[]{60,59,105,165,173,171},
-                                6, true)
+                                new int[]{372,413,421,428,411},
+                                new int[]{60,59,105,165,173},
+                                5, true)
                 )
                 .addObstacle(
                         new MapPolygon(

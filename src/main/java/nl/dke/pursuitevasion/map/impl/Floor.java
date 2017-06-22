@@ -1,5 +1,6 @@
 package nl.dke.pursuitevasion.map.impl;
 
+import com.sun.corba.se.impl.orbutil.graph.*;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.map.AbstractObject;
 import nl.dke.pursuitevasion.map.ObjectType;
@@ -257,6 +258,8 @@ public class Floor extends AbstractObject
                 boolean vertexesEqual = v.equals(u);
                 boolean edgeExists = g.getEdge(u, v) != null;
                 boolean vertexesLineOfSight = isLineOfSight(v, u, obstacles);
+                boolean edgeInsidePolygon = insidePolygon(this.getPolygon(),
+                        v, u);
 
                 //log
                 if(logger.isTraceEnabled())
@@ -270,7 +273,8 @@ public class Floor extends AbstractObject
 
                 //add edge if vertexes not equal, edge doesn't exist,
                 // and there is line of sight between the vertexes
-                if(!vertexesEqual && !edgeExists && vertexesLineOfSight)
+                if(!vertexesEqual && !edgeExists && vertexesLineOfSight
+                        && edgeInsidePolygon)
                 {
                     DefaultWeightedEdge e = new DefaultWeightedEdge();
                     g.addEdge(v, u, e);
@@ -378,15 +382,8 @@ public class Floor extends AbstractObject
         }
 
         // case 5: The line connecting u and v is outside of the polygon
-        boolean edgeInsidePolygon = insidePolygon(this.getPolygon(), v, u);
-        if(edgeInsidePolygon)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+
+        return true;
     }
 
     /**
@@ -467,7 +464,7 @@ public class Floor extends AbstractObject
         // Step 2: add the path to both sP1 and sP2
         List<Vector2D> reversedPath = path.getVertexList();
         Collections.reverse(reversedPath);
-
+        // remove the common vertexes from both paths before adding
         walk1.addAll(reversedPath);
         walk2.addAll(reversedPath);
 

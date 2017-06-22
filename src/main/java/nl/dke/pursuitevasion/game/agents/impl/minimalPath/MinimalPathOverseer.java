@@ -18,9 +18,7 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.jgrapht.*;
 import org.jgrapht.alg.interfaces.KShortestPathAlgorithm;
 import org.jgrapht.alg.shortestpath.KShortestPaths;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.DefaultWeightedEdge;
-import org.jgrapht.graph.SimpleGraph;
+import org.jgrapht.graph.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,12 +128,13 @@ public class MinimalPathOverseer
                                                 EngineConstants.VISION_ANGLE,
                                                 this, i));
 
-//            if(i == 0)
-//            {
-//                GraphPath<Vector2D, DefaultWeightedEdge> path = paths.get(0);
-//                guardMap.put(agent, path);
-//            }
-//            else
+            if(i == 0)
+            {
+                GraphPath<Vector2D, DefaultWeightedEdge> path = paths.get(0);
+                agent.setState(MinimalPathAgentState.MOVING_TO_PATH);
+                guardMap.put(agent, path);
+            }
+            else
             {
                 guardMap.put(agent, null);
             }
@@ -346,10 +345,10 @@ public class MinimalPathOverseer
     {
         Vector2D evaderLocation = mapInfo.getAgentPoints().get(0);
         // redetermine Pe
-        if(!Pe.contains(evaderLocation)){
-            logger.debug("recalculating Pe");
-            Pe = recalculatePe(evaderLocation);
-        }
+        Pe = recalculatePe(evaderLocation);
+//        if(!Pe.contains(evaderLocation)){
+//            logger.debug("recalculating Pe");
+//        }
 
         // check if we are bounding or if the situation does not allow us to stop guarding
         if((isBounding(agent)|| !situationStable()) && (agent.getState() != MinimalPathAgentState.NO_PATH && agent.getState() != MinimalPathAgentState.CHASING))
@@ -362,7 +361,8 @@ public class MinimalPathOverseer
             if(situationStable()){
                 // if holes -> Make agent guard new path in Pe
                 // if no holes -> Evict E
-                if(Pe.getObstacles().size() > 0){
+                if(Pe.getObstacles().size() > 0 //|| PeCannotShrink(evaderLocation)
+                ){
                     // shrink
                     logger.info("shrinking with agent {}", agent.getAgentNumber());
                     shrink(agent, request, mapInfo);
@@ -383,7 +383,10 @@ public class MinimalPathOverseer
     private Floor recalculatePe(Vector2D evaderLocation) {
         // Pe is no longer valid
         // determine the bounding paths
-        List<GraphPath<Vector2D, DefaultWeightedEdge>> boundingPaths = getGuardedPaths();
+//        List<GraphPath<Vector2D, DefaultWeightedEdge>> boundingPaths = getBoundingPaths();
+//        if(boundingPaths.size()==3){boundingPaths = getPathsBoundingPe();}
+
+        List<GraphPath<Vector2D, DefaultWeightedEdge>> boundingPaths = getPathsBoundingPe();
         if(boundingPaths.size() == 0){
             return completeFloor;
         }
@@ -391,8 +394,9 @@ public class MinimalPathOverseer
             GraphPath<Vector2D, DefaultWeightedEdge> path1 = boundingPaths.get(0);
             GraphPath<Vector2D, DefaultWeightedEdge> path2 = boundingPaths.get(1);
 
+            MapPolygon boundingPolygon = joinPathsToPolygon(path1, path2);
             // this means that Pe is bound by these 2 paths
-            if(joinPathsToPolygon(path1, path2).contains(evaderLocation)){
+            if(boundingPolygon.contains(evaderLocation)){
                 // therefore we can prune the complete floor with these paths sequentually to get Pe
                 return pruneFloor(path2, evaderLocation, pruneFloor(path1, evaderLocation, completeFloor));
             }
@@ -478,11 +482,16 @@ public class MinimalPathOverseer
             index = 2;
         }
         KShortestPaths<Vector2D, DefaultWeightedEdge> k = new KShortestPaths<>(vGraph, index+1);
-        GraphPath<Vector2D,DefaultWeightedEdge> path = k.getPaths(u,v).get(index);
+        List<GraphPath<Vector2D, DefaultWeightedEdge>> graphPaths = k.getPaths(u, v);
+        GraphPath<Vector2D,DefaultWeightedEdge> path = graphPaths.get(index);
+        if(alreadyGuarded(path)){
+            path = graphPaths.get(0);
+        }
 
         boundingAgents.add(agent);
         guardMap.put(agent, path);
         // TODO recalculate Pe when u or v change so there are no "handles" on the polygon
+        getNewUV(evaderLocation);
         try {
             Pe = pruneFloor(path, evaderLocation, Pe);
         }
@@ -492,7 +501,63 @@ public class MinimalPathOverseer
         }
         // Setting the state here to make the situation "unstable"
         agent.setState(MinimalPathAgentState.MOVING_TO_PATH);
+        boundingAgents.add(agent);
         request.add(new MinimalPathGuardTask(path, evaderLocation));
+    }
+
+    private void recalculatePaths() {
+        // U and V have changed therefore we can remove the prefixes of the paths
+        for (MinimalPathAgent agent : guardMap.keySet()) {
+            // if path contains the new U and V
+            GraphPath<Vector2D, DefaultWeightedEdge> path = guardMap.get(agent);
+            if (path != null) {
+                List<Vector2D> vertexList = path.getVertexList();
+                if(vertexList.contains(u) && vertexList.contains(v)){
+                    KShortestPaths<Vector2D, DefaultWeightedEdge> k = new KShortestPaths<>(createPathGraph(path), 1);
+                    GraphPath<Vector2D, DefaultWeightedEdge> newPath = k.getPaths(u, v).get(0);
+                    guardMap.put(agent, newPath);
+                }
+            }
+        }
+    }
+
+    private Graph<Vector2D, DefaultWeightedEdge> createPathGraph(GraphPath<Vector2D, DefaultWeightedEdge> path) {
+        Graph<Vector2D, DefaultWeightedEdge> pathGraph = path.getGraph();
+        SimpleWeightedGraph<Vector2D, DefaultWeightedEdge> g = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
+        // Add all vertexes to the graph
+        for (Vector2D vertex : path.getVertexList()) {
+            g.addVertex(vertex);
+        }
+        // Add all the edges to the graph
+        for (DefaultWeightedEdge edge : path.getEdgeList()) {
+            g.addEdge(pathGraph.getEdgeSource(edge), pathGraph.getEdgeTarget(edge),edge);
+        }
+        return g;
+    }
+
+    private boolean alreadyGuarded(GraphPath<Vector2D, DefaultWeightedEdge> path) {
+        for (GraphPath<Vector2D, DefaultWeightedEdge> guardedPath : getBoundingPaths()) {
+            if(samePath(guardedPath, path)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean samePath(GraphPath<Vector2D, DefaultWeightedEdge> guardedPath, GraphPath<Vector2D, DefaultWeightedEdge> path){
+        // check length
+        List<Vector2D> guardVertexes = guardedPath.getVertexList();
+        List<Vector2D> pathVertexes = path.getVertexList();
+        if(guardVertexes.size() != pathVertexes.size()){
+            return false;
+        }
+        // check al vertexes
+        for (int i =0; i < guardVertexes.size(); i++) {
+            if(!guardVertexes.get(i).equals(pathVertexes.get(i))){
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean peBoundedBy2OtherPaths(MinimalPathAgent agent) {
@@ -522,7 +587,8 @@ public class MinimalPathOverseer
         // get paths of the bounding agents
         if(boundingAgents.size() < 2){return;}
 
-        List<GraphPath<Vector2D, DefaultWeightedEdge>> guardPaths = getBoundingPaths();
+        List<GraphPath<Vector2D, DefaultWeightedEdge>> guardPaths = getPathsBoundingPe();
+        if(guardPaths.size() < 2){return;}
         GraphPath<Vector2D, DefaultWeightedEdge> path1 = guardPaths.get(0);
         GraphPath<Vector2D, DefaultWeightedEdge> path2 = guardPaths.get(1);
 
@@ -558,6 +624,13 @@ public class MinimalPathOverseer
         return paths;
     }
 
+    private List<GraphPath<Vector2D, DefaultWeightedEdge>> getPathsBoundingPe(){
+        List<GraphPath<Vector2D, DefaultWeightedEdge>> boundingPaths = getBoundingPaths();
+        boundingPaths.removeIf(g -> !boundsPe(g));
+        return boundingPaths;
+
+    }
+
     private MapPolygon joinPathsToPolygon(GraphPath<Vector2D, DefaultWeightedEdge> path1, GraphPath<Vector2D, DefaultWeightedEdge> path2) {
         // check if path starts and ends are the same.
         if(!path1.getStartVertex().equals(path2.getStartVertex())){throw new IllegalArgumentException("paths do not share a starting vertex");}
@@ -566,7 +639,6 @@ public class MinimalPathOverseer
         Vector2D end = path1.getEndVertex();
         List<Vector2D> path1VertexList = path1.getVertexList();
         List<Vector2D> path2VertexList = path2.getVertexList();
-        Collections.reverse(path2VertexList);
         // remove common vertexes
         reduceCommonVertexes(path1VertexList, path2VertexList, start, end);
 
@@ -590,12 +662,19 @@ public class MinimalPathOverseer
     }
 
     private void reduceCommonVertexes(List<Vector2D> path1, List<Vector2D> path2, Vector2D start, Vector2D end) {
-        Vector2D startSplit = findPathSplit(path1, path2, start);
-        Vector2D endSplit =  findPathSplit(path1, path2, end);
 
-        if(startSplit != start && endSplit != end) {
-            path1.retainAll(path1.subList(path1.indexOf(startSplit), path1.indexOf(endSplit)+1));
-            path2.retainAll(path2.subList(path2.indexOf(startSplit), path2.indexOf(endSplit)+1));
+        try{
+
+            Vector2D startSplit = findPathSplit(path1, path2, start);
+            Vector2D endSplit =  findPathSplit(path1, path2, end);
+            if(startSplit != start && endSplit != end) {
+                path1.retainAll(path1.subList(path1.indexOf(startSplit), path1.indexOf(endSplit)+1));
+                path2.retainAll(path2.subList(path2.indexOf(startSplit), path2.indexOf(endSplit)+1));
+            }
+        }
+        //
+        catch (IllegalArgumentException e){
+            logger.debug("paths are identical");
         }
     }
 
@@ -625,7 +704,18 @@ public class MinimalPathOverseer
     }
 
     private Floor pruneFloor(GraphPath<Vector2D, DefaultWeightedEdge> path, Vector2D evaderLocation, Floor toPrune) {
-        Collection<Floor> floors = toPrune.getSubFloors(path);
+//        if(!boundsPe(path)) {
+//            path = removePathEdgesOnPe(path);
+//        }
+        List<Floor> floors = new ArrayList<>(toPrune.getSubFloors(path));
+
+        // both floors contain the evader
+        if(floors.size() == 2 && floors.get(0).contains(evaderLocation) && floors.get(1).contains(evaderLocation))
+        {
+            // return the smaller floor
+            return floors.get(0).getPolygon().getArea() < floors.get(1).getPolygon().getArea() ? floors.get(0) : floors.get(1);
+        }
+
         for (Floor floor : floors){
             boolean contains = floor.contains(evaderLocation);
             if(contains){
@@ -633,6 +723,51 @@ public class MinimalPathOverseer
             }
         }
         throw(new IllegalStateException("Evader is in none of the subFloors"));
+    }
+
+    private GraphPath<Vector2D, DefaultWeightedEdge> removePathEdgesOnPe(GraphPath<Vector2D, DefaultWeightedEdge> path) {
+        SimpleGraph<Vector2D, DefaultEdge> polygonGraph = Pe.getPolygonGraph();
+        Graph<Vector2D, DefaultWeightedEdge> pathGraph = createPathGraph(path);
+        // walk the path from start as long as the edges are shared
+        Vector2D startVertex = path.getStartVertex();
+        List<Vector2D> vertexList = path.getVertexList();
+        for (int i = 1; i < vertexList.size() - 1; i++) {
+            Vector2D newVertex = vertexList.get(i);
+            if(polygonGraph.getEdge(startVertex, newVertex) != null){
+                // Path edge exists in Pe
+                // So remove it
+                pathGraph.removeEdge(startVertex, newVertex);
+                startVertex = newVertex;
+            }
+            else {
+                // Path does not exist in Pe
+                // So startVertex is the last shared vertex
+                break;
+            }
+        }
+
+        Vector2D endVertex = path.getEndVertex();
+        Collections.reverse(vertexList);
+        for (int i = 1; i < vertexList.size() - 1; i++) {
+            Vector2D newVertex = vertexList.get(i);
+            if(polygonGraph.getEdge(startVertex, newVertex) != null){
+                // Path edge exists in Pe
+                // So remove it
+                pathGraph.removeEdge(endVertex, newVertex);
+                startVertex = newVertex;
+            }
+            else {
+                // Path does not exist in Pe
+                // So endVertex is the last shared vertex
+                break;
+            }
+        }
+        KShortestPaths<Vector2D, DefaultWeightedEdge> k = new KShortestPaths<Vector2D, DefaultWeightedEdge>(pathGraph, 1);
+        return k.getPaths(startVertex, endVertex).get(0);
+
+
+
+
     }
 
     /**
