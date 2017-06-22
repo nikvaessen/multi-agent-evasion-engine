@@ -38,6 +38,7 @@ public class EngineConstants
     private static Random random = new Random(seed);
     public static double shortestMoveLength = 10;
     public static double TIMECONSTANT = 1;
+    public static int preCalcSize = 20;
 
     public static Random getRandom() {
         return random;

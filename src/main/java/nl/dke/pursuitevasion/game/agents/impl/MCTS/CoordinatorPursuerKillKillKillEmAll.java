@@ -28,6 +28,7 @@ public class CoordinatorPursuerKillKillKillEmAll{
     private final Floor floor;
     private final Engine engine;
     private final ArrayList<AbstractAgent> agents;
+    private final PreCalcMap preCalcMap;
     ArrayList<AbstractAgent>  evador  = new ArrayList<>(1);
     ArrayList<AbstractAgent> pursuers = new ArrayList<>(3);
     private MCTS_2 m;
@@ -45,6 +46,8 @@ public class CoordinatorPursuerKillKillKillEmAll{
         this.floor = startingFloor;
         this.engine = e;
         this.agents = agents;
+        this.preCalcMap = new PreCalcMap(map);
+
         PursuerKillKillKillEmAll p1 = new PursuerKillKillKillEmAll( map,  startingFloor,  startLocation,  startsFacing,  radius,
                 visionRange,  visionAngle,0);
         PursuerKillKillKillEmAll p2 = new PursuerKillKillKillEmAll( map,  startingFloor,  startLocation,  startsFacing,  radius,
@@ -58,17 +61,17 @@ public class CoordinatorPursuerKillKillKillEmAll{
         TurnOrder t = new TurnOrder(p1,agents);
         State s = new State(engine, map, t, evador, pursuers);
 
-        Thread calctrhead = new Thread(new ThinkThread(p1,s,t,this, EngineConstants.CALCULATION_TIME));
+        Thread calctrhead = new Thread(new ThinkThread(p1,s,t,this, EngineConstants.CALCULATION_TIME,preCalcMap));
         calctrhead.start();
         TurnOrder t2 = new TurnOrder(p2,agents);
         State s2 = new State(engine, map, t2, evador, pursuers);
 
-        Thread calctrhead2 = new Thread(new ThinkThread(p2,s2,t2,this,EngineConstants.CALCULATION_TIME));
+        Thread calctrhead2 = new Thread(new ThinkThread(p2,s2,t2,this,EngineConstants.CALCULATION_TIME,preCalcMap));
         calctrhead2.start();
         TurnOrder t3 = new TurnOrder(p3,agents);
 
         State s3 = new State(engine, map, t3, evador, pursuers);
-        Thread calctrhead3 = new Thread(new ThinkThread(p3,s3,t3,this,EngineConstants.CALCULATION_TIME));
+        Thread calctrhead3 = new Thread(new ThinkThread(p3,s3,t3,this,EngineConstants.CALCULATION_TIME,preCalcMap));
         calctrhead3.start();
 
 
@@ -90,7 +93,7 @@ public class CoordinatorPursuerKillKillKillEmAll{
         State s = new State(engine, map, t, evador, pursuers);
         hasNewRequest = false;
         hasRequest.put(p.getId(),false);
-        Thread calctrhead = new Thread(new ThinkThread(p,s,t,this,calculationTime));
+        Thread calctrhead = new Thread(new ThinkThread(p,s,t,this,calculationTime,preCalcMap));
         calctrhead.start();
 
         AbstractAgentTask aa = lastAbstractAgentTask.get(p.getId());
@@ -121,20 +124,22 @@ public class CoordinatorPursuerKillKillKillEmAll{
         private final TurnOrder t;
         private final CoordinatorPursuerKillKillKillEmAll Coordinator;
         private final long calculationTime;
+        private final PreCalcMap precalcmap;
 
-        public ThinkThread(PursuerKillKillKillEmAll p, State s, TurnOrder t, CoordinatorPursuerKillKillKillEmAll coordinatorPursuerKillKillKillEmAll, long calculationTime) {
+        public ThinkThread(PursuerKillKillKillEmAll p, State s, TurnOrder t, CoordinatorPursuerKillKillKillEmAll coordinatorPursuerKillKillKillEmAll, long calculationTime,PreCalcMap preCalcMap) {
             this.p = p;
             this.s = s;
             this.t = t;
             this.Coordinator = coordinatorPursuerKillKillKillEmAll;
             this.calculationTime = calculationTime;
+            this.precalcmap =preCalcMap;
         }
 
         @Override
         public void run() {
             long start = System.currentTimeMillis();
             System.out.println("Started one MCTS at: " + start + "ms");
-            if (MCTS_2.getLastMCTS() == null) m = new MCTS_2(s,t,calculationTime, 10,false);
+            if (MCTS_2.getLastMCTS() == null) m = new MCTS_2(s,t,calculationTime, 10,false,precalcmap);
             else m = MCTS_2.getLastMCTS();
             if (viewport!=null){
                 if ((  start - lastTimeViewUpdate)>2000)  {

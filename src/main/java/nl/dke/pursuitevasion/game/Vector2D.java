@@ -16,12 +16,12 @@ public class Vector2D implements Serializable
     /**
      * The x component of the Vector2D
      */
-    private double x;
+    public double x;
 
     /**
      * The y component of the Vector2D
      */
-    private double y;
+    public double y;
 
     /**
      * Constructor that creates a Vector2D with length 0

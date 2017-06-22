@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.*;
 
 
@@ -42,6 +44,37 @@ public class MapViewPanel
         this.objects = map.getPolygons();
         this.agents  = agents;
         this.preferredSize = computePreferredSize();
+        this.addMouseListener(mctsMouseListener());
+    }
+
+    private MouseListener mctsMouseListener() {
+        MouseListener m = new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (mcts!= null) mcts.click(e);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        };
+        return m;
     }
 
     public void setMCTSPreview(MCTS_2 mcts){
@@ -120,7 +153,7 @@ public class MapViewPanel
 
         }
         if (mcts != null) {
-            mcts.paint(g,mctsViewSettings,this);
+            mcts.paint(g,mctsViewSettings,this,agents);
         }
     }
 

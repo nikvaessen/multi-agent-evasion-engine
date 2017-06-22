@@ -46,6 +46,7 @@ public class CoordinatorEvaderKillKillKillEmAll{
     private final Floor floor;
     private final Engine engine;
     private final ArrayList<AbstractAgent> agents;
+    private final PreCalcMap preCalcMap;
     ArrayList<AbstractAgent>  evador  = new ArrayList<>(1);
     ArrayList<AbstractAgent> pursuers = new ArrayList<>(3);
     private MCTS_2 m;
@@ -74,6 +75,9 @@ public class CoordinatorEvaderKillKillKillEmAll{
         System.out.println(e1);
         TurnOrder t = new TurnOrder(e1,agents);
        // t.previousPlayer();
+
+            this.preCalcMap = new PreCalcMap(map);
+
         State s = new State(engine, map, t, evador, pursuers);
         this.agents.add(0,e1);
         Thread calctrhead = new Thread(new ThinkThread(e1,s,t,this, EngineConstants.CALCULATION_TIME));
@@ -144,7 +148,7 @@ public class CoordinatorEvaderKillKillKillEmAll{
         public void run() {
             long start = System.currentTimeMillis();
             System.out.println("Started one MCTS at: " + start + "ms");
-            if (MCTS_2.getLastMCTS() == null) m = new MCTS_2(s,t,calculationTime, 10,false);
+            if (MCTS_2.getLastMCTS() == null) m = new MCTS_2(s,t,calculationTime, 10,false,preCalcMap);
             else m = MCTS_2.getLastMCTS();
             if (viewport!=null){
                 if ((  start - lastTimeViewUpdate)>2000)  {

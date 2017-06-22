@@ -1,11 +1,15 @@
 package nl.dke.pursuitevasion.game.agents.impl.MCTS;
 
 
+import nl.dke.pursuitevasion.game.Vector2D;
+import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.Angle;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.logging.Logger;
 
 /**
@@ -15,6 +19,7 @@ import java.util.logging.Logger;
 public class MCTS_2 implements Strategy{
     private final static Logger log = Logger.getLogger( MCTS_2.class.getName() );
     private final int depthLevel;
+    private static PreCalcMap preCalcMap;
 
     private boolean extensionStrategy;
     private TurnOrder ally;
@@ -45,13 +50,17 @@ public class MCTS_2 implements Strategy{
     private static MCTS_2 lastMCTS;
 
 
-    public MCTS_2(State realState, TurnOrder firstPlayer, long maxCalcTimeMilliSeconds, int depthLevel, boolean ExtensionStrategy){
+    public MCTS_2(State realState, TurnOrder firstPlayer, long maxCalcTimeMilliSeconds, int depthLevel, boolean ExtensionStrategy, PreCalcMap preCalcMap){
         this.depthLevel = depthLevel;
         this.realState = realState;
         this.ally = firstPlayer;
 
         this.maxtTime = (int) maxCalcTimeMilliSeconds;
         this.extensionStrategy = ExtensionStrategy;
+        this.preCalcMap =preCalcMap;
+
+
+
 
         /*int s = realState.getSize();
 
@@ -63,6 +72,8 @@ public class MCTS_2 implements Strategy{
 
 
     }
+
+
 
     public NodeTree_2 getRoot() {
         return root;
@@ -579,7 +590,7 @@ public class MCTS_2 implements Strategy{
         realState = state;
     }
 
-    public void paint(Graphics g, MCTSViewSettings mctsViewSettings, MapViewPanel mapViewPanel) {
+    public void paint(Graphics g, MCTSViewSettings mctsViewSettings, MapViewPanel mapViewPanel, Collection<AbstractAgent> agents) {
         NodeTree_2 root = this.getRoot();
         if (root == null) return;
         int height = root.getHeight();
@@ -587,7 +598,25 @@ public class MCTS_2 implements Strategy{
 
         //lv.paintComponent(g);
         lv.paintOverView(g,mapViewPanel);
+
+        g.setColor(Color.magenta);
+
+        PreCalcMap p = this.preCalcMap;
+        p.draw(g, mctsViewSettings, mapViewPanel,agents);
+
+
     }
+
+    public void click(MouseEvent e) {
+        PreCalcMap p = this.preCalcMap;
+        Point pp = p.ScreenPosToXY(e.getPoint());
+       // int x = pp[0];
+       // int y = pp[1];
+       // p.generateSink(pp);
+
+    }
+
+
 
 
     public static class MCTSViewSettings {

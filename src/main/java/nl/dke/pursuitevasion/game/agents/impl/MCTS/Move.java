@@ -150,7 +150,7 @@ public class Move {
 
         }
         if (c==false) System.out.println("hopala");
-         System.out.println("checkinglegality of moves" + moves.size() );
+         //System.out.println("checkinglegality of moves" + moves.size() );
         int start = moves.size()-1;
         for (int i = start; i >= 0 ; i--) {
            // System.out.println(moves.size() + " "  + i);
