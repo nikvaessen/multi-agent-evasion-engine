@@ -220,10 +220,18 @@ public class Map implements Serializable
                     true
             );
 
+        /*    MapPolygon obstacle2 = new MapPolygon(
+                    new int[] {800, 850, 750},
+                    new int[] {100, 300, 300},
+                    3,
+                    true
+            );
+*/
             return MapBuilder.create()
                     .makeFloor(mainFloor)
                     .addObstacle(obstacle1)
                     .addObstacle(obstacle)
+                //    .addObstacle(obstacle2)
                     .finish()
                     .build();
         }

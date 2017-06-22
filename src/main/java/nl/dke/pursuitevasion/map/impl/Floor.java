@@ -16,6 +16,7 @@ import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.*;
 import java.util.List;
@@ -608,6 +609,7 @@ public class Floor extends AbstractObject
         ArrayList<ArrayList<Point>> conns = new ArrayList<ArrayList<Point>>();
 
 //            System.out.println("1st: compute first link to outer polygon");
+        //find first connection to outer polygon
         Point floorCon = null;
         Point obsCon = null;
         double smallestDistance=Integer.MAX_VALUE;
@@ -636,6 +638,8 @@ public class Floor extends AbstractObject
 //            System.out.println("conns" + conns.toString());
 
         // compute closest link between obstacles
+
+        ArrayList<Obstacle> obstacleCopy = new ArrayList<>(ob);
         smallestDistance=Integer.MAX_VALUE;
         Point floorCon1 = null;
         Point obsCon1 = null;
@@ -644,9 +648,11 @@ public class Floor extends AbstractObject
         for (int k=0; k<ob.size(); k++) {
             //loops through points of each obstacle
             for (int l = 0; l < ob.get(k).getPolygon().xpoints.length; l++) {
+
                 if (k != ob.size() - 1) {
-                    //                            System.out.println("2nd: Compute closest link");
+                    //System.out.println("2nd: Compute closest link");
                     //loops through points of neighbouring obstacle
+                    //find closest connection between obstacles
                     for (int m = 0; m < ob.get(k+1).getPolygon().xpoints.length; m++) {
                         if (computeDistance(
                                 ob.get(k).getPolygon().xpoints[l],
@@ -657,9 +663,9 @@ public class Floor extends AbstractObject
                             smallestDistance = computeDistance(ob.get(k).getPolygon().xpoints[l],ob.get(k+1).getPolygon().xpoints[m],ob.get(k).getPolygon().ypoints[l],ob.get(k+1).getPolygon().ypoints[m]);
                             obsCon1 = new Point(ob.get(k).getPolygon().xpoints[l], ob.get(k).getPolygon().ypoints[l]);
                             floorCon1 = new Point(ob.get(k+1).getPolygon().xpoints[m], ob.get(k+1).getPolygon().ypoints[m]);
-                            //                                    System.out.println("distance: " + smallestDistance);
-                            //                                    System.out.println("obsCon: " + obsCon);
-                            //                                    System.out.println("floorCon: " + floorCon);
+                            //System.out.println("distance: " + smallestDistance);
+                            //System.out.println("obsCon: " + obsCon);
+                            //System.out.println("floorCon: " + floorCon);
                         }
                     }
                 } else {
@@ -734,13 +740,30 @@ public class Floor extends AbstractObject
         polygon1.remove(polygon1.size()-1);
 
         polygon1 = findLastPartOfFloor(floorVertices, firstConnection1, secondConnection1, conns, polygon1);
-        newSimplePolygon1=polygon1;
+        newSimplePolygon1= new ArrayList<>(polygon1);
 
-        ArrayList<Point> toBeTriangulatedPolygon = newSimplePolygon1;
-
-        triangles = getTriangles(toBeTriangulatedPolygon);
+        ArrayList<Point> toBeTriangulatedPolygon = new ArrayList<>(newSimplePolygon1);
 
         trianglesToDraw = getTriangles(toBeTriangulatedPolygon);
+
+        System.out.println();
+        System.out.println("polygon1");
+        for (Point p: polygon1){
+            System.out.println(p.x+","+p.y);
+        }
+
+        System.out.println();
+        System.out.println("newSimplePolygon1");
+        for (Point p: newSimplePolygon1){
+            System.out.println(p.x+","+p.y);
+        }
+
+        System.out.println();
+        System.out.println("toBeTriangulatedPolygon");
+        for (Point p: toBeTriangulatedPolygon){
+            System.out.println(p.x+","+p.y);
+        }
+
 
         System.out.println();
         System.out.println("TrianglesToDraw");
@@ -1148,7 +1171,9 @@ public class Floor extends AbstractObject
             double a2 = (y4-y3)/(x4-x3);
             double b2 = y3 - a2*x3;
 
-            if (a1==0 && a2==0){
+            System.out.println("a1: "+ Math.abs(a1));
+            System.out.println("a2: "+ Math.abs(a2));
+            if (Math.abs(a1)==0 && Math.abs(a2)==0){
                 return null;
             }
 
@@ -1235,10 +1260,10 @@ public class Floor extends AbstractObject
     public ArrayList<Polygon> getTriangles(ArrayList<Point> polygon){
         ArrayList<Polygon> triangles = new ArrayList<>();
 
-        System.out.println("POLYGON");
-        for (Point p: polygon) {
-            System.out.println(p.x + "," + p.y);
-        }
+//        System.out.println("POLYGON");
+//        for (Point p: polygon) {
+//            System.out.println(p.x + "," + p.y);
+//        }
 
         Point viminus = new Point();
         Point vi = new Point();
@@ -1247,6 +1272,8 @@ public class Floor extends AbstractObject
         ArrayList<Line2D> linesOfPolygon = getPolygonLines(polygon);
 
         while (polygon.size()>3){
+        System.out.println(polygon.size());
+//        for(int h=polygon.size()-1; h>2; h--){
             for (int i=0; i<polygon.size()-1; i++){
                 System.out.println();
                 System.out.println("i: "+i);
@@ -1317,6 +1344,146 @@ public class Floor extends AbstractObject
 
                 }
             }
+        }
+        Polygon remainingPolygon = createNewTriangle(polygon.get(0), polygon.get(1), polygon.get(2));
+        triangles.add(remainingPolygon);
+        polygon=null;
+        System.out.println("FINAL triangles");
+        for (int i=0; i<triangles.size(); i++){
+            System.out.println("triangle: "+ i);
+            Polygon p = triangles.get(i);
+            for (int j=0; j<triangles.get(i).xpoints.length; j++){
+                int x = p.xpoints[j];
+                int y = p.ypoints[j];
+                System.out.println(x+","+y);
+            }
+        }
+
+
+        return triangles;
+    }
+
+    public ArrayList<Polygon> getTrianglesWithRatioTest(ArrayList<Point> polygon){
+        ArrayList<Polygon> triangles = new ArrayList<>();
+
+        Point viminus = new Point();
+        Point vi = new Point();
+        Point viplus = new Point();
+
+        ArrayList<Line2D> linesOfPolygon = getPolygonLines(polygon);
+
+        while (polygon.size()>3){
+
+            Polygon biggestEar = new Polygon();
+            double biggestRatio =  Double.MIN_VALUE;
+            int respectiveIndex = -1;
+
+            System.out.println();
+            System.out.println(polygon.size());
+            for (int i=0; i<polygon.size()-1; i++){
+                System.out.println("i: "+i);
+                if (i!=polygon.size() && i!=0){
+                    viminus = new Point(polygon.get(i-1));
+                    vi = new Point(polygon.get(i));
+                    viplus = new Point(polygon.get(i+1));
+
+                    boolean liesInside = liesCompletelyInside(viminus, vi, viplus, polygon, linesOfPolygon, triangles);
+                    if (liesInside) {
+                        Polygon toBeAdded = createNewTriangle(viminus, vi, viplus);
+                        Rectangle2D boundingBox = toBeAdded.getBounds2D();
+                        System.out.println("current biggestRatio: "+biggestRatio);
+                        double ratio = boundingBox.getWidth()/boundingBox.getHeight();
+                        System.out.println("current triangleRatio: "+ ratio);
+
+                        if (ratio>biggestRatio){
+                            biggestEar=toBeAdded;
+                            biggestRatio=ratio;
+                            respectiveIndex = i;
+                            System.out.println("new biggestRatio: "+ biggestRatio);
+                            System.out.println("respectiveIndex: "+respectiveIndex);
+                        }
+                    }
+
+
+
+                    //if line between viminus and viplus lies COMPLETELY inside polygon, add the triangle...
+                    System.out.println(polygon.size());
+                    System.out.println("BOOLEAN: " + liesInside);
+                    System.out.println("viminus: " + viminus.x + "," + viminus.y);
+                    System.out.println("vi: " + vi.x + "," + vi.y);
+                    System.out.println("viplus: " + viplus.x + "," + viplus.y);
+
+
+
+                } else if (i==polygon.size()-1){
+
+                    viminus = new Point(polygon.get(i-1));
+                    vi = new Point(polygon.get(i));
+                    viplus = new Point(polygon.get(0));
+
+                    boolean liesInside = liesCompletelyInside(viminus, vi, viplus, polygon, linesOfPolygon, triangles);
+                    if (liesInside) {
+                        Polygon toBeAdded = createNewTriangle(viminus, vi, viplus);
+                        Rectangle2D boundingBox = toBeAdded.getBounds2D();
+                        System.out.println("current biggestRatio: "+biggestRatio);
+                        double ratio = boundingBox.getWidth()/boundingBox.getHeight();
+                        System.out.println("current triangleRatio: "+ ratio);
+
+                        if (ratio>biggestRatio){
+                            biggestEar=toBeAdded;
+                            biggestRatio=ratio;
+                            respectiveIndex = i;
+                            System.out.println("new biggestRatio: "+ biggestRatio);
+                            System.out.println("respectiveIndex: "+respectiveIndex);
+                        }
+                    }
+
+                    //if line between viminus and viplus lies COMPLETELY inside polygon, add the triangle...
+                    System.out.println(polygon.size());
+                    System.out.println("BOOLEAN: " + liesInside);
+                    System.out.println("viminus: " + viminus.x + "," + viminus.y);
+                    System.out.println("vi: " + vi.x + "," + vi.y);
+                    System.out.println("viplus: " + viplus.x + "," + viplus.y);
+
+
+                } else {
+                    viminus = new Point(polygon.get(polygon.size()-1));
+                    vi = new Point(polygon.get(i));
+                    viplus = new Point(polygon.get(i+1));
+
+                    boolean liesInside = liesCompletelyInside(viminus, vi, viplus, polygon, linesOfPolygon, triangles);
+                    if (liesInside) {
+                        Polygon toBeAdded = createNewTriangle(viminus, vi, viplus);
+                        Rectangle2D boundingBox = toBeAdded.getBounds2D();
+                        System.out.println("current biggestRatio: "+biggestRatio);
+                        double ratio = boundingBox.getWidth()/boundingBox.getHeight();
+                        System.out.println("current triangleRatio: "+ ratio);
+
+                        if (ratio>biggestRatio){
+                            biggestEar=toBeAdded;
+                            biggestRatio=ratio;
+                            respectiveIndex = i;
+                            System.out.println("new biggestRatio: "+ biggestRatio);
+                            System.out.println("respectiveIndex: "+respectiveIndex);
+                        }
+                    }
+                    //if line between viminus and viplus lies COMPLETELY inside polygon, add the triangle...
+                    System.out.println(polygon.size());
+                    System.out.println("BOOLEAN: " + liesInside);
+                    System.out.println("viminus: " + viminus.x + "," + viminus.y);
+                    System.out.println("vi: " + vi.x + "," + vi.y);
+                    System.out.println("viplus: " + viplus.x + "," + viplus.y);
+
+                }
+            }
+            System.out.println();
+            System.out.println("Biggest Ear: ");
+            for (int i=0;i<biggestEar.xpoints.length; i++){
+                System.out.println(biggestEar.xpoints[i]+","+biggestEar.ypoints[i]);
+            }
+            System.out.println("index: "+respectiveIndex);
+            triangles.add(biggestEar);
+            polygon.remove(respectiveIndex);
         }
         Polygon remainingPolygon = createNewTriangle(polygon.get(0), polygon.get(1), polygon.get(2));
         triangles.add(remainingPolygon);
