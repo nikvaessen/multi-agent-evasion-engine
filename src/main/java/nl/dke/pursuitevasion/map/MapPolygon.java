@@ -33,6 +33,11 @@ public class MapPolygon extends java.awt.Polygon
         this(polygon.xpoints, polygon.ypoints, polygon.npoints, solid);
     }
 
+    public MapPolygon(boolean solid)
+    {
+        this.solid = solid;
+    }
+
     public boolean isSolid()
     {
         return solid;

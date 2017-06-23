@@ -10,7 +10,7 @@ import java.util.Random;
  */
 public class EngineConstants
 {
-    public final static double WALKING_SPEED =  40; // pixels
+    public final static double WALKING_SPEED =  32; // scale is cm
     public final static double TURNING_SPEED = 360; // degrees (1 circle rotation per second)
     public final static double VISION_RANGE  = 100; // pixels
     public final static double VISION_ANGLE  = 120; // degrees
