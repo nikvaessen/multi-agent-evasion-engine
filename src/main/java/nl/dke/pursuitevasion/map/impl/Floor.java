@@ -1233,9 +1233,9 @@ public class Floor extends AbstractObject
             } else {
                 //if you reached the first element, continue at the end of the list until the found first connection
                 for (int m = obstacleVertices.get(lastObstacle).size() - 1; m > lastObstacleVertex; m--) {
-                    System.out.println("m: " + m);
-                    newPolygon.add(obstacleVertices.get(lastObstacle).get(m));
-                    verticesInbetween++;
+                    //System.out.println("m: " + m);
+                    //newPolygon.add(obstacleVertices.get(lastObstacle).get(m));
+                    //verticesInbetween++;
                     if (!found) {
                         System.out.println(obstacleVertices.get(lastObstacle).get(m));
                         newPolygon.add(obstacleVertices.get(lastObstacle).get(m));
