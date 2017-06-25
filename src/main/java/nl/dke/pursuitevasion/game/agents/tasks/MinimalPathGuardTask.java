@@ -3,8 +3,8 @@ package nl.dke.pursuitevasion.game.agents.tasks;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.AgentCommand;
-import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathAgent;
-import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathAgentState;
+import nl.dke.pursuitevasion.game.agents.impl.minimalPath.MinimalPathAgent;
+import nl.dke.pursuitevasion.game.agents.impl.minimalPath.MinimalPathAgentState;
 
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;

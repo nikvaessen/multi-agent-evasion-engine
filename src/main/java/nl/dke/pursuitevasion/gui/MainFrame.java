@@ -6,19 +6,14 @@ import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.Direction;
 import nl.dke.pursuitevasion.game.agents.impl.MCTS.CoordinatorEvaderKillKillKillEmAll;
-import nl.dke.pursuitevasion.game.agents.impl.MCTS.CoordinatorPursuerKillKillKillEmAll;
-import nl.dke.pursuitevasion.game.agents.impl.DistanceAgent;
-import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathAgent;
-import nl.dke.pursuitevasion.game.agents.impl.SimpleAgent;
+
 import nl.dke.pursuitevasion.game.agents.impl.UserAgent;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Created by nik on 2/8/17.
