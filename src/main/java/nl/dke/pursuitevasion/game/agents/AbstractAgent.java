@@ -4,7 +4,6 @@ import nl.dke.pursuitevasion.game.MapInfo;
 import nl.dke.pursuitevasion.game.EngineConstants;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.map.AbstractObject;
-import nl.dke.pursuitevasion.map.impl.EntryEvader;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 import nl.dke.pursuitevasion.map.impl.Obstacle;
@@ -47,7 +46,7 @@ public abstract class AbstractAgent
     /**
      * the unique id of an agent.
      *
-     * @return
+     * @return id of agent
      */
     public int getId() {
         return id;
@@ -132,8 +131,6 @@ public abstract class AbstractAgent
         this.visionRange = visionRange;
         this.visionAngle = visionAngle;
         this.visionArc = new VisionArc();
-
-
     }
 
     public void setMapInfo(MapInfo mapInfo){
@@ -143,7 +140,7 @@ public abstract class AbstractAgent
     /**
      * Update the Agent based on a command
      */
-    public void update(AgentCommand command)
+    void update(AgentCommand command)
     {
         if(logger.isTraceEnabled())
         {
@@ -336,7 +333,7 @@ public abstract class AbstractAgent
     }
 
     /** sets the start location inside the map boundaries
-     * @param startLocation
+     * @param startLocation startlocation
      */
     private void setStartLocation(Vector2D startLocation) {
         this.location = startLocation; if (true) return;
@@ -405,9 +402,6 @@ public abstract class AbstractAgent
         }
 
         private Collection<AbstractAgent> getVisibleAgents(Collection<AbstractAgent> agents){
-            // TODO: filter out own agent.
-
-            // TODO: filter out agent on other floors
             Floor f = getFloor();
             // pre-calculate all lines created by obstacles in the floor
             Collection<Line2D> lines = f.getLines();
@@ -442,7 +436,6 @@ public abstract class AbstractAgent
                     floor.getObstacles()) {
                 obstructions.add(obstacle.getPolygon());
             }
-            // TODO maybe limit this to the closest polygons.
             // get the lines for all objects in the Floor
             ArrayList<Line2D> lines = new ArrayList<>();
             for(Polygon polygon : obstructions){

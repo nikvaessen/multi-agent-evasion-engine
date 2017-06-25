@@ -147,7 +147,7 @@ public abstract class AbstractObject implements Serializable
      * @param polygon the polygon
      * @return the lines between all vertexes of the polygon
      */
-    private ArrayList<Line2D> getLines(Polygon polygon){
+    public ArrayList<Line2D> getLines(Polygon polygon){
         ArrayList<java.awt.geom.Line2D> lines = new ArrayList<>();
         Point2D start = null;
         Point2D last = null;
@@ -243,6 +243,17 @@ public abstract class AbstractObject implements Serializable
             }
         }
         return false;
+    }
+
+    /**
+     * Check if the given vector location is inside or on the boundaries of this object
+     *
+     * @param v the location
+     * @return true is it's inside or on the boundary of this object, false otherwise
+     */
+    public boolean contains(Vector2D v)
+    {
+        return this.polygon.contains(v);
     }
 
     /**

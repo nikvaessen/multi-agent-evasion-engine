@@ -1,14 +1,15 @@
 package nl.dke.pursuitevasion.map.impl;
 
+import com.sun.corba.se.impl.orbutil.graph.*;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.map.AbstractObject;
 import nl.dke.pursuitevasion.map.ObjectType;
 import nl.dke.pursuitevasion.map.MapPolygon;
+import nl.dke.pursuitevasion.map.builders.IDRegister;
+import nl.dke.pursuitevasion.map.builders.MapBuilder;
 import org.jgrapht.*;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.DefaultWeightedEdge;
-import org.jgrapht.graph.SimpleGraph;
-import org.jgrapht.graph.SimpleWeightedGraph;
+import org.jgrapht.alg.NeighborIndex;
+import org.jgrapht.graph.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,7 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.*;
+import java.util.List;
 
 /**
  * A floor is a 2d level in which agents can walk
@@ -68,7 +70,7 @@ public class Floor extends AbstractObject
      * and of the obstacles. Edges represents line-of-sight visibility between the two endpoints.
      * The weight is the distance between the two vertexes in the floor
      */
-    private WeightedGraph<Vector2D, DefaultWeightedEdge> visibilityGraph;
+    private SimpleWeightedGraph<Vector2D, DefaultWeightedEdge> visibilityGraph;
 
     /**
      * Create a floor object
@@ -86,11 +88,11 @@ public class Floor extends AbstractObject
         super(polygon, floodID);
         //verifyInsideFloor(obstacles);
         //verifyInsideFloor(gates);
-        this.obstacles = Collections.unmodifiableCollection(obstacles);
-        this.gates = Collections.unmodifiableCollection(gates);
-        this.exits = Collections.unmodifiableCollection(exits);
-        this.entryEvader = Collections.unmodifiableCollection(entryEvader);
-        this.entryPursuer = Collections.unmodifiableCollection(entryPursuer);
+        this.obstacles = Collections.unmodifiableCollection(obstacles == null ? new ArrayList<>(0) : obstacles);
+        this.gates = Collections.unmodifiableCollection(gates == null? new ArrayList<>(0) : gates);
+        this.exits = Collections.unmodifiableCollection(exits == null ? new ArrayList<>(0) : exits);
+        this.entryEvader = Collections.unmodifiableCollection(entryEvader == null ? new ArrayList<>(0) : entryEvader);
+        this.entryPursuer = Collections.unmodifiableCollection(entryPursuer == null ? new ArrayList<>(0) : entryPursuer);
         this.lines = this.constructLines();
         this.visibilityGraph = computeVisibilityGraph();
     }
@@ -190,13 +192,38 @@ public class Floor extends AbstractObject
     }
 
     /**
-     * Compute the visibility graph of this floor
+     * Get the visibility graph of the floor including a list of vertexes which should also be included into
+     * the graph
+     *
+     * @param additionalVertexes the list of vertexes which should also be included into the graph
+     * @return the visibility graph of the floor, where each vertex is a vertex of the polygon and
+     * also included the vertexes given. All edges mean there is visibility between the two vertexes
+     */
+    public WeightedGraph<Vector2D, DefaultWeightedEdge> getVisibilityGraph(List<Vector2D> additionalVertexes)
+    {
+        return computeVisibilityGraph(additionalVertexes);
+    }
 
+    /**
+     * Compute the visibility graph of this floor
+     *
      * @return the visibility graph
      */
-    private WeightedGraph<Vector2D, DefaultWeightedEdge> computeVisibilityGraph()
+    private SimpleWeightedGraph<Vector2D, DefaultWeightedEdge> computeVisibilityGraph()
     {
-        WeightedGraph<Vector2D, DefaultWeightedEdge> g
+        return this.computeVisibilityGraph(null);
+    }
+
+
+    /**
+     * Compute the visibility graph of this floor
+     *
+     * @param toInclude list of vertexes which should also be included into the vertex
+     * @return the visibility graph
+     */
+    private SimpleWeightedGraph<Vector2D, DefaultWeightedEdge> computeVisibilityGraph(List<Vector2D> toInclude)
+    {
+        SimpleWeightedGraph<Vector2D, DefaultWeightedEdge> g
                 = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
 
         // Get all subgraphs
@@ -213,7 +240,15 @@ public class Floor extends AbstractObject
             }
         }
 
-        //add the rest of the edges
+        // also include the extra vertexes
+        if(toInclude != null)
+        {
+            for (Vector2D v : toInclude) {
+                g.addVertex(v);
+            }
+        }
+
+        //add the edges
         Set<Vector2D> vertexes = g.vertexSet();
         for(Vector2D v : vertexes)
         {
@@ -223,7 +258,9 @@ public class Floor extends AbstractObject
                 boolean vertexesEqual = v.equals(u);
                 boolean edgeExists = g.getEdge(u, v) != null;
                 boolean vertexesLineOfSight = isLineOfSight(v, u, obstacles);
-
+                boolean edgeInsidePolygon = insidePolygon(this.getPolygon(),
+                        v, u);
+                boolean edgeInsideObstacle = insideObstacle(u,v, obstacles);
                 //log
                 if(logger.isTraceEnabled())
                 {
@@ -234,8 +271,10 @@ public class Floor extends AbstractObject
                                  vertexesLineOfSight);
                 }
 
-                //add edge if vertexes not equal, edge doesn't exist, and there is line of sight between the vertexes
-                if(!vertexesEqual && !edgeExists && vertexesLineOfSight)
+                //add edge if vertexes not equal, edge doesn't exist,
+                // and there is line of sight between the vertexes
+                if(!vertexesEqual && !edgeExists && vertexesLineOfSight
+                        && edgeInsidePolygon && !edgeInsideObstacle)
                 {
                     DefaultWeightedEdge e = new DefaultWeightedEdge();
                     g.addEdge(v, u, e);
@@ -245,6 +284,32 @@ public class Floor extends AbstractObject
         }
 
         return g;
+    }
+
+    private boolean insideObstacle(Vector2D u, Vector2D v, Collection<Obstacle> obstacles) {
+        for (Obstacle obstacle : obstacles) {
+
+            if(insidePolygon(obstacle.getPolygon(), u,v)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check whether the mid point of the line between u and v
+     * is inside the given polygon p
+     *
+     * @param p the polygon
+     * @param v a location v, the start point of the line
+     * @param u another location, the end point of the line
+     * @return true when the midpoint of the line between u and v
+     *         is inside the given polygon, false otherwise
+     */
+    private boolean insidePolygon(MapPolygon p, Vector2D v, Vector2D u)
+    {
+        Vector2D midPoint = v.add(u).scale(0.5);
+        return p.contains(midPoint);
     }
 
     /**
@@ -280,9 +345,10 @@ public class Floor extends AbstractObject
                 new Point2D.Double(u.getX(), u.getY()));
 
         // Knowing that they are not neighbours:
-        // case 1: They are both vertexes on a non-solid polygon (both vertexes of floor)
+        // cas@e 1: They are both vertexes on a non-solid polygon (both vertexes of floor)
         //         Check for intersection with solid-polygons inside floor and non-solid
         //         polygon excluding lines with one endpoint being either vertex
+        //         If this is the case, there is no visibility
         if(bothInObject(this, u, v))
         {
             for(Line2D line: lines)
@@ -303,7 +369,7 @@ public class Floor extends AbstractObject
         //         that is checked in step 1
         for(Obstacle o : obstacles)
         {
-            if(bothInObject(o, u, v))
+            if(bothInObject(o, u, v) && insidePolygon(o.getPolygon(), u, v))
             {
                 return false;
             }
@@ -324,6 +390,9 @@ public class Floor extends AbstractObject
                 }
             }
         }
+
+        // case 5: The line connecting u and v is outside of the polygon
+
         return true;
     }
 
@@ -366,15 +435,235 @@ public class Floor extends AbstractObject
         return v.equals(e1) || v.equals(e2);
     }
 
-    private boolean lineIntersectsPolygon(Polygon p, Line2D line)
+    /**
+     * Calculates the subfloors created by using a path to divide the main polygon up in
+     * two subpolygons
+     *
+     * @param path the path dividing the floor into two subpolygons
+     * @return Arraylist of size 2 with the subfloors
+     * @throws IllegalArgumentException when the given path cannot divide the floor
+     */
+    public ArrayList<Floor> getSubFloors(GraphPath<Vector2D, ? extends DefaultEdge> path)
+            throws IllegalArgumentException
     {
-        // step 1: check if u and v
+        // Step 1: Create the 2 walks from u to v to create sP1 and sP2
+        MapPolygon mainPolygon = this.getPolygon();
 
-        for (int i = 0; i < p.npoints; i++)
+        Vector2D u = path.getStartVertex();
+        Vector2D v = path.getEndVertex();
+
+        //check if both u and v are vertexes in main floor and different from each other
+        if (!mainPolygon.getPoints().contains(u) || !mainPolygon.getPoints().contains(v) || u.equals(v))
         {
-            new Vector2D(p.xpoints[i], p.ypoints[i]);
+            throw new IllegalArgumentException("The given path cannot divide the floor in two subfloors");
+        }
+
+
+        // remove the "handles" from the floor.
+        Subgraph<Vector2D, DefaultEdge, SimpleGraph<Vector2D, DefaultEdge>> g = removeHandles(this.getPolygonGraph());
+        // TODO: recalculate u and v
+        // walk the path until you reach a vertex in the graph in both directions.
+        NeighborIndex<Vector2D, DefaultEdge> mainPolygonGraphNeighbourList = new NeighborIndex<>(g);
+        for (Vector2D w : g.vertexSet())
+        {
+            List<Vector2D> neighbors = mainPolygonGraphNeighbourList.neighborListOf(w);
+            if (neighbors.size() != 2)
+            {
+
+                throw new IllegalArgumentException("Cannot divide main polygon");
+            }
+        }
+
+        ArrayList<Vector2D> walk1 = constructWalkFromUToV(mainPolygonGraphNeighbourList, u, v, new ArrayList<>());
+        ArrayList<Vector2D> walk2 = constructWalkFromUToV(mainPolygonGraphNeighbourList, u, v, new ArrayList<>(walk1));
+
+        // Step 2: add the path to both sP1 and sP2
+        List<Vector2D> reversedPath = path.getVertexList();
+        Collections.reverse(reversedPath);
+        walk1.addAll(reversedPath);
+        walk2.addAll(reversedPath);
+
+        //create the main floor polygons :)
+        MapPolygon sp1Floor = createMapPolygon(walk1, false);
+        MapPolygon sp2Floor = createMapPolygon(walk2, false);
+
+        // Step 3: for all obstacles who have a vertex in the shortest path:
+        //          see if another vertex of the obstacle lie inside sP1 or sP2
+        //          and add the obstacle according to the position of that vertex
+        // Step 4: for all other obstacles:
+        //          see if a vertex lies inside sP1 or sP2 and add accordingly
+        LinkedList<Obstacle> sp1Obstacles = new LinkedList<>();
+        LinkedList<Obstacle> sp2Obstacles = new LinkedList<>();
+        for (Obstacle o : this.obstacles)
+        {
+            if(obstacleInPolygon(o, sp1Floor))
+            {
+                sp1Obstacles.add(o);
+            }
+            else if(obstacleInPolygon(o, sp2Floor))
+            {
+                sp2Obstacles.add(o);
+            }
+            else
+            {
+                throw new IllegalArgumentException("Obstacle not in any polygon");
+            }
+        }
+
+        Floor f1 = new Floor(sp1Floor, 1, sp1Obstacles, null, null, null, null);
+        Floor f2 = new Floor(sp2Floor, 2, sp2Obstacles, null, null, null, null);
+
+        ArrayList<Floor> floors = new ArrayList<>();
+        floors.add(f1);
+        floors.add(f2);
+
+        return floors;
+    }
+
+    public boolean isSimple(){
+        if(obstacles.size() == 0){
+            return true;
+        }
+        int obstaclesSharingVertex = 0;
+        Collection<Vector2D> polygonVertexes = this.getPolygon().getPoints();
+        for (Obstacle obstacle : obstacles) {
+            for (Vector2D obstacleVertex : obstacle.getPolygon().getPoints()) {
+                if(polygonVertexes.contains(obstacleVertex)){
+                    obstaclesSharingVertex ++;
+                    break;
+                }
+            }
+        }
+        if(obstaclesSharingVertex == obstacles.size()){
+            return true;
         }
         return false;
+    }
+
+    private Subgraph<Vector2D, DefaultEdge, SimpleGraph<Vector2D, DefaultEdge>> removeHandles(SimpleGraph<Vector2D, DefaultEdge> polygonGraph) {
+        NeighborIndex<Vector2D, DefaultEdge> neighbourList = getNeigbourList();
+        Subgraph<Vector2D, DefaultEdge, SimpleGraph<Vector2D, DefaultEdge>> newGraph =
+                new Subgraph<Vector2D, DefaultEdge, SimpleGraph<Vector2D, DefaultEdge>>(polygonGraph);
+
+        ArrayList<Vector2D> removedVertexes = new ArrayList<>();
+        boolean done = false;
+        while(!done){
+            boolean changed = false;
+            for (Vector2D vector : polygonGraph.vertexSet()) {
+                if(neighbourList.neighborsOf(vector).size() == 1 && !removedVertexes.contains(vector)){
+                    changed = true;
+                    newGraph.removeVertex(vector);
+                    removedVertexes.add(vector);
+                }
+            }
+            if(changed){
+                done = false;
+            }
+            else{
+                done = true;
+            }
+        }
+        return newGraph;
+    }
+
+    /**
+     * Find the path of vertexes to be able to walk from u to v, given a list of all neighbours
+     * for all vertexes in the graph. This excludes the initial u and v
+     *
+     * @param neighborIndex the list of neighbours of all vertexes
+     * @param u the start vertex
+     * @param v the end vertex
+     * @param notAllowed list of vertexes not allowed to walk to
+     * @return the walk from u to v, excluding u and v
+     */
+    private ArrayList<Vector2D> constructWalkFromUToV(NeighborIndex<Vector2D, DefaultEdge> neighborIndex,
+                                                      Vector2D u, Vector2D v, ArrayList<Vector2D> notAllowed)
+    {
+        ArrayList<Vector2D> list = new ArrayList<>();
+        return constructWalkFromUToV(neighborIndex, u, v, notAllowed, list);
+    }
+
+    /**
+     * Find the path of vertexes to be able to walk from u to v, given a list of all neighbours
+     * for all vertexes in the graph. This excludes the initial u and v
+     *
+     * @param neighborIndex the list of neighbours for each vertex of the graph
+     * @param u the start vertex
+     * @param v the end vertex
+     * @param notAllowed the vertexes which are not allowed to be walked to
+     * @param previousVertexes list of vertexes already walked to
+     * @return the list of vertexes walked to + 1 new one vertex
+     */
+    private ArrayList<Vector2D> constructWalkFromUToV(NeighborIndex<Vector2D, DefaultEdge> neighborIndex,
+                                                      Vector2D u, Vector2D v, ArrayList<Vector2D> notAllowed,
+                                                      ArrayList<Vector2D> previousVertexes)
+    {
+        if(u.equals(v))
+        {
+            previousVertexes.remove(v);
+            return previousVertexes;
+        }
+        else
+        {
+            List<Vector2D> neighbors = neighborIndex.neighborListOf(u);
+            Vector2D neighbor = null;
+            for(Vector2D w : neighbors)
+            {
+                if(!w.equals(u) && !notAllowed.contains(w))
+                {
+                    neighbor = w;
+                }
+            }
+            if(neighbor == null)
+            {
+                throw new IllegalArgumentException("Cannot find a walk to v");
+            }
+
+            previousVertexes.add(neighbor);
+            notAllowed.add(u);
+            return constructWalkFromUToV(neighborIndex, neighbor, v, notAllowed, previousVertexes);
+        }
+    }
+
+    /**
+     * Create the MapPolygon based on a given array of vertexes of the polygon to be
+     *
+     * @param vertexes the list of vertexes
+     * @param solid if the MapPolygon will be solid or not
+     * @return the MapPolygon
+     */
+    private MapPolygon createMapPolygon(ArrayList<Vector2D> vertexes, boolean solid)
+    {
+        MapPolygon p = new MapPolygon();
+        //vertexes.removeIf(v -> Collections.frequency(vertexes, v) > 1);
+        for(Vector2D v : vertexes)
+        {
+            p.addPoint(new Double(v.getX()).intValue(),
+                       new Double(v.getY()).intValue());
+        }
+        return new MapPolygon(p, solid);
+    }
+
+    /**
+     * Checks whether a given obstacle is in a given Polygon
+     *
+     * @param o the obstacle
+     * @param polygon the polygon
+     * @return
+     */
+    private boolean obstacleInPolygon(Obstacle o, MapPolygon polygon)
+    {
+        for(Vector2D v : o.getPolygon().getPoints())
+        {
+            boolean vInsideP = polygon.contains(v);
+            logger.trace("{} inside {}: {}", v, polygon, vInsideP);
+            if(!vInsideP)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -405,35 +694,16 @@ public class Floor extends AbstractObject
         return lines;
     }
 
-    /**
-     * Get the lines between all vertexes of the given polygon
-     *
-     * @param polygon the polygon
-     * @return the lines between all vertexes of the polygon
-     */
-    private ArrayList<Line2D> getLines(Polygon polygon){
-        ArrayList<java.awt.geom.Line2D> lines = new ArrayList<>();
-        Point2D start = null;
-        Point2D last = null;
-        for (PathIterator iter = polygon.getPathIterator(null); !iter.isDone(); iter.next()) {
-            double[] points = new double[6];
-            int type = iter.currentSegment(points);
-            if (type == PathIterator.SEG_MOVETO) {
-                Point2D moveP = new Point2D.Double(points[0], points[1]);
-                last = moveP;
-                start = moveP;
-            } else if (type == PathIterator.SEG_LINETO) {
-                Point2D newP = new Point2D.Double(points[0], points[1]);
-                java.awt.geom.Line2D line = new java.awt.geom.Line2D.Double(last, newP);
-                lines.add(line);
-                last = newP;
-            } else if (type == PathIterator.SEG_CLOSE){
-                java.awt.geom.Line2D line = new java.awt.geom.Line2D.Double(start, last);
-                lines.add(line);
-            }
+    @Override
+    public String toString()
+    {
+        StringBuilder builder = new StringBuilder("Floor[");
+        builder.append(String.format("mainPolygon: %s,", this.getPolygonGraph().vertexSet()));
+        for(Obstacle o: this.getObstacles())
+        {
+            builder.append(String.format("\n\tobstacle: %s \n", o.getPolygonGraph().vertexSet()));
         }
-        return lines;
+        builder.append("]");
+        return builder.toString();
     }
-
-
 }

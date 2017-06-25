@@ -100,7 +100,6 @@ public class Engine
                     pursuers.push(agent);
                 }
             }
-
             // start the game loop
             loop();
         }
@@ -307,6 +306,7 @@ public class Engine
                     allowedMeters -= command.getMovedDistance();
 
                     allowedRotation -= command.getRotatedDistance();
+                    
 
                     if(logger.isTraceEnabled())
                     {
@@ -428,7 +428,7 @@ public class Engine
 
         private boolean inside(AbstractObject o, Vector2D point)
         {
-            return o.inside(point);
+            return o.getPolygon().contains(point);
         }
 
         private void removeCaughtEvaders()
@@ -441,8 +441,10 @@ public class Engine
                 {
                     if(agentsOverlap(evader, pursuer))
                     {
-                        agents.remove(evader);
-                        evaders.remove(evader);
+                        if(!EngineConstants.GOD_MODE){
+                            agents.remove(evader);
+                            evaders.remove(evader);
+                        }
                     }
                 }
             }

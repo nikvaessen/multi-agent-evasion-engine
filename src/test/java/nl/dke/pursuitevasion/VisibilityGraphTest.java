@@ -62,10 +62,12 @@ public class VisibilityGraphTest
         List<GraphPath<Vector2D, DefaultWeightedEdge>> paths =
                 kShortestPaths.getPaths(v1, v2);
 
+        System.out.println("Paths between " + v1 + "and " + v2);
         System.out.println(paths.size());
         for(GraphPath p : paths)
         {
-            System.out.println(p);
+            System.out.printf("path: %s, edges: %s=, length: %f\n",
+                    p.getVertexList(), p.getLength(), p.getWeight());
         }
 
     }

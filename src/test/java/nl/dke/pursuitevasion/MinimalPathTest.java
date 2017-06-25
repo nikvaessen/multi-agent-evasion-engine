@@ -5,9 +5,8 @@ import nl.dke.pursuitevasion.game.EngineConstants;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.Direction;
-import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathAgent;
-import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathOverseer;
 import nl.dke.pursuitevasion.game.agents.impl.RandomAgent;
+import nl.dke.pursuitevasion.game.agents.impl.minimalPath.MinimalPathOverseer;
 import nl.dke.pursuitevasion.game.agents.impl.UserAgent;
 import nl.dke.pursuitevasion.gui.KeyboardInputListener;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
@@ -19,8 +18,6 @@ import org.jgrapht.graph.*;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by Jan on 24-5-2017.
@@ -29,8 +26,7 @@ public class MinimalPathTest {
 
     public static void main(String[] args) {
         // do init stuff
-        //Map map = Map.getMap("simpleMap.ser");
-        Map map = Map.getMap("NikMap.ser");
+        Map map = Map.getTestMap();
         ArrayList<AbstractAgent> agents = new ArrayList<>();
         JFrame frame = new JFrame();
         Floor floor = map.getFloors().iterator().next();
@@ -39,24 +35,25 @@ public class MinimalPathTest {
         KeyboardInputListener l = new KeyboardInputListener();
         frame.addKeyListener(l);
 
-        agents.add(new MinimalPathAgent(map, floor, new Vector2D(50.0,50.0), Direction.NORTH, 5, 100000, 360));
-        agents.add(new MinimalPathAgent(map, floor, new Vector2D(75.0,50.0), Direction.NORTH, 5, 100000, 360));
-        agents.add(new MinimalPathAgent(map, floor, new Vector2D(25.0,50.0), Direction.NORTH, 5, 100000, 360));
+        MinimalPathOverseer overseer = new MinimalPathOverseer(map, new Vector2D(50, 50));
+        panel.setMinimalPathOverseer(overseer);
+        for(int i = 0 ; i < overseer.getAmountOfAgents(); i++)
+        {
+            agents.add(overseer.getAgent(i));
+        }
         //agents.add(new RandomAgent(map, floor, new Vector2D(200.0, 100.0), Direction.NORTH, 5, 100, 120));
-        agents.add(new UserAgent(map, floor, new Vector2D(500.0, 130.0), Direction.NORTH, 5, 100, 120, l, true));
+        //agents.add(new UserAgent(map, floor, new Vector2D(200.0, 320.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE,  EngineConstants.VISION_ANGLE, l, true));
+        agents.add(new RandomAgent(map, floor, new Vector2D(200.0, 320.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
 
         Engine simulationEngine = new Engine(map, agents, panel, 60);
-
 
         frame.getContentPane().add(panel);
         frame.pack();
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setVisible(true);
         simulationEngine.start();
-        /*
 
         //drawFrame(frame, map, visibilityGraph, null);
-*/
     }
 
     private static void drawGraph(JFrame frame, Floor floor, Graph<Vector2D, DefaultWeightedEdge> vgraph){
