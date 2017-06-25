@@ -4,21 +4,17 @@ import nl.dke.pursuitevasion.game.Engine;
 import nl.dke.pursuitevasion.game.EngineConstants;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
-import nl.dke.pursuitevasion.game.agents.AgentCommand;
 import nl.dke.pursuitevasion.game.agents.Angle;
 import nl.dke.pursuitevasion.game.agents.Direction;
 import nl.dke.pursuitevasion.game.agents.tasks.AbstractAgentTask;
 import nl.dke.pursuitevasion.game.agents.tasks.RotateTask;
 import nl.dke.pursuitevasion.game.agents.tasks.WalkToTask;
-import nl.dke.pursuitevasion.gui.KeyboardInputListener;
-import nl.dke.pursuitevasion.gui.editor.ModelView;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by Nibbla on 19.05.2017.
@@ -143,7 +139,7 @@ public class CoordinatorPursuerKillKillKillEmAll{
             else m = MCTS_2.getLastMCTS();
             if (viewport!=null){
                 if ((  start - lastTimeViewUpdate)>2000)  {
-                    viewport.setMCTSPreview(m);
+                    viewport.setMCTSPreview(m, false);
                     lastTimeViewUpdate = start;
                 }
 

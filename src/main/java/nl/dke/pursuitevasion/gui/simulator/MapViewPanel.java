@@ -44,6 +44,7 @@ public class MapViewPanel
     private Dimension preferredSize;
 
     private MinimalPathOverseer minimalPathOverseer;
+    private boolean visualOutputMCTS = false;
 
 
     public MapViewPanel(Map map, Collection<AbstractAgent> agents)
@@ -84,9 +85,10 @@ public class MapViewPanel
         return m;
     }
 
-    public void setMCTSPreview(MCTS_2 mcts)
+    public void setMCTSPreview(MCTS_2 mcts, boolean visualOutput)
     {
         this.mcts = mcts;
+        this.visualOutputMCTS = visualOutput;
     }
 
     public void setMCTSViewSettings(MCTS_2.MCTSViewSettings mctsViewSettings)
@@ -184,7 +186,7 @@ public class MapViewPanel
 //            g.drawLine(left.x, left.y, base.x, base.y);
 
         }
-        if (mcts != null) {
+        if (mcts != null && visualOutputMCTS) {
             mcts.paint(g,mctsViewSettings,this,agents);
         }
         if(minimalPathOverseer != null)

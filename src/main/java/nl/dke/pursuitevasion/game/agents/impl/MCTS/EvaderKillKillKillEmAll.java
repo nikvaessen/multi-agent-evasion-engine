@@ -59,10 +59,10 @@ public class EvaderKillKillKillEmAll extends AbstractAgent{
     @Override
     protected void completeRequest(AgentRequest request) {
        // if (CoordinatorPursuer == null) CoordinatorPursuer = new CoordinatorPursuerKillKillKillEmAll();
-        System.out.println("Ask for move");
+       // System.out.println("Ask for move");
         AbstractAgentTask a =coordinatorEvader.getNextMove(this, EngineConstants.CALCULATION_TIME);
         AbstractAgentTask b = coordinatorEvader.getRotationTaks(this);
-        System.out.println("recieved as solution: "+ a);
+       // System.out.println("recieved as solution: "+ a);
         request.add(a);
 
 

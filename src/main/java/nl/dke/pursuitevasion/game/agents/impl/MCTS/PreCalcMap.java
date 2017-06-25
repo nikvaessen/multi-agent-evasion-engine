@@ -189,13 +189,13 @@ public class PreCalcMap {
                 for (int y = 0; y < w; y++) {
                     Vector2D current = XYToScreenPos(x,y);
                     val[x][y] = center.distance(current);
-                    System.out.print(val[x][y]);
+                   // System.out.print(val[x][y]);
                     if (x==19&&y==19&&center.x>=19&&center.y>=19) {
-                        System.out.print("eheh");
+                        //System.out.print("eheh");
                     }
                 }
             }
-            System.out.println();
+           // System.out.println();
 
 
 

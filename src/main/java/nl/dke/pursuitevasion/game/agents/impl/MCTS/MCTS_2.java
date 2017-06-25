@@ -92,7 +92,7 @@ public class MCTS_2 implements Strategy{
             }
         }
         //printTree(root);
-        System.out.println("Expansions: "+n_expansion);
+       // System.out.println("Expansions: "+n_expansion);
         NodeTree_2 m = null;
         if (depthLevel==10){ m = getBestValue();}else
         {m = getBestMove();}
@@ -189,13 +189,13 @@ public class MCTS_2 implements Strategy{
     public NodeTree_2 getBestValue() {
         NodeTree_2 bestNode = null;
         double bestValue = -999999999;
-        System.out.println("gettingthe best for evader?" + ally.isEvader());
+       // System.out.println("gettingthe best for evader?" + ally.isEvader());
 
         for(NodeTree_2 child: root.getChildren()){
 
             double value = child.getWins()/(child.getMaximalPossiblePoints()*1.0);
-            System.out.println(child.getMove());
-            System.out.println("   " + value );
+           // System.out.println(child.getMove());
+           // System.out.println("   " + value );
             if(value>bestValue) {
                 bestNode = child;
                 bestValue = value;

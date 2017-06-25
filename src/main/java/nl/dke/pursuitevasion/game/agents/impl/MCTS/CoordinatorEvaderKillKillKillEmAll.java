@@ -47,6 +47,7 @@ public class CoordinatorEvaderKillKillKillEmAll{
     private final Engine engine;
     private final ArrayList<AbstractAgent> agents;
     private final PreCalcMap preCalcMap;
+    private boolean visualOutput;
     ArrayList<AbstractAgent>  evador  = new ArrayList<>(1);
     ArrayList<AbstractAgent> pursuers = new ArrayList<>(3);
     private MCTS_2 m;
@@ -59,11 +60,12 @@ public class CoordinatorEvaderKillKillKillEmAll{
 
 
     public CoordinatorEvaderKillKillKillEmAll(Engine e, Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing, int radius,
-                                               double visionRange, double visionAngle, ArrayList<AbstractAgent> agents  ) {
+                                              double visionRange, double visionAngle, ArrayList<AbstractAgent> agents, boolean visualOUtput) {
         this.map = map;
         this.floor = startingFloor;
         this.engine = e;
         this.agents = agents;
+        this.visualOutput = visualOUtput;
         EvaderKillKillKillEmAll e1 = new EvaderKillKillKillEmAll( map,  startingFloor,  startLocation,  startsFacing,  radius,
                 visionRange,  visionAngle,0);
 
@@ -147,12 +149,12 @@ public class CoordinatorEvaderKillKillKillEmAll{
         @Override
         public void run() {
             long start = System.currentTimeMillis();
-            System.out.println("Started one MCTS at: " + start + "ms");
+          //  System.out.println("Started one MCTS at: " + start + "ms");
             if (MCTS_2.getLastMCTS() == null) m = new MCTS_2(s,t,calculationTime, 10,false,preCalcMap);
             else m = MCTS_2.getLastMCTS();
             if (viewport!=null){
                 if ((  start - lastTimeViewUpdate)>2000)  {
-                    viewport.setMCTSPreview(m);
+                    viewport.setMCTSPreview(m,visualOutput);
                     lastTimeViewUpdate = start;
                 }
 
@@ -169,8 +171,8 @@ public class CoordinatorEvaderKillKillKillEmAll{
             long finish = System.currentTimeMillis();
             long duration = finish-start;
             lastTime = finish;
-            System.out.println(m.toString());
-            System.out.println("Finished one MCTS in: " + duration + "ms");
+            //System.out.println(m.toString());
+           // System.out.println("Finished one MCTS in: " + duration + "ms");
         }
     }
 

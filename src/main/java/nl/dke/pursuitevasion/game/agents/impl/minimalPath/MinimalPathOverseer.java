@@ -1,4 +1,4 @@
-package nl.dke.pursuitevasion.game.agents.impl.minimalPath;
+package nl.dke.pursuitevasion.game.agents.impl.MinimalPath;
 
 import nl.dke.pursuitevasion.game.EngineConstants;
 import nl.dke.pursuitevasion.game.MapInfo;
@@ -22,7 +22,7 @@ import org.jgrapht.graph.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static nl.dke.pursuitevasion.game.agents.impl.minimalPath.MinimalPathOverseerState.THIRD_AGENT_CHASING;
+import static nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathOverseerState.THIRD_AGENT_CHASING;
 
 /**
  * Created by Jan on 24-5-2017.
