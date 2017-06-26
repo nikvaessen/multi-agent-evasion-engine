@@ -13,8 +13,10 @@ import nl.dke.pursuitevasion.map.impl.Map;
 
 import java.util.*;
 import java.util.List;
+import java.util.logging.LogManager;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
+import org.apache.log4j.Level;
 import org.jgrapht.*;
 import org.jgrapht.alg.interfaces.KShortestPathAlgorithm;
 import org.jgrapht.alg.shortestpath.KShortestPaths;
@@ -370,6 +372,7 @@ public class MinimalPathOverseer
                     // evict
                     logger.info("evicting with agent {}", agent.getAgentNumber());
                     evict(agent, request, mapInfo);
+                    return;
                 }
             }
             // unless you are already chasing
@@ -385,11 +388,15 @@ public class MinimalPathOverseer
 //        List<GraphPath<Vector2D, DefaultWeightedEdge>> boundingPaths = getBoundingPaths();
 //        if(boundingPaths.size()==3){boundingPaths = getPathsBoundingPe();}
 
-        List<GraphPath<Vector2D, DefaultWeightedEdge>> boundingPaths = getPathsBoundingPe();
+        List<GraphPath<Vector2D, DefaultWeightedEdge>> boundingPaths = getBoundingPaths();
         if(boundingPaths.size() == 0){
             return completeFloor;
         }
-        if(boundingPaths.size()>1){
+        else if(boundingPaths.size() == 1){
+            GraphPath<Vector2D, DefaultWeightedEdge> path = boundingPaths.get(0);
+            return pruneFloor(path, evaderLocation, completeFloor);
+        }
+        else if(boundingPaths.size()== 2){
             GraphPath<Vector2D, DefaultWeightedEdge> path1 = boundingPaths.get(0);
             GraphPath<Vector2D, DefaultWeightedEdge> path2 = boundingPaths.get(1);
 
@@ -406,12 +413,41 @@ public class MinimalPathOverseer
             return f1.getPolygon().getArea() < f2.getPolygon().getArea() ? f1 : f2;
 
         }
-        else{
-
-            GraphPath<Vector2D, DefaultWeightedEdge> path = boundingPaths.get(0);
-            return pruneFloor(path, evaderLocation, completeFloor);
+        else if(boundingPaths.size() == 3){
+            List<Floor> potentialPes = getPotentialPes(boundingPaths, evaderLocation);
+            double minArea = Double.MAX_VALUE;
+            Floor smallestFloor = null;
+            for (Floor potentialPe : potentialPes) {
+                double area = potentialPe.getPolygon().getArea();
+                if(area < minArea){
+                    smallestFloor = potentialPe;
+                    minArea = area;
+                }
+            }
+            return smallestFloor;
         }
 
+        throw(new IllegalStateException("Invalid amount of paths "));
+
+    }
+
+    private List<Floor> getPotentialPes(List<GraphPath<Vector2D, DefaultWeightedEdge>> paths, Vector2D evaderLocation) {
+        List<Floor> PeCandidates = new ArrayList<>();
+
+        for(int i = 0 ; i < paths.size(); i ++){
+            for(int j = i+1 ; j < paths.size(); j ++){
+                GraphPath<Vector2D, DefaultWeightedEdge> path1 = paths.get(i);
+                GraphPath<Vector2D, DefaultWeightedEdge> path2 = paths.get(j);
+                try{
+                    Floor f = pruneFloor(path1, evaderLocation, pruneFloor(path2, evaderLocation, Pe));
+                    PeCandidates.add(f);
+                }
+                catch (IllegalStateException e){
+                    // lol
+                }
+            }
+        }
+        return PeCandidates;
     }
 
 
@@ -432,6 +468,8 @@ public class MinimalPathOverseer
         }
         return guardedPaths;
     }
+
+    
 /*
     private Floor determinePe(Vector2D evaderLocation) {
         // get the bounding paths

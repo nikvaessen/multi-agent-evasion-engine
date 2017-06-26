@@ -264,11 +264,14 @@ public class Floor extends AbstractObject
                 //log
                 if(logger.isTraceEnabled())
                 {
-                    logger.trace("v:{}, u:{}, v==u:{}, exists: {}, sight: {}",
-                                 v, u,
-                                 vertexesEqual,
-                                 edgeExists,
-                                 vertexesLineOfSight);
+                    logger.trace("v:{}, u:{}\tv==u:{}\texists: {}\tsight: {}\tinsideFloor: {}\tinsideObstacle: {}",
+                            v, u,
+                            vertexesEqual,
+                            edgeExists,
+                            vertexesLineOfSight,
+                            edgeInsidePolygon,
+                            edgeInsideObstacle
+                            );
                 }
 
                 //add edge if vertexes not equal, edge doesn't exist,

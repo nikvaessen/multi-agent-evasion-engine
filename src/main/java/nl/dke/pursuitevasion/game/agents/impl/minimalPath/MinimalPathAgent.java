@@ -44,6 +44,10 @@ public class MinimalPathAgent extends AbstractAgent{
         state = MinimalPathAgentState.NO_PATH;
     }
 
+    public MinimalPathAgent(int id) {
+        super(id);
+    }
+
     public int getAgentNumber(){return agentNumber;}
 
     @Override
@@ -61,6 +65,17 @@ public class MinimalPathAgent extends AbstractAgent{
     @Override
     public boolean isEvader() {
         return false;
+    }
+
+    @Override
+    public MinimalPathAgent clone(){
+        MinimalPathAgent a = new MinimalPathAgent(this.getId());
+        AbstractAgent.setProtectedValues(this, a);
+        a.agentNumber = this.agentNumber;
+        a.overseer = this.overseer;
+        a.state = this.state;
+        a.projectionLocation = this.projectionLocation;
+        return a;
     }
 
     public MinimalPathAgentState getState(){return state;}

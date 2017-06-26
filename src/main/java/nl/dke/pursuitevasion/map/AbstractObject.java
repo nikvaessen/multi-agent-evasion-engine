@@ -237,7 +237,7 @@ public abstract class AbstractObject implements Serializable
     {
         for(Line2D line : connectionLines)
         {
-            if(line.ptSegDist(v.getX(), v.getY()) < 0.5)
+            if(line.ptSegDist(v.getX(), v.getY()) < 0.0001)
             {
                 return true;
             }

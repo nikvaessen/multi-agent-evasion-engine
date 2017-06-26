@@ -22,7 +22,7 @@ public class WalkToTask
     extends AbstractAgentTask
 {
 
-    private static Logger logger = LoggerFactory.getLogger(WalkToTask.class);
+    public static Logger logger = LoggerFactory.getLogger(WalkToTask.class);
 
     private Vector2D walkToLocation;
     private boolean pathFind;
@@ -79,6 +79,7 @@ public class WalkToTask
                 }
                 else
                 {
+
                     throw new IllegalArgumentException("Cannot compute path");
                 }
             }

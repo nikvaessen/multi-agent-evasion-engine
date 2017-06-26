@@ -26,22 +26,17 @@ import java.util.Random;
  *
  * Created by nik on 2/8/17.
  */
-public abstract class AbstractAgent
+public abstract class AbstractAgent implements Cloneable
 {
     private final static Logger logger = LoggerFactory.getLogger(AbstractAgent.class);
 
-
-
-
     private final int id;
+
     private static int idCount = 0;
 
     public AbstractAgent(int id) {
         this.id = id;
     }
-
-
-
 
     /**
      * the unique id of an agent.
@@ -504,5 +499,18 @@ public abstract class AbstractAgent
         }
     }
 
+    @Override
+    protected abstract Object clone() throws CloneNotSupportedException;
 
+    protected static void setProtectedValues(AbstractAgent original, AbstractAgent copy){
+        copy.map =          original.map;
+        copy.floor =        original.floor;
+        copy.location =     original.location.copy();
+
+        copy.facing =       original.facing.clone();
+        copy.radius =       original.radius;
+        copy.visionRange =  original.visionRange;
+        copy.visionAngle =  original.visionAngle;
+        copy.visionArc =    original.getVisionArc().clone();
+    }
 }

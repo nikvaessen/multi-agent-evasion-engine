@@ -39,6 +39,10 @@ public class DistanceAgent extends AbstractAgent
         super(map, startingFloor, startLocation, startsFacing, radius, visionRange, visionAngle);
     }
 
+    public DistanceAgent(int id) {
+        super(id);
+    }
+
     @Override
     protected void completeRequest(AgentRequest request)
     {
@@ -119,5 +123,12 @@ public class DistanceAgent extends AbstractAgent
     @Override
     public String toString() {
         return "Distance" + super.toString();
+    }
+
+    @Override
+    protected DistanceAgent clone() throws CloneNotSupportedException {
+        DistanceAgent a = new DistanceAgent(this.getId());
+        AbstractAgent.setProtectedValues(this, a);
+        return a;
     }
 }

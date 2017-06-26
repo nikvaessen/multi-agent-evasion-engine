@@ -39,21 +39,11 @@ public class RandomAgent extends AbstractAgent{
     @Override
     public RandomAgent clone() {
         RandomAgent ra = new RandomAgent(this.getId());
-        ra.map = map;
-        ra.floor = this.floor;
-        ra.location = this.location.copy();
-
-        ra.facing = this.facing.clone();
-        ra.radius = this.radius;
-        ra.visionRange = this.visionRange;
-        ra.visionAngle = this.visionAngle;
-        ra.visionArc = this.getVisionArc().clone();
-
-
+        AbstractAgent.setProtectedValues(this, ra);
         return ra;
     }
 
-    public RandomAgent(Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing, int radius, double visionRange, double visionAngle){
+    public RandomAgent(Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing, int radius, double visionRange, double visionAngle, boolean isEvader){
         super(map, startingFloor, startLocation, startsFacing, radius, visionRange, visionAngle);
     }
 
