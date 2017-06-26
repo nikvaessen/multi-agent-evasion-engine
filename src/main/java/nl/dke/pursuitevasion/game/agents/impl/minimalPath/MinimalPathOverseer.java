@@ -97,8 +97,9 @@ public class MinimalPathOverseer
      * @param map           the map the agents will play pursuit-evasion in
      * @param startLocation the startLocation of the first agent on the floor of the map
      */
-    public MinimalPathOverseer(Map map, Vector2D startLocation)
+    public MinimalPathOverseer(Map map)
     {
+        Vector2D startLocation = map.getPursuerSpawnLocation();
         // Set the known member variables
 
         // Information about the environment
@@ -125,7 +126,7 @@ public class MinimalPathOverseer
             MinimalPathAgent agent;
             agents.add(agent =
                            new MinimalPathAgent(map, this.completeFloor,
-                                                startLocation.add(new Vector2D(i * (2*radius + 1), 0)),
+                                                startLocation,
                                                 Direction.NORTH, radius, EngineConstants.VISION_RANGE,
                                                 EngineConstants.VISION_ANGLE,
                                                 this, i));
@@ -365,12 +366,12 @@ public class MinimalPathOverseer
                 // if no holes -> Evict E
                 if(Pe.getObstacles().size() > 0 && !Pe.isSimple()){
                     // shrink
-                    logger.info("shrinking with agent {}", agent.getAgentNumber());
+                    logger.debug("shrinking with agent {}", agent.getAgentNumber());
                     shrink(agent, request, mapInfo);
                 }
                 else{
                     // evict
-                    logger.info("evicting with agent {}", agent.getAgentNumber());
+                    logger.debug("evicting with agent {}", agent.getAgentNumber());
                     evict(agent, request, mapInfo);
                     return;
                 }
@@ -469,7 +470,7 @@ public class MinimalPathOverseer
         return guardedPaths;
     }
 
-    
+
 /*
     private Floor determinePe(Vector2D evaderLocation) {
         // get the bounding paths
@@ -1041,5 +1042,7 @@ public class MinimalPathOverseer
             return 0;
         }
     }
+
+    public List<MinimalPathAgent> getAgents(){return agents;}
 
 }

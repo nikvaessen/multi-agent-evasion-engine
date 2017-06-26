@@ -33,7 +33,7 @@ public class MinimalPathAgent extends AbstractAgent{
      */
     private Vector2D projectionLocation = null;
 
-    public MinimalPathAgent(Map map, Floor floor, Vector2D startLocation, Direction startsFacing, int radius,
+    protected MinimalPathAgent(Map map, Floor floor, Vector2D startLocation, Direction startsFacing, int radius,
                             double visionRange, double visionAngle, MinimalPathOverseer overseer, int agentNumber)
     {
         super(map, floor, startLocation, startsFacing, radius, visionRange, visionAngle);

@@ -47,9 +47,9 @@ public class MapPolygon extends java.awt.Polygon
         addPoint((int)Math.round(point.getX()), (int)Math.round(point.getY()));
     }
 
-    public Collection<Vector2D> getPoints(){
+    public List<Vector2D> getPoints(){
         PathIterator it = this.getPathIterator(null);
-        Collection<Vector2D> points = new ArrayList<Vector2D>(this.npoints);
+        List<Vector2D> points = new ArrayList<Vector2D>(this.npoints);
         // current contains the points for the next segment.
         // has to be size 6 because of how the currentSegment function is implemented.
         double[] current = new double[6];

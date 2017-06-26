@@ -52,24 +52,24 @@ public class DistanceAgent extends AbstractAgent
         }
 
         MapInfo info = super.mapInfo;
-        System.out.println(info.getAgentPoints().get(0).getX());
+        logger.debug("{}", info.getAgentPoints().get(0).getX());
         LinkedList<Vector2D> agentPoint = new LinkedList<>(info.getAgentPoints());
         for (Vector2D point: agentPoint){
-            System.out.println("X: " + point.getX());
-            System.out.println("Y: " + point.getY());
+            logger.debug("X: " + point.getX());
+            logger.debug("Y: " + point.getY());
         }
         Vector2D currentLocation = super.location;
         double shortestDistance = Double.MAX_VALUE;
         int agentIndex=-1;
         for (int i=0; i<agentPoint.size(); i++){
             double distance = Math.abs(agentPoint.get(i).distance(currentLocation));
-            System.out.println("Distnace: "+distance);
+            logger.debug("Distnace: "+distance);
             if (distance<shortestDistance){
                 shortestDistance = distance;
                 agentIndex = i;
             }
         }
-        System.out.println("AgentIndex: "+agentIndex);
+        logger.debug("AgentIndex: "+agentIndex);
 
         double pursuerX = agentPoint.get(agentIndex).getX();
         double pursuerY = agentPoint.get(agentIndex).getY();

@@ -1,5 +1,6 @@
 package nl.dke.pursuitevasion.game;
 
+import jdk.nashorn.internal.codegen.CompilerConstants;
 import nl.dke.pursuitevasion.game.agents.*;
 import nl.dke.pursuitevasion.game.agents.tasks.AbstractAgentTask;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
@@ -9,11 +10,14 @@ import nl.dke.pursuitevasion.map.impl.Map;
 import nl.dke.pursuitevasion.map.impl.Obstacle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.nio.ch.ThreadPool;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.function.Predicate;
 
 /**
@@ -36,6 +40,8 @@ public class Engine
 
     private Thread gameLoopThread;
 
+    private boolean started = false;
+
     public Engine copy(){
         Engine e = new Engine(map,agents,null,desiredFPS);
         e.start();
@@ -56,13 +62,14 @@ public class Engine
         this(map, agents, null, desiredFPS);
     }
 
-    public synchronized void start()
+    public synchronized Future<Integer> start()
         throws IllegalStateException
     {
-        if(gameLoopThread == null || !gameLoopThread.isAlive())
+        if(!started)
         {
-            gameLoopThread = new Thread(new GameLoopRunnable());
-            gameLoopThread.start();
+            Future<Integer> x = java.util.concurrent.Executors.newSingleThreadExecutor().submit(new GameLoopRunnable());
+            started = true;
+            return x;
         }
         else
         {
@@ -71,7 +78,7 @@ public class Engine
     }
 
     private class GameLoopRunnable
-        implements Runnable
+        implements Callable<Integer>
     {
         private LinkedList<AgentRequest> requests = new LinkedList<>();
 
@@ -86,7 +93,7 @@ public class Engine
         private double rotationPerIteration = EngineConstants.TURNING_SPEED / desiredIterationLength;
 
         @Override
-        public void run()
+        public Integer call()
         {
             // put all the agents in the correct list
             for(AbstractAgent agent : agents)
@@ -101,7 +108,7 @@ public class Engine
                 }
             }
             // start the game loop
-            loop();
+            return loop();
         }
 
         /**
@@ -114,7 +121,7 @@ public class Engine
          * 6. Render on screen
          * 7. Wait if there is time left.
          */
-        private void loop()
+        private int loop()
         {
             // house keeping variables for loop
             long startTime = System.currentTimeMillis(), iterationStartTime, msPassed;
@@ -261,18 +268,18 @@ public class Engine
                 if(msPassed < desiredIterationLength)
                 {
 
-                    try
-                    {
-                        if(logger.isDebugEnabled())
-                        {
-                            logger.debug("waiting for {} ms", desiredIterationLength - msPassed);
-                        }
-                        Thread.sleep(desiredIterationLength - msPassed);
-                    }
-                    catch(InterruptedException e)
-                    {
-                        e.printStackTrace();
-                    }
+//                    try
+//                    {
+//                        if(logger.isDebugEnabled())
+//                        {
+//                            logger.debug("waiting for {} ms", desiredIterationLength - msPassed);
+//                        }
+//                        Thread.sleep(desiredIterationLength - msPassed);
+//                    }
+//                    catch(InterruptedException e)
+//                    {
+//                        e.printStackTrace();
+//                    }
                 }
                 else
                 {
@@ -280,8 +287,8 @@ public class Engine
                                 msPassed, desiredIterationLength, msPassed - desiredIterationLength);
                 }
             }
-
             logger.info("Game successfully terminated in {} ms", System.currentTimeMillis() - startTime);
+            return count;
         }
 
         private void handleRequest(AgentRequest request)

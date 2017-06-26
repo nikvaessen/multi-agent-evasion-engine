@@ -45,7 +45,7 @@ public class CoordinatorEvaderKillKillKillEmAll{
     private final Map map;
     private final Floor floor;
     private final Engine engine;
-    private final ArrayList<AbstractAgent> agents;
+    private final List<AbstractAgent> agents;
     private final PreCalcMap preCalcMap;
     private boolean visualOutput;
     ArrayList<AbstractAgent>  evador  = new ArrayList<>(1);
@@ -57,10 +57,11 @@ public class CoordinatorEvaderKillKillKillEmAll{
     private java.util.Map<Integer,AbstractAgentTask> lastAbstractAgentTask = new HashMap<>(4);
     private java.util.Map<Integer,Boolean> hasRequest = new HashMap<>(4);
     private boolean hasNewRequest = false;
+    private AbstractAgent realAgent;
 
 
     public CoordinatorEvaderKillKillKillEmAll(Engine e, Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing, int radius,
-                                              double visionRange, double visionAngle, ArrayList<AbstractAgent> agents, boolean visualOUtput) {
+                                              double visionRange, double visionAngle, List<AbstractAgent> agents, boolean visualOUtput) {
         this.map = map;
         this.floor = startingFloor;
         this.engine = e;
@@ -69,6 +70,7 @@ public class CoordinatorEvaderKillKillKillEmAll{
         EvaderKillKillKillEmAll e1 = new EvaderKillKillKillEmAll( map,  startingFloor,  startLocation,  startsFacing,  radius,
                 visionRange,  visionAngle,0);
 
+        this.realAgent = e1;
 
         this.evador.add(e1);
 
@@ -97,6 +99,11 @@ public class CoordinatorEvaderKillKillKillEmAll{
 
     public void setViewPort(MapViewPanel panel){
         viewport = panel;
+    }
+
+    public AbstractAgent getRealAgent()
+    {
+        return realAgent;
     }
 
     public AbstractAgentTask getNextMove(EvaderKillKillKillEmAll p, long calculationTime){
@@ -172,7 +179,7 @@ public class CoordinatorEvaderKillKillKillEmAll{
             long duration = finish-start;
             lastTime = finish;
             //System.out.println(m.toString());
-           // System.out.println("Finished one MCTS in: " + duration + "ms");
+           System.out.println("Finished one MCTS in: " + duration + "ms");
         }
     }
 

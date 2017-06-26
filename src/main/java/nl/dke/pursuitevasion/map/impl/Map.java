@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -235,31 +234,36 @@ public class Map implements Serializable
             Map m = (Map)o.readObject();
             return m;
         }
-        catch (IOException | ClassNotFoundException e){
-            if(logger.isErrorEnabled()){
+        catch (IOException | ClassNotFoundException e) {
+            if (logger.isErrorEnabled()) {
                 logger.error("Error loading map: {}", e);
             }
-            MapPolygon mainFloor = new MapPolygon(
-                    new int[] {   0, 600, 600,   0},
-                    new int[] {   0,   0, 600, 600},
-                    4,
-                    false
-            );
-
-            MapPolygon obstacle = new MapPolygon(
-                    new int[] {240, 360, 360, 240},
-                    new int[] {240, 240, 360, 360},
-                    4,
-                    true
-            );
-
-            return MapBuilder.create()
-                    .makeFloor(mainFloor)
-                    .addObstacle(obstacle)
-                    .finish()
-                    .build();
+            return getSimpleTestMap();
         }
     }
+
+    public static Map getSimpleTestMap() {
+        MapPolygon mainFloor = new MapPolygon(
+                new int[] {   0, 600, 600,   0},
+                new int[] {   0,   0, 600, 600},
+                4,
+                false
+        );
+
+        MapPolygon obstacle = new MapPolygon(
+                new int[] {240, 360, 360, 240},
+                new int[] {240, 240, 360, 360},
+                4,
+                true
+        );
+
+        return MapBuilder.create()
+                .makeFloor(mainFloor)
+                .addObstacle(obstacle)
+                .finish()
+                .build();
+    }
+
 
     public static Map getSimpleMapNoHoles(){
         MapBuilder b = MapBuilder.create();
@@ -287,5 +291,31 @@ public class Map implements Serializable
         }
 
         return false;
+    }
+
+    public Vector2D getEvaderSpawnLocation() {
+        Floor f = floors.iterator().next();
+        return f.getEvaderSpawnLocation();
+    }
+
+
+
+    public Vector2D getPursuerSpawnLocation(){
+        Floor f = floors.iterator().next();
+        return f.getPursuerSpawnLocation();
+    }
+
+    /**
+     * makes a description of the map
+     * @return String containing the amount of floor vertexes, amount of obstace vertexes
+     * and amount of obstacles separated by commas
+     */
+    public String getMapDescription() {
+        Floor f = this.floors.iterator().next();
+        int v = f.getPolygon().npoints;
+        int ov = f.getObstaclePoints().size();
+        int oi = f.getObstacles().size();
+        return String.format("%d,%d, %d", v, ov, oi);
+
     }
 }

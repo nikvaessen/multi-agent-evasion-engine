@@ -709,4 +709,34 @@ public class Floor extends AbstractObject
         builder.append("]");
         return builder.toString();
     }
+
+    public Vector2D getEvaderSpawnLocation() {
+        List<Vector2D> vertexes = new ArrayList<>();
+        for (Obstacle obstacle : obstacles) {
+            vertexes.addAll(obstacle.getPolygon().getPoints());
+        }
+        if(vertexes.isEmpty()){
+            // get middle
+            double x = getPolygon().getBounds2D().getCenterX();
+            double y = getPolygon().getBounds2D().getCenterY();
+            return new Vector2D(x,y);
+
+        }
+        Collections.shuffle(vertexes);
+        return vertexes.get(0);
+    }
+
+    public Vector2D getPursuerSpawnLocation(){
+        List<Vector2D> points = this.getPolygon().getPoints();
+        Collections.shuffle(points);
+        return points.get(0);
+    }
+
+    public List<Vector2D> getObstaclePoints() {
+        List<Vector2D> points = new ArrayList<>();
+        for (Obstacle obstacle : obstacles) {
+            points.addAll(obstacle.getPolygon().getPoints());
+        }
+        return points;
+    }
 }

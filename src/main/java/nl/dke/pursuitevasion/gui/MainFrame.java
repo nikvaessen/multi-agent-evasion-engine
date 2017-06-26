@@ -7,6 +7,7 @@ import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.Direction;
 import nl.dke.pursuitevasion.game.agents.impl.MCTS.CoordinatorEvaderKillKillKillEmAll;
 
+import nl.dke.pursuitevasion.game.agents.impl.RandomAgent;
 import nl.dke.pursuitevasion.game.agents.impl.UserAgent;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
 import nl.dke.pursuitevasion.map.impl.Floor;
@@ -36,11 +37,13 @@ public class MainFrame extends JFrame
             break;
         }
 
-        //agents.add(new SimpleAgent(new Point(5,5), Direction.SOUTH, 5));
+//        agents.add(new SimpleAgent(new Point(5,5), Direction.SOUTH, 5));
         agents.add(new UserAgent(map, floor, new Vector2D(400, 510), Direction.SOUTH, 5,
                                  EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, keyboardInputListener,false));
         agents.add(new UserAgent(map, floor, new Vector2D(400, 410), Direction.SOUTH, 5,
                 EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, keyboardInputListener,false));
+//        agents.add(new RandomAgent(map, floor, new Vector2D(400, 410), Direction.SOUTH, 5, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, false));
+//        agents.add(new RandomAgent(map, floor, new Vector2D(400, 410), Direction.SOUTH, 5, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, false));
         agents.add(new UserAgent(map, floor, new Vector2D(400, 310), Direction.SOUTH, 5,
                 EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, keyboardInputListener,false));
         //agents.add(new MinimalPathAgent(map, floor, new Vector2D(50.0,50.0), Direction.NORTH, 5, 100000, 360));
