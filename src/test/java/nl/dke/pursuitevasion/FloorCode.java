@@ -16,13 +16,15 @@ public class FloorCode {
 
     public static void main(String[] args) {
 
-        String code = getConstructionCode(Map.getMap("averageMapManyHoles.ser"));
+        String code = getConstructionCode(Map.getMap("averageMany.ser"));
         System.out.println(code);
+        System.out.println("\n");
 
-        code = getConstructionCode(Map.getMap("averageMapAverageHoles.ser"));
+        code = getConstructionCode(Map.getMap("averageAverage.ser"));
         System.out.println(code);
+        System.out.println("\n");
 
-        code = getConstructionCode(Map.getMap("averageMapFewHoles.ser"));
+        code = getConstructionCode(Map.getMap("averageFew.ser"));
         System.out.println(code);
 
     }
