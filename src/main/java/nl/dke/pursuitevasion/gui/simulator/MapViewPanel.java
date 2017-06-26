@@ -237,6 +237,14 @@ public class MapViewPanel
                 polygonPoints1.get(0).x, polygonPoints1.get(0).y);
 
 
+        ArrayList<Point2D> midPoints = floor.getMidPoints(floor.getTriangles(polygonPoints1));
+        g.setColor(Color.black);
+        for(int i = 0; i<midPoints.size(); i++)
+        {
+            g.drawLine((int)(midPoints.get(i).getX()), (int)(midPoints.get(i).getY()), (int)(midPoints.get(i).getX()), (int)(midPoints.get(i).getY()));
+        }
+
+
 
     }
 
