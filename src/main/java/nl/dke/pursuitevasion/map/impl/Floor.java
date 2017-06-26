@@ -608,13 +608,16 @@ public class Floor extends AbstractObject
         //index 1=floor points
         ArrayList<ArrayList<Point>> conns = new ArrayList<ArrayList<Point>>();
 
-//            System.out.println("1st: compute first link to outer polygon");
         //find first connection to outer polygon
         Point floorCon = null;
         Point obsCon = null;
         double smallestDistance=Integer.MAX_VALUE;
         int newStartingObstacleIndex = -1;
         int oldStartingIndex = -1;
+        int vertexOld = -1;
+        int vertexNew = -1;
+        ArrayList visitedObstacles = new ArrayList();
+        //find first connection from outer polygon to closest obstacle
         for (int h=0; h<ob.size(); h++){
             Polygon oPoly = ob.get(h).getPolygon();
 
@@ -628,6 +631,8 @@ public class Floor extends AbstractObject
                         obsCon = new Point(oPoly.xpoints[i], oPoly.ypoints[i]);
                         floorCon = new Point(mPoly.xpoints[j], mPoly.ypoints[j]);
                         newStartingObstacleIndex = h;
+                        vertexNew = i;
+                        visitedObstacles.add(newStartingObstacleIndex);
 ////                            System.out.println("distance: " + smallestDistance);
 ////                            System.out.println("obsCon: " + obsCon);
 ////                            System.out.println("floorCon: " + floorCon);
@@ -640,141 +645,147 @@ public class Floor extends AbstractObject
         conns.get(conns.size()-1).add(floorCon);
 //            System.out.println("conns" + conns.toString());
 
-        // compute closest link between obstacles
-
         ArrayList<Obstacle> obstacleCopy = new ArrayList<>(ob);
-        smallestDistance=Integer.MAX_VALUE;
-        Point floorCon1 = null;
-        Point obsCon1 = null;
 
-        //loop through obstaclelist
-        System.out.println("k before loop: "+newStartingObstacleIndex);
-        System.out.println("obstacleCopy.size(): "+obstacleCopy.size());
-        for (int g=0; g<obstacleCopy.size(); g++) {
-            System.out.println("g: "+g);
-            System.out.println(newStartingObstacleIndex);
-            System.out.println(oldStartingIndex);
-            System.out.println("OBSTACLECOPY.size(): "+obstacleCopy.size());
-            int k = newStartingObstacleIndex;
-            //int kminus =oldStartingIndex;
-            System.out.println("k in loop: "+k);
-            Point oneObsConn = null;
-            Point anotherObsConn = null;
-            //loops through points of each obstacle
-            for (int l = 0; l < obstacleCopy.get(k).getPolygon().xpoints.length; l++) {
-                System.out.println("vertex no. l of k: " + l);
+        if (obstacleCopy.size()>1) {
 
-                if (obstacleCopy.size()!= 1) {
-                    for (int x = 0; x < obstacleCopy.size(); x++) {
-                        System.out.println("x: " + x);
-                        //System.out.println("obstacleCopy.size(): "+obstacleCopy.size());
-                        for (int y = 0; y < obstacleCopy.get(x).getPolygon().xpoints.length; y++) {
-                            System.out.println("y: "+y);
-                           // System.out.println("obstacleCopy.poly.length: "+obstacleCopy.get(x).getPolygon().xpoints.length);
-                            System.out.println("START: "+newStartingObstacleIndex);
-                            System.out.println("END: "+oldStartingIndex);
-                            System.out.println(x!=oldStartingIndex);
-                            if (x != k && x!=oldStartingIndex) {
-                                if (computeDistance(
-                                        obstacleCopy.get(k).getPolygon().xpoints[l],
-                                        obstacleCopy.get(x).getPolygon().xpoints[y],
-                                        obstacleCopy.get(k).getPolygon().ypoints[l],
-                                        obstacleCopy.get(x).getPolygon().ypoints[y]
-                                ) < smallestDistance) {
-                                    smallestDistance = computeDistance(obstacleCopy.get(k).getPolygon().xpoints[l], obstacleCopy.get(x).getPolygon().xpoints[y], obstacleCopy.get(k).getPolygon().ypoints[l], obstacleCopy.get(x).getPolygon().ypoints[y]);
-                                    oneObsConn = new Point(obstacleCopy.get(k).getPolygon().xpoints[l], obstacleCopy.get(k).getPolygon().ypoints[l]);
-                                    anotherObsConn = new Point(obstacleCopy.get(x).getPolygon().xpoints[y], obstacleCopy.get(x).getPolygon().ypoints[y]);
-                                    oldStartingIndex = k;
-                                    newStartingObstacleIndex = x;
-                                    System.out.println("smallestDistance: "+smallestDistance);
+            smallestDistance = Integer.MAX_VALUE;
+            Point floorCon1 = null;
+            Point obsCon1 = null;
 
+
+            //loop through obstaclelist
+            //find closest connections between obstacles
+            System.out.println("k before loop: " + newStartingObstacleIndex);
+            System.out.println("obstacleCopy.size(): " + obstacleCopy.size());
+            for (int g = 0; g < obstacleCopy.size(); g++) {
+                System.out.println("g: " + g);
+                System.out.println(newStartingObstacleIndex);
+                System.out.println(oldStartingIndex);
+                System.out.println("OBSTACLECOPY.size(): " + obstacleCopy.size());
+                int k = newStartingObstacleIndex;
+                //int kminus =oldStartingIndex;
+                System.out.println("k in loop: " + k);
+                Point oneObsConn = null;
+                Point anotherObsConn = null;
+                //loops through points of each obstacle
+                for (int l = 0; l < obstacleCopy.get(k).getPolygon().xpoints.length; l++) {
+                    System.out.println("vertex no. l of k: " + l);
+
+
+                        for (int x = 0; x < obstacleCopy.size(); x++) {
+                            System.out.println("x: " + x);
+                            //System.out.println("obstacleCopy.size(): "+obstacleCopy.size());
+                            for (int y = 0; y < obstacleCopy.get(x).getPolygon().xpoints.length; y++) {
+                                System.out.println("y: " + y);
+                                // System.out.println("obstacleCopy.poly.length: "+obstacleCopy.get(x).getPolygon().xpoints.length);
+                                System.out.println("START: " + newStartingObstacleIndex);
+                                System.out.println("END: " + oldStartingIndex);
+                                System.out.println("x!=oldStartingIndex: " + (x != oldStartingIndex));
+                                System.out.println("!visitedObstacles.contains(x): " + !visitedObstacles.contains(x));
+                                if (!visitedObstacles.contains(x)) {
+                                    System.out.println();
+                                    System.out.println("old smallest distance: " + smallestDistance);
+                                    System.out.println("local distance: " + computeDistance(
+                                            obstacleCopy.get(k).getPolygon().xpoints[l],
+                                            obstacleCopy.get(x).getPolygon().xpoints[y],
+                                            obstacleCopy.get(k).getPolygon().ypoints[l],
+                                            obstacleCopy.get(x).getPolygon().ypoints[y]
+                                    ));
+                                    System.out.println();
+                                    if (computeDistance(
+                                            obstacleCopy.get(k).getPolygon().xpoints[l],
+                                            obstacleCopy.get(x).getPolygon().xpoints[y],
+                                            obstacleCopy.get(k).getPolygon().ypoints[l],
+                                            obstacleCopy.get(x).getPolygon().ypoints[y]
+                                    ) < smallestDistance) {
+                                        smallestDistance = computeDistance(obstacleCopy.get(k).getPolygon().xpoints[l], obstacleCopy.get(x).getPolygon().xpoints[y], obstacleCopy.get(k).getPolygon().ypoints[l], obstacleCopy.get(x).getPolygon().ypoints[y]);
+                                        oneObsConn = new Point(obstacleCopy.get(k).getPolygon().xpoints[l], obstacleCopy.get(k).getPolygon().ypoints[l]);
+                                        anotherObsConn = new Point(obstacleCopy.get(x).getPolygon().xpoints[y], obstacleCopy.get(x).getPolygon().ypoints[y]);
+                                        oldStartingIndex = k;
+                                        vertexOld = l;
+                                        newStartingObstacleIndex = x;
+                                        vertexNew = y;
+                                        visitedObstacles.add(oldStartingIndex);
+                                        System.out.println("new distance: " + smallestDistance);
+
+
+                                    }
                                 }
                             }
                         }
+
+                    System.out.println();
+                    System.out.println("smallestDistance: " + smallestDistance);
+                    System.out.println("oldStartingIndex: " + oldStartingIndex + " >> newStartingObstacleIndex: " + newStartingObstacleIndex);
+                    System.out.println("VertexOld: " + vertexOld + " >> VertexNew: " + vertexNew);
+                    System.out.println();
+                }
+
+                if (oneObsConn != null) {
+                    conns.add(new ArrayList<>());
+                    conns.get(conns.size() - 1).add(oneObsConn);
+                    conns.get(conns.size() - 1).add(anotherObsConn);
+                    //obstacleCopy.remove(k);
+                }
+                System.out.println();
+                System.out.println("smallestDistance: " + smallestDistance);
+                System.out.println("oldStartingIndex: " + oldStartingIndex + " >> newStartingObstacleIndex: " + newStartingObstacleIndex);
+                System.out.println("VertexOld: " + vertexOld + " >> VertexNew: " + vertexNew);
+                System.out.println();
+                oneObsConn = null;
+                anotherObsConn = null;
+                smallestDistance = Integer.MAX_VALUE;
+                System.out.println();
+                System.out.println("SMALLEST DISTANCE RESET");
+                System.out.println();
+            }
+
+            // find last connection from last obstacle to outer polygon
+            System.out.println("last link with more obstacles");
+            smallestDistance = Integer.MAX_VALUE;
+            for (int i = 0; i < getPolygon().xpoints.length; i++) {
+                int k = newStartingObstacleIndex;
+                for (int j = 0; j < obstacleCopy.get(k).getPolygon().xpoints.length; j++) {
+                    if (computeDistance(
+                            getPolygon().xpoints[i],
+                            obstacleCopy.get(k).getPolygon().xpoints[j],
+                            getPolygon().ypoints[i],
+                            obstacleCopy.get(k).getPolygon().ypoints[j]
+                    ) <= smallestDistance) {
+                        smallestDistance = computeDistance(obstacleCopy.get(k).getPolygon().xpoints[j], getPolygon().xpoints[i], obstacleCopy.get(k).getPolygon().ypoints[j], getPolygon().ypoints[i]);
+                        obsCon = new Point(obstacleCopy.get(k).getPolygon().xpoints[j], obstacleCopy.get(k).getPolygon().ypoints[j]);
+                        floorCon = new Point(getPolygon().xpoints[i], getPolygon().ypoints[i]);
                     }
-                } else {
-                    System.out.println("list == 1");
-                    // connect last of the chain to other border
-                    //                            System.out.println("3rd: compute last link to outer polygon");
-                    smallestDistance = Integer.MAX_VALUE;
-                    //loops through points of floor
-                    for (int j = 0; j < getPolygon().xpoints.length; j++) {
+                }
+            }
+
+        } else {
+            // find last connection from obstacle to outer polygon
+            System.out.println("last link with one obstacle");
+            smallestDistance = Integer.MAX_VALUE;
+            for (int i = 0; i < getPolygon().xpoints.length; i++) {
+                int k = newStartingObstacleIndex;
+                for (int j = 0; j < obstacleCopy.get(k).getPolygon().xpoints.length; j++) {
+                    if (vertexNew!=j) {
                         if (computeDistance(
-                                obstacleCopy.get(k).getPolygon().xpoints[l],
-                                getPolygon().xpoints[j],
-                                obstacleCopy.get(k).getPolygon().ypoints[l],
-                                getPolygon().ypoints[j])
-                                <= smallestDistance) {
-                            smallestDistance = computeDistance(obstacleCopy.get(k).getPolygon().xpoints[l], getPolygon().xpoints[l], obstacleCopy.get(k).getPolygon().ypoints[l], getPolygon().ypoints[l]);
-                            obsCon = new Point(obstacleCopy.get(k).getPolygon().xpoints[l], obstacleCopy.get(k).getPolygon().ypoints[l]);
-                            floorCon = new Point(getPolygon().xpoints[j], getPolygon().ypoints[j]);
+                                getPolygon().xpoints[i],
+                                obstacleCopy.get(k).getPolygon().xpoints[j],
+                                getPolygon().ypoints[i],
+                                obstacleCopy.get(k).getPolygon().ypoints[j]
+                        ) <= smallestDistance) {
+                            smallestDistance = computeDistance(obstacleCopy.get(k).getPolygon().xpoints[j], getPolygon().xpoints[i], obstacleCopy.get(k).getPolygon().ypoints[j], getPolygon().ypoints[i]);
+                            obsCon = new Point(obstacleCopy.get(k).getPolygon().xpoints[j], obstacleCopy.get(k).getPolygon().ypoints[j]);
+                            floorCon = new Point(getPolygon().xpoints[i], getPolygon().ypoints[i]);
                         }
                     }
                 }
             }
-            if (oneObsConn != null) {
-                conns.add(new ArrayList<>());
-                conns.get(conns.size() - 1).add(oneObsConn);
-                conns.get(conns.size() - 1).add(anotherObsConn);
-                //obstacleCopy.remove(k);
-            }
-            oneObsConn = null;
-            anotherObsConn = null;
-            smallestDistance = Integer.MAX_VALUE;
         }
-        /*
-                if (k != obstacleCopy.size() - 1) {
-                    //System.out.println("2nd: Compute closest link");
-                    //loops through points of neighbouring obstacle
-                    //find closest connection between obstacles
-                    for (int m = 0; m < obstacleCopy.get(k+1).getPolygon().xpoints.length; m++) {
-                        if (computeDistance(
-                                obstacleCopy.get(k).getPolygon().xpoints[l],
-                                obstacleCopy.get(k+1).getPolygon().xpoints[m],
-                                obstacleCopy.get(k).getPolygon().ypoints[l],
-                                obstacleCopy.get(k+1).getPolygon().ypoints[m]
-                        ) < smallestDistance) {
-                            smallestDistance = computeDistance(obstacleCopy.get(k).getPolygon().xpoints[l],obstacleCopy.get(k+1).getPolygon().xpoints[m],obstacleCopy.get(k).getPolygon().ypoints[l],obstacleCopy.get(k+1).getPolygon().ypoints[m]);
-                            obsCon1 = new Point(obstacleCopy.get(k).getPolygon().xpoints[l], obstacleCopy.get(k).getPolygon().ypoints[l]);
-                            floorCon1 = new Point(obstacleCopy.get(k+1).getPolygon().xpoints[m], obstacleCopy.get(k+1).getPolygon().ypoints[m]);
-                            //System.out.println("distance: " + smallestDistance);
-                            //System.out.println("obsCon: " + obsCon);
-                            //System.out.println("floorCon: " + floorCon);
-                        }
-                    }
-                } else {
-                    // connect last of the chain to other border
-                    //                            System.out.println("3rd: compute last link to outer polygon");
-                    smallestDistance = Integer.MAX_VALUE;
-                    //loops through points of floor
-                    for (int j = 0; j < getPolygon().xpoints.length; j++) {
-                        if (computeDistance(
-                                obstacleCopy.get(k).getPolygon().xpoints[l],
-                                getPolygon().xpoints[j],
-                                obstacleCopy.get(k).getPolygon().ypoints[l],
-                                getPolygon().ypoints[j])
-                                <= smallestDistance) {
-                            smallestDistance = computeDistance(obstacleCopy.get(k).getPolygon().xpoints[l],getPolygon().xpoints[l],obstacleCopy.get(k).getPolygon().ypoints[l],getPolygon().ypoints[l]);
-                            obsCon = new Point(obstacleCopy.get(k).getPolygon().xpoints[l], obstacleCopy.get(k).getPolygon().ypoints[l]);
-                            floorCon = new Point(getPolygon().xpoints[j], getPolygon().ypoints[j]);
-                        }
-                    }
-                }
-            }
-            if (obsCon1!=null) {
-                conns.add(new ArrayList<>());
-                conns.get(conns.size() - 1).add(obsCon1);
-                conns.get(conns.size() - 1).add(floorCon1);
-            }
-            obsCon1 =null;
-            floorCon1 = null;
-            smallestDistance = Integer.MAX_VALUE;
-        }*/
 
         conns.add(new ArrayList<>());
         conns.get(conns.size()-1).add(obsCon);
         conns.get(conns.size()-1).add(floorCon);
-
 
         System.out.println("CONNECTIONS");
         for (int i=0; i<conns.size(); i++){
@@ -811,7 +822,7 @@ public class Floor extends AbstractObject
         ArrayList<Point> finalPolygon2 = new ArrayList<>();
 
         //get order for first polygon
-        System.out.println();
+    /*    System.out.println();
         System.out.println("Polygon 1");
         ArrayList<Point> polygon1 = findFirstPartOfFloor(0, floorVertices, conns, finalPolygon1);
         int index = polygon1.get(polygon1.size()-1).x;
@@ -830,7 +841,7 @@ public class Floor extends AbstractObject
 
        // trianglesToDraw = getTriangles(toBeTriangulatedPolygon);
 
-        System.out.println();
+    /*    System.out.println();
         System.out.println("polygon1");
         for (Point p: polygon1){
             System.out.println(p.x+","+p.y);
@@ -848,7 +859,7 @@ public class Floor extends AbstractObject
             System.out.println(p.x+","+p.y);
         }
 
-
+*/
         System.out.println();
         System.out.println("TrianglesToDraw");
         for (Polygon p: trianglesToDraw){
