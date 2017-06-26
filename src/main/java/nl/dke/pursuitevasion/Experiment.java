@@ -193,136 +193,162 @@ public class Experiment
     
     public static Map getAverageMapFewHoles()
     {
-        return Map.getMap("averageMapFewHoles.ser");
-        /*
         MapPolygon floor = new MapPolygon(false);
-        floor.addPoint(new Vector2D(0,0));
-        floor.addPoint(new Vector2D(600, 0));
-        floor.addPoint(new Vector2D(600, 600));
-        floor.addPoint(new Vector2D(0, 600));
+        floor.addPoint(new Vector2D(26, 14));
+        floor.addPoint(new Vector2D(344, 163));
+        floor.addPoint(new Vector2D(340, 21));
+        floor.addPoint(new Vector2D(779, 192));
+        floor.addPoint(new Vector2D(888, 34));
+        floor.addPoint(new Vector2D(899, 654));
+        floor.addPoint(new Vector2D(717, 856));
+        floor.addPoint(new Vector2D(509, 613));
+        floor.addPoint(new Vector2D(398, 861));
+        floor.addPoint(new Vector2D(32, 858));
+
+        MapPolygon obstacle0 = new MapPolygon(true);
+        obstacle0.addPoint(new Vector2D(222, 273));
+        obstacle0.addPoint(new Vector2D(323, 376));
+        obstacle0.addPoint(new Vector2D(228, 557));
+        obstacle0.addPoint(new Vector2D(182, 419));
 
         MapPolygon obstacle1 = new MapPolygon(true);
-        obstacle1.addPoint(new Vector2D());
-        obstacle1.addPoint(new Vector2D());
-        obstacle1.addPoint(new Vector2D());
-        obstacle1.addPoint(new Vector2D());
+        obstacle1.addPoint(new Vector2D(599, 305));
+        obstacle1.addPoint(new Vector2D(757, 387));
+        obstacle1.addPoint(new Vector2D(778, 493));
+        obstacle1.addPoint(new Vector2D(622, 468));
 
-        MapPolygon obstacle2 = new MapPolygon(true);
-        obstacle2.addPoint(new Vector2D());
-        obstacle2.addPoint(new Vector2D());
-        obstacle2.addPoint(new Vector2D());
-        obstacle2.addPoint(new Vector2D());
-
-        MapPolygon obstacle3 = new MapPolygon(true);
-        obstacle3.addPoint(new Vector2D());
-        obstacle3.addPoint(new Vector2D());
-        obstacle3.addPoint(new Vector2D());
-        obstacle3.addPoint(new Vector2D());
-
-        MapPolygon obstacle4 = new MapPolygon(true);
-        obstacle4.addPoint(new Vector2D());
-        obstacle4.addPoint(new Vector2D());
-        obstacle4.addPoint(new Vector2D());
-        obstacle4.addPoint(new Vector2D());
-
-        MapPolygon obstacle5 = new MapPolygon(true);
-        obstacle5.addPoint(new Vector2D());
-        obstacle5.addPoint(new Vector2D());
-        obstacle5.addPoint(new Vector2D());
-        obstacle5.addPoint(new Vector2D());
-
-        MapPolygon obstacle6 = new MapPolygon(true);
-        obstacle6.addPoint(new Vector2D());
-        obstacle6.addPoint(new Vector2D());
-        obstacle6.addPoint(new Vector2D());
-        obstacle6.addPoint(new Vector2D());
-
-        MapPolygon obstacle7 = new MapPolygon(true);
-        obstacle7.addPoint(new Vector2D());
-        obstacle7.addPoint(new Vector2D());
-        obstacle7.addPoint(new Vector2D());
-        obstacle7.addPoint(new Vector2D());
-
-        MapPolygon obstacle8 = new MapPolygon(true);
-        obstacle8.addPoint(new Vector2D());
-        obstacle8.addPoint(new Vector2D());
-        obstacle8.addPoint(new Vector2D());
-        obstacle8.addPoint(new Vector2D());
-
-        return MapBuilder.create().
-                makeFloor(floor)
+        return MapBuilder.create()
+                .makeFloor(floor)
+                .addObstacle(obstacle0)
                 .addObstacle(obstacle1)
-                .addObstacle(obstacle2)
-                .addObstacle(obstacle3)
-                .addObstacle(obstacle4)
-                .addObstacle(obstacle5)
-                .addObstacle(obstacle6)
-                .addObstacle(obstacle7)
-                .addObstacle(obstacle8)
                 .finish()
-                .build();*/
+                .build();
     }
 
     public static Map getAverageMapAverageHoles()
     {
-        return Map.getMap("averageMapAverageHoles.ser");
-        /*
         MapPolygon floor = new MapPolygon(false);
-        floor.addPoint(new Vector2D(0,0));
-        floor.addPoint(new Vector2D(600, 0));
-        floor.addPoint(new Vector2D(600, 600));
-        floor.addPoint(new Vector2D(0, 600));
+        floor.addPoint(new Vector2D(26, 14));
+        floor.addPoint(new Vector2D(344, 163));
+        floor.addPoint(new Vector2D(340, 21));
+        floor.addPoint(new Vector2D(779, 192));
+        floor.addPoint(new Vector2D(888, 34));
+        floor.addPoint(new Vector2D(899, 654));
+        floor.addPoint(new Vector2D(717, 856));
+        floor.addPoint(new Vector2D(509, 613));
+        floor.addPoint(new Vector2D(398, 861));
+        floor.addPoint(new Vector2D(32, 858));
+
+        MapPolygon obstacle0 = new MapPolygon(true);
+        obstacle0.addPoint(new Vector2D(222, 273));
+        obstacle0.addPoint(new Vector2D(323, 376));
+        obstacle0.addPoint(new Vector2D(228, 557));
+        obstacle0.addPoint(new Vector2D(182, 419));
 
         MapPolygon obstacle1 = new MapPolygon(true);
-        obstacle1.addPoint(new Vector2D());
-        obstacle1.addPoint(new Vector2D());
-        obstacle1.addPoint(new Vector2D());
-        obstacle1.addPoint(new Vector2D());
+        obstacle1.addPoint(new Vector2D(599, 305));
+        obstacle1.addPoint(new Vector2D(757, 387));
+        obstacle1.addPoint(new Vector2D(778, 493));
+        obstacle1.addPoint(new Vector2D(622, 468));
 
         MapPolygon obstacle2 = new MapPolygon(true);
-        obstacle2.addPoint(new Vector2D());
-        obstacle2.addPoint(new Vector2D());
-        obstacle2.addPoint(new Vector2D());
-        obstacle2.addPoint(new Vector2D());
+        obstacle2.addPoint(new Vector2D(159, 668));
+        obstacle2.addPoint(new Vector2D(369, 660));
+        obstacle2.addPoint(new Vector2D(309, 734));
+        obstacle2.addPoint(new Vector2D(190, 787));
+        obstacle2.addPoint(new Vector2D(121, 743));
+        obstacle2.addPoint(new Vector2D(109, 705));
 
         MapPolygon obstacle3 = new MapPolygon(true);
-        obstacle3.addPoint(new Vector2D());
-        obstacle3.addPoint(new Vector2D());
-        obstacle3.addPoint(new Vector2D());
-        obstacle3.addPoint(new Vector2D());
+        obstacle3.addPoint(new Vector2D(430, 148));
+        obstacle3.addPoint(new Vector2D(502, 149));
+        obstacle3.addPoint(new Vector2D(551, 201));
+        obstacle3.addPoint(new Vector2D(530, 268));
+        obstacle3.addPoint(new Vector2D(437, 265));
+        obstacle3.addPoint(new Vector2D(394, 223));
+        obstacle3.addPoint(new Vector2D(398, 180));
+
+        return MapBuilder.create()
+                .makeFloor(floor)
+                .addObstacle(obstacle0)
+                .addObstacle(obstacle1)
+                .addObstacle(obstacle2)
+                .addObstacle(obstacle3)
+                .finish()
+                .build();
+        }
+
+    public static Map getAverageMapManyHoles()
+    {
+        MapPolygon floor = new MapPolygon(false);
+        floor.addPoint(new Vector2D(26, 14));
+        floor.addPoint(new Vector2D(344, 163));
+        floor.addPoint(new Vector2D(340, 21));
+        floor.addPoint(new Vector2D(779, 192));
+        floor.addPoint(new Vector2D(888, 34));
+        floor.addPoint(new Vector2D(899, 654));
+        floor.addPoint(new Vector2D(717, 856));
+        floor.addPoint(new Vector2D(509, 613));
+        floor.addPoint(new Vector2D(398, 861));
+        floor.addPoint(new Vector2D(32, 858));
+
+        MapPolygon obstacle0 = new MapPolygon(true);
+        obstacle0.addPoint(new Vector2D(222, 273));
+        obstacle0.addPoint(new Vector2D(323, 376));
+        obstacle0.addPoint(new Vector2D(228, 557));
+        obstacle0.addPoint(new Vector2D(182, 419));
+
+        MapPolygon obstacle1 = new MapPolygon(true);
+        obstacle1.addPoint(new Vector2D(599, 305));
+        obstacle1.addPoint(new Vector2D(757, 387));
+        obstacle1.addPoint(new Vector2D(778, 493));
+        obstacle1.addPoint(new Vector2D(622, 468));
+
+        MapPolygon obstacle2 = new MapPolygon(true);
+        obstacle2.addPoint(new Vector2D(159, 668));
+        obstacle2.addPoint(new Vector2D(369, 660));
+        obstacle2.addPoint(new Vector2D(309, 734));
+        obstacle2.addPoint(new Vector2D(190, 787));
+        obstacle2.addPoint(new Vector2D(121, 743));
+        obstacle2.addPoint(new Vector2D(109, 705));
+
+        MapPolygon obstacle3 = new MapPolygon(true);
+        obstacle3.addPoint(new Vector2D(430, 148));
+        obstacle3.addPoint(new Vector2D(502, 149));
+        obstacle3.addPoint(new Vector2D(551, 201));
+        obstacle3.addPoint(new Vector2D(530, 268));
+        obstacle3.addPoint(new Vector2D(437, 265));
+        obstacle3.addPoint(new Vector2D(394, 223));
+        obstacle3.addPoint(new Vector2D(398, 180));
 
         MapPolygon obstacle4 = new MapPolygon(true);
-        obstacle4.addPoint(new Vector2D());
-        obstacle4.addPoint(new Vector2D());
-        obstacle4.addPoint(new Vector2D());
-        obstacle4.addPoint(new Vector2D());
+        obstacle4.addPoint(new Vector2D(377, 460));
+        obstacle4.addPoint(new Vector2D(445, 361));
+        obstacle4.addPoint(new Vector2D(596, 516));
+        obstacle4.addPoint(new Vector2D(420, 570));
+        obstacle4.addPoint(new Vector2D(358, 548));
 
         MapPolygon obstacle5 = new MapPolygon(true);
-        obstacle5.addPoint(new Vector2D());
-        obstacle5.addPoint(new Vector2D());
-        obstacle5.addPoint(new Vector2D());
-        obstacle5.addPoint(new Vector2D());
+        obstacle5.addPoint(new Vector2D(693, 614));
+        obstacle5.addPoint(new Vector2D(750, 572));
+        obstacle5.addPoint(new Vector2D(746, 622));
 
         MapPolygon obstacle6 = new MapPolygon(true);
-        obstacle6.addPoint(new Vector2D());
-        obstacle6.addPoint(new Vector2D());
-        obstacle6.addPoint(new Vector2D());
-        obstacle6.addPoint(new Vector2D());
+        obstacle6.addPoint(new Vector2D(200, 163));
+        obstacle6.addPoint(new Vector2D(219, 185));
+        obstacle6.addPoint(new Vector2D(139, 239));
+        obstacle6.addPoint(new Vector2D(73, 174));
+        obstacle6.addPoint(new Vector2D(124, 139));
 
         MapPolygon obstacle7 = new MapPolygon(true);
-        obstacle7.addPoint(new Vector2D());
-        obstacle7.addPoint(new Vector2D());
-        obstacle7.addPoint(new Vector2D());
-        obstacle7.addPoint(new Vector2D());
+        obstacle7.addPoint(new Vector2D(778, 263));
+        obstacle7.addPoint(new Vector2D(844, 264));
+        obstacle7.addPoint(new Vector2D(826, 313));
+        obstacle7.addPoint(new Vector2D(652, 249));
 
-        MapPolygon obstacle8 = new MapPolygon(true);
-        obstacle8.addPoint(new Vector2D());
-        obstacle8.addPoint(new Vector2D());
-        obstacle8.addPoint(new Vector2D());
-        obstacle8.addPoint(new Vector2D());
-
-        return MapBuilder.create().
-                makeFloor(floor)
+        return MapBuilder.create()
+                .makeFloor(floor)
+                .addObstacle(obstacle0)
                 .addObstacle(obstacle1)
                 .addObstacle(obstacle2)
                 .addObstacle(obstacle3)
@@ -330,14 +356,8 @@ public class Experiment
                 .addObstacle(obstacle5)
                 .addObstacle(obstacle6)
                 .addObstacle(obstacle7)
-                .addObstacle(obstacle8)
                 .finish()
-                .build();*/
-    }
-
-    public static Map getAverageMapManyHoles()
-    {
-        return MapBuilder.create().build();
+                .build();
     }
 
     public static Map getBigMapFewHoles()
