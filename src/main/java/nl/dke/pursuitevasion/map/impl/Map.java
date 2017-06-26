@@ -315,7 +315,7 @@ public class Map implements Serializable
         int v = f.getPolygon().npoints;
         int ov = f.getObstaclePoints().size();
         int oi = f.getObstacles().size();
-        return String.format("%d,%d, %d", v, ov, oi);
+        return String.format("%d,%d,%d", v, ov, oi);
 
     }
 }

@@ -30,7 +30,8 @@ public class MinimalPathTest {
 
     public static void main(String[] args) {
         // do init stuff
-        Map map = Map.getTestMap();
+        //Map map = Map.getTestMap();
+        Map map = Experiment.getAverageMapManyHoles();
         ArrayList<AbstractAgent> agents = new ArrayList<>();
         JFrame frame = new JFrame();
         Floor floor = map.getFloors().iterator().next();
@@ -48,12 +49,12 @@ public class MinimalPathTest {
 
         Engine simulationEngine = new Engine(map, agents, panel, 60);
 
-        CoordinatorEvaderKillKillKillEmAll hunter = new CoordinatorEvaderKillKillKillEmAll(simulationEngine,map, floor, map.getEvaderSpawnLocation(), Direction.SOUTH, 5,
-                EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, agents,false);
-        hunter.setViewPort(panel);
+//        CoordinatorEvaderKillKillKillEmAll hunter = new CoordinatorEvaderKillKillKillEmAll(simulationEngine,map, floor, map.getEvaderSpawnLocation(), Direction.SOUTH, 5,
+//                EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, agents,false);
+//        hunter.setViewPort(panel);
 
         //agents.add(new RandomAgent(map, floor, new Vector2D(200.0, 100.0), Direction.NORTH, 5, 100, 120));
-//        agents.add(new UserAgent(map, floor, new Vector2D(200.0, 320.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE,  EngineConstants.VISION_ANGLE, l, true));
+        agents.add(new UserAgent(map, floor, new Vector2D(200.0, 320.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE,  EngineConstants.VISION_ANGLE, l, true));
         //agents.add(new RandomAgent(map, floor, new Vector2D(200.0, 320.0), Direction.NORTH, 5, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, true));
 //        agents.add(new DistanceAgent(map, floor, map.getEvaderSpawnLocation(), Direction.NORTH, EngineConstants.AGENT_RADIUS, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
 

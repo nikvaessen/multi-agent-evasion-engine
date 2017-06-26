@@ -333,6 +333,8 @@ public class Experiment
 
     public static Map getAverageMapManyHoles()
     {
+        return Map.getMap("averageMapManyHoles.ser");
+        /*
         MapPolygon floor = new MapPolygon(false);
         floor.addPoint(new Vector2D(0,0));
         floor.addPoint(new Vector2D(600, 0));
@@ -398,7 +400,7 @@ public class Experiment
                 .addObstacle(obstacle7)
                 .addObstacle(obstacle8)
                 .finish()
-                .build();
+                .build();*/
     }
 
     public static Map getBigMapFewHoles()

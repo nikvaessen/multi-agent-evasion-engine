@@ -20,12 +20,13 @@ public class ExperimentTest {
 
     public static void main(String[] args) {
         int amount = 10;
-        List<Callable<Map>>  mapFunctions = Experiment.getMapFunctions();
+        List<Callable<Map>>  mapFunctions =  new ArrayList<>(); //Experiment.getMapFunctions();
+        mapFunctions.add(Experiment::getSmallMapFewHoles);
         Class evaderClass = DistanceAgent.class;
 
         List<ExperimentResult> results  = runExperiments(amount, mapFunctions, evaderClass);
 
-        try(FileWriter writer = new FileWriter(evaderClass.getSimpleName() + " - " + " - "  + amount + ".csv");){
+        try(FileWriter writer = new FileWriter(evaderClass.getSimpleName() + " - " + amount + ".csv");){
             // Print header
             writer.write("iterations, vertexes, obstacle vertexes, obstacles\n");
             for (ExperimentResult result : results) {
