@@ -472,7 +472,6 @@ public class Floor extends AbstractObject
             List<Vector2D> neighbors = mainPolygonGraphNeighbourList.neighborListOf(w);
             if (neighbors.size() != 2)
             {
-
                 throw new IllegalArgumentException("Cannot divide main polygon");
             }
         }
@@ -739,4 +738,5 @@ public class Floor extends AbstractObject
         }
         return points;
     }
+
 }

@@ -31,7 +31,7 @@ public class MinimalPathTest {
     public static void main(String[] args) {
         // do init stuff
         //Map map = Map.getTestMap();
-        Map map = Experiment.getAverageMapManyHoles();
+        Map map = Experiment.getBigMapFewHoles();
         ArrayList<AbstractAgent> agents = new ArrayList<>();
         JFrame frame = new JFrame();
         Floor floor = map.getFloors().iterator().next();
