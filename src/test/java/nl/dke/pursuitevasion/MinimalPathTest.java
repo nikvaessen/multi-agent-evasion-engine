@@ -31,7 +31,7 @@ public class MinimalPathTest {
     public static void main(String[] args) {
         // do init stuff
         //Map map = Map.getTestMap();
-        Map map = Experiment.getBigMapFewHoles();
+        Map map = Experiment.getAverageMapManyHoles();
         ArrayList<AbstractAgent> agents = new ArrayList<>();
         JFrame frame = new JFrame();
         Floor floor = map.getFloors().iterator().next();
@@ -76,7 +76,7 @@ public class MinimalPathTest {
             System.out.printf("iterations: %d", f.get());
         }
         catch (Exception lol){
-            // lol
+            lol.printStackTrace();
         }
 
 

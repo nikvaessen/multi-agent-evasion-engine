@@ -95,7 +95,6 @@ public class MinimalPathOverseer
      * Create MinimalPathOverseer, which creates 3 agents it will control
      *
      * @param map           the map the agents will play pursuit-evasion in
-     * @param startLocation the startLocation of the first agent on the floor of the map
      */
     public MinimalPathOverseer(Map map)
     {
