@@ -839,6 +839,7 @@ public class Floor extends AbstractObject
         ArrayList<Point> toBeTriangulatedPolygon = new ArrayList<>(newSimplePolygon1);
 
        trianglesToDraw = getTriangles(toBeTriangulatedPolygon);
+       ArrayList<ArrayList<Polygon>> adjacentTriangles = getAdjacentTriangles(trianglesToDraw);
 
         System.out.println();
         System.out.println("polygon1");
@@ -1907,7 +1908,46 @@ public class Floor extends AbstractObject
         return midPoints;
     }
 
-    public ArrayList<ArrayList<Polygon>>
+    public ArrayList<ArrayList<Polygon>> getAdjacentTriangles(ArrayList<Polygon> triangles)
+    {
+        ArrayList<ArrayList<Polygon>> adjacentTrianglesList = new ArrayList<>();
+        for(int i = 0; i< triangles.size(); i++)
+        {
+            ArrayList<Polygon> adjacentTriangles = new ArrayList<>();
+            adjacentTriangles.add(triangles.get(i));
+            int equalCornerPoints = 0;
+            for(int k = 0; k<triangles.get(i).xpoints.length; k++) {
+                System.out.println("Triangle " + i + " " + triangles.get(i).xpoints[k] + "," + triangles.get(i).ypoints[k]);
+            }
+            for(int j = 0; j<triangles.get(i).xpoints.length; j++)
+            {
 
+                for(int a = 0; a< triangles.size(); a++)
+                {
 
+                    for(int b = 0; b< triangles.get(a).xpoints.length; b++)
+                    {
+                        if(triangles.get(i).xpoints[j] == triangles.get(a).xpoints[b] && triangles.get(i).ypoints[j] == triangles.get(a).ypoints[b] && i!=a)
+                        {
+                            equalCornerPoints++;
+                            if(equalCornerPoints == 2)
+                            {
+                                for(int k = 0; k<triangles.get(a).xpoints.length; k++)
+                                {
+                                    System.out.println("Adjacent Triangles of triangle "+ i + " " + triangles.get(a).xpoints[k] + ", " + triangles.get(a).ypoints[k]);
+                                }
+                                adjacentTriangles.add(triangles.get(a));
+                                equalCornerPoints = 0;
+                            }
+                            adjacentTrianglesList.add(adjacentTriangles);
+                        }
+                    }
+                }
+                System.out.println();
+            }
+            System.out.println();
+
+        }
+        return adjacentTrianglesList;
+    }
 }
