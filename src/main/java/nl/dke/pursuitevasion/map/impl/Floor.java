@@ -9,6 +9,7 @@ import nl.dke.pursuitevasion.map.builders.IDRegister;
 import nl.dke.pursuitevasion.map.builders.MapBuilder;
 import org.jgrapht.*;
 import org.jgrapht.alg.NeighborIndex;
+import org.jgrapht.event.GraphVertexChangeEvent;
 import org.jgrapht.graph.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -543,17 +544,19 @@ public class Floor extends AbstractObject
     }
 
     private Subgraph<Vector2D, DefaultEdge, SimpleGraph<Vector2D, DefaultEdge>> removeHandles(SimpleGraph<Vector2D, DefaultEdge> polygonGraph) {
-        NeighborIndex<Vector2D, DefaultEdge> neighbourList = getNeigbourList();
         Subgraph<Vector2D, DefaultEdge, SimpleGraph<Vector2D, DefaultEdge>> newGraph =
                 new Subgraph<Vector2D, DefaultEdge, SimpleGraph<Vector2D, DefaultEdge>>(polygonGraph);
+        NeighborIndex<Vector2D, DefaultEdge> neighbourList = new NeighborIndex<>(newGraph);
 
         ArrayList<Vector2D> removedVertexes = new ArrayList<>();
         boolean done = false;
         while(!done){
             boolean changed = false;
             for (Vector2D vector : polygonGraph.vertexSet()) {
-                if(neighbourList.neighborsOf(vector).size() == 1 && !removedVertexes.contains(vector)){
+                if(neighbourList.neighborListOf(vector).size() == 1 && !removedVertexes.contains(vector)){
                     changed = true;
+                    neighbourList.vertexRemoved(
+                            new GraphVertexChangeEvent<Vector2D>(newGraph, GraphVertexChangeEvent.VERTEX_REMOVED, vector));
                     newGraph.removeVertex(vector);
                     removedVertexes.add(vector);
                 }
