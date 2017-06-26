@@ -205,7 +205,7 @@ public class MapViewPanel
                     conns.get(i).get(1).x,conns.get(i).get(1).y);
         }
 
-/*
+
 
             //draw second splitted polygon
             ((Graphics2D) g).setStroke(new BasicStroke(2));
@@ -216,7 +216,7 @@ public class MapViewPanel
                         polygonPoints2.get(i+1).x, polygonPoints2.get(i+1).y);
             }
 
-*/
+
         //draw triangles
         ((Graphics2D) g).setStroke(new BasicStroke(2));
         ArrayList<Polygon> triangles = floor.trianglesToDraw;
