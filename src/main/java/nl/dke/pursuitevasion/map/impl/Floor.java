@@ -17,6 +17,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.*;
 import java.util.List;
@@ -835,11 +836,21 @@ public class Floor extends AbstractObject
         //polygon1.remove(polygon1.size()-1);
 
         polygon1 = findLastPartOfFloor(floorVertices, firstConnection1, secondConnection1, conns, polygon1);
+        polygon1 = removeDoubleVertices(polygon1);
+
+        System.out.println();
+        System.out.println("AFTER EVERYTHING");
+        for (int i = 0; i< polygon1.size(); i++)
+        {
+            System.out.println(polygon1.get(i).x + ", " + polygon1.get(i).y);
+        }
+
         newSimplePolygon1= new ArrayList<>(polygon1);
 
         ArrayList<Point> toBeTriangulatedPolygon = new ArrayList<>(newSimplePolygon1);
 
-       // trianglesToDraw = getTriangles(toBeTriangulatedPolygon);
+       trianglesToDraw = getTriangles(toBeTriangulatedPolygon);
+       ArrayList<ArrayList<Polygon>> adjacentTriangles = getAdjacentTriangles(trianglesToDraw);
 
     /*    System.out.println();
         System.out.println("polygon1");
@@ -1414,7 +1425,7 @@ public class Floor extends AbstractObject
         System.out.println("WTF");
         System.out.println();
         System.out.println("after everything");
-        for (int i=0; i<newPolygon.size(); i++){
+        for (int i=0; i<newPolygon.size(); i++) {
             System.out.println(newPolygon.get(i));
         }
         System.out.println("Last part of polygon still missing");
@@ -1449,6 +1460,17 @@ public class Floor extends AbstractObject
             System.out.println(newPolygon.get(i));
         }
         return newPolygon;
+    }
+    public ArrayList<Point> removeDoubleVertices(ArrayList<Point> polygon)
+    {
+        ArrayList<Point> arrayList = new ArrayList<>();
+        polygon.forEach(p -> {
+            if(!arrayList.contains(p))
+            {
+                arrayList.add(p);
+            }
+        });
+        return arrayList;
     }
 
     //finds the 2 indices of specific element in obstacle list
@@ -1589,6 +1611,11 @@ public class Floor extends AbstractObject
                     intersectionPoints.add(intersection);
                 }
             }
+            //check if each point is exactly twice in the list
+            //if(!isTwiceInList(intersectionPoints)) {
+            //    return false;
+            //}
+
             ArrayList<Boolean> allIntersectionsAreCornerpoints = new ArrayList<>();
 //            boolean allIntersectionsAreCornerpoints = false;
             for (int j=0; j< intersectionPoints.size(); j++){
@@ -1608,6 +1635,22 @@ public class Floor extends AbstractObject
             return true;
         }
         return false;
+    }
+
+    public boolean isTwiceInList(ArrayList<Point> intersectionpoints)
+    {
+        for(int i = 0; i< intersectionpoints.size(); i++)
+        {
+            int occurence = Collections.frequency(intersectionpoints, intersectionpoints.get(i));
+            System.out.println();
+            System.out.println("OCCURENCE: " + occurence);
+            System.out.println();
+                if(occurence % 2 != 0)
+                {
+                    return false;
+                }
+        }
+        return true;
     }
 
     public ArrayList<Polygon> getTriangles(ArrayList<Point> polygon){
@@ -1854,5 +1897,68 @@ public class Floor extends AbstractObject
 
 
         return triangles;
+    }
+
+    public ArrayList<Point2D> getMidPoints(ArrayList<Polygon> triangles)
+    {
+        ArrayList<Point2D> midPoints = new ArrayList<>();
+        for(int i = 0; i<triangles.size(); i++)
+        {
+            double sumX = 0;
+            double sumY = 0;
+            for(int j = 0; j<triangles.get(i).xpoints.length; j++)
+            {
+                sumX += triangles.get(i).xpoints[j];
+                sumY += triangles.get(i).ypoints[j];
+            }
+            int x = (int) sumX/3;
+            int y = (int) sumY/3;
+            System.out.print("x: " + x + " y: " + y);
+            midPoints.add(new Point(x, y));
+        }
+        return midPoints;
+    }
+
+    public ArrayList<ArrayList<Polygon>> getAdjacentTriangles(ArrayList<Polygon> triangles)
+    {
+        ArrayList<ArrayList<Polygon>> adjacentTrianglesList = new ArrayList<>();
+        for(int i = 0; i< triangles.size(); i++)
+        {
+            ArrayList<Polygon> adjacentTriangles = new ArrayList<>();
+            adjacentTriangles.add(triangles.get(i));
+            int equalCornerPoints = 0;
+            for(int k = 0; k<triangles.get(i).xpoints.length; k++) {
+                System.out.println("Triangle " + i + " " + triangles.get(i).xpoints[k] + "," + triangles.get(i).ypoints[k]);
+            }
+            for(int j = 0; j<triangles.get(i).xpoints.length; j++)
+            {
+
+                for(int a = 0; a< triangles.size(); a++)
+                {
+
+                    for(int b = 0; b< triangles.get(a).xpoints.length; b++)
+                    {
+                        if(triangles.get(i).xpoints[j] == triangles.get(a).xpoints[b] && triangles.get(i).ypoints[j] == triangles.get(a).ypoints[b] && i!=a)
+                        {
+                            equalCornerPoints++;
+                            if(equalCornerPoints == 2)
+                            {
+                                for(int k = 0; k<triangles.get(a).xpoints.length; k++)
+                                {
+                                    System.out.println("Adjacent Triangles of triangle "+ i + " " + triangles.get(a).xpoints[k] + ", " + triangles.get(a).ypoints[k]);
+                                }
+                                adjacentTriangles.add(triangles.get(a));
+                                equalCornerPoints = 0;
+                            }
+                            adjacentTrianglesList.add(adjacentTriangles);
+                        }
+                    }
+                }
+                System.out.println();
+            }
+            System.out.println();
+
+        }
+        return adjacentTrianglesList;
     }
 }

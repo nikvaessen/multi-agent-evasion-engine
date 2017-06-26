@@ -207,7 +207,7 @@ public class MapViewPanel
 
 
 
-     /*       //draw second splitted polygon
+            //draw second splitted polygon
             ((Graphics2D) g).setStroke(new BasicStroke(2));
             ArrayList<Point> polygonPoints2 = floor.newSimplePolygon2;
             g.setColor(Color.MAGENTA);
@@ -216,17 +216,17 @@ public class MapViewPanel
                         polygonPoints2.get(i+1).x, polygonPoints2.get(i+1).y);
             }
 
-*/
+
         //draw triangles
-   /*     ((Graphics2D) g).setStroke(new BasicStroke(2));
+        ((Graphics2D) g).setStroke(new BasicStroke(2));
         ArrayList<Polygon> triangles = floor.trianglesToDraw;
         g.setColor(Color.blue);
         for(Polygon p: triangles){
             g.drawPolygon(p);
-        }*/
+        }
 
         //draw first splitted polygon
-    /*    ((Graphics2D) g).setStroke(new BasicStroke(2));
+        ((Graphics2D) g).setStroke(new BasicStroke(2));
         ArrayList<Point> polygonPoints1 = floor.newSimplePolygon1;
         g.setColor(Color.red);
         for (int i=0; i<polygonPoints1.size()-1; i++){
@@ -236,7 +236,15 @@ public class MapViewPanel
         g.drawLine(polygonPoints1.get(polygonPoints1.size()-1).x, polygonPoints1.get(polygonPoints1.size()-1).y,
                 polygonPoints1.get(0).x, polygonPoints1.get(0).y);
 
-*/
+
+        ArrayList<Point2D> midPoints = floor.getMidPoints(floor.getTriangles(polygonPoints1));
+        g.setColor(Color.black);
+        for(int i = 0; i<midPoints.size(); i++)
+        {
+            g.drawLine((int)(midPoints.get(i).getX()), (int)(midPoints.get(i).getY()), (int)(midPoints.get(i).getX()), (int)(midPoints.get(i).getY()));
+        }
+
+
 
     }
 
