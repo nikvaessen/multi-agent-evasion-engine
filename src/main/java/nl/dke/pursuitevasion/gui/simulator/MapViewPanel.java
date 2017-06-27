@@ -104,6 +104,9 @@ public class MapViewPanel
 
         //draw all polygons which make up the map
         ((Graphics2D) g).setStroke(new BasicStroke(BORDER_STROKE_WIDTH)); //make borders more wide
+
+
+
         for(MapPolygon polygon : objects)
         {
             if(polygon.isSolid())
@@ -119,6 +122,11 @@ public class MapViewPanel
 
         //draw all points of the agents
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        if (mcts != null && visualOutputMCTS) {
+            mcts.paint(g,mctsViewSettings,this,agents);
+        }
+
         for(AbstractAgent agent : agents)
         {
             if(agent.isEvader())
@@ -187,9 +195,7 @@ public class MapViewPanel
 //            g.drawLine(left.x, left.y, base.x, base.y);
 
         }
-        if (mcts != null && visualOutputMCTS) {
-            mcts.paint(g,mctsViewSettings,this,agents);
-        }
+
         if(minimalPathOverseer != null)
         {
             g.setColor(Color.RED);

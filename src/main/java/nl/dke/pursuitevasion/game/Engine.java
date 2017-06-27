@@ -269,18 +269,18 @@ public class Engine
                 if(msPassed < desiredIterationLength)
                 {
 
-//                    try
-//                    {
-//                        if(logger.isDebugEnabled())
-//                        {
-//                            logger.debug("waiting for {} ms", desiredIterationLength - msPassed);
-//                        }
-//                        Thread.sleep(desiredIterationLength - msPassed);
-//                    }
-//                    catch(InterruptedException e)
-//                    {
-//                        e.printStackTrace();
-//                    }
+                    try
+                    {
+                        if(logger.isDebugEnabled())
+                        {
+                            logger.debug("waiting for {} ms", desiredIterationLength - msPassed);
+                        }
+                        Thread.sleep(desiredIterationLength - msPassed);
+                    }
+                    catch(InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
                 else
                 {

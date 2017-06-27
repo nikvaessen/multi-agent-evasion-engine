@@ -592,6 +592,9 @@ public class MCTS_2 implements Strategy{
     }
 
     public void paint(Graphics g, MCTSViewSettings mctsViewSettings, MapViewPanel mapViewPanel, Collection<AbstractAgent> agents) {
+        PreCalcMap p = this.preCalcMap;
+        p.draw(g, mctsViewSettings, mapViewPanel,agents);
+
         NodeTree_2 root = this.getRoot();
         if (root == null) return;
         int height = root.getHeight();
@@ -602,8 +605,7 @@ public class MCTS_2 implements Strategy{
 
         g.setColor(Color.magenta);
 
-        PreCalcMap p = this.preCalcMap;
-        p.draw(g, mctsViewSettings, mapViewPanel,agents);
+
 
 
     }

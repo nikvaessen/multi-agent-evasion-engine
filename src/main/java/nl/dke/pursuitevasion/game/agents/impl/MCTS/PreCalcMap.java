@@ -161,12 +161,16 @@ public class PreCalcMap {
 
 
                 double v = getValueOfEvador(x,y,agents);
-                Color c = new Color((float)(1-(v/900)),(float)(v/900),0.f);
+                float r =  (float)(0.7-(v/900)); if (r<0) r =0;
+                float gr =  (float)((v/900)+0.1);
+                float b = 0;
+
+                Color c = new Color(r,gr,b);
                 //int v = 3;
                 g.setColor(c);
-                int r = 20;
+                int rad = 20;
                // radius = 10;
-                if (il[x][y]) g.fillOval((int)(sp.x-r/2),(int)(sp.y-r/2),r,r);
+                if (il[x][y]) g.fillOval((int)(sp.x-rad/2),(int)(sp.y-rad/2),rad,rad);
             }
         }
     }

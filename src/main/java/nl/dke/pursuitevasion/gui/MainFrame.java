@@ -50,7 +50,7 @@ public class MainFrame extends JFrame
        // agents.add(new MinimalPathAgent(map, floor, new Vector2D(75.0,50.0), Direction.NORTH, 5, 100000, 360));
        // agents.add(new MinimalPathAgent(map, floor, new Vector2D(25.0,50.0), Direction.NORTH, 5, 100000, 360));
         CoordinatorEvaderKillKillKillEmAll hunter = new CoordinatorEvaderKillKillKillEmAll(engine,map, floor, new Vector2D(220, 200), Direction.SOUTH, 5,
-                EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, agents,false);
+                EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, agents,true);
         //agents.add(new DistanceAgent(map, floor, new Vector2D(20,20), Direction.SOUTH, 5, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
 //        agents.add(new SimpleAgent(map, floor, new Vector2D(15,15), Direction.SOUTH, 5,
 //                EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));

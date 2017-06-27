@@ -46,14 +46,15 @@ public class Move {
     public Move(AbstractAgent agent, Angle angle, double skale,State previousState) {
         this.angle = angle.clone();
         this.skale = skale;
+        //this.skale = 10;
         this.agent = agent.copy();
          id =   agent.getId();
         double[] val = null;
        // val = moveHashMap.get(this);
         if (val ==null){
             val = new double[2];
-            val[0] =  Math.cos(angle.getRadians())* skale ;
-            val[1] =  Math.sin(angle.getRadians())* skale ;
+            val[0] =  Math.cos(angle.getRadians())* this.skale ;
+            val[1] =  Math.sin(angle.getRadians())* this.skale ;
             //moveHashMap.put(this,val);
         }
         deltaX = val[0];
