@@ -20,7 +20,7 @@ import java.util.concurrent.Future;
 public class ExperimentTest {
 
     public static void main(String[] args) {
-        int amount = 50;
+        int amount = 5;
         List<Callable<Map>>  mapFunctions =  new ArrayList<>(); //Experiment.getMapFunctions();
         mapFunctions.add(Experiment::getSmallMapFewHoles);
         mapFunctions.add(Experiment::getSmallMapAverageHoles);

@@ -433,8 +433,8 @@ public class MCTS_2 implements Strategy{
         TurnOrder to = node.getTurn();
         //repeat until 4 seconds are full
         //node.getState().evaluate(to);
-       // State.StatePreCalcValue value = Evaluator.calcValues(node.getState(),node.getState().getStateHandler());
-        State.StatePreCalcValue value = preCalcMap.getValueOfEvadorValMap(node);
+        State.StatePreCalcValue value = Evaluator.calcValues(node.getState(),node.getState().getStateHandler());
+       // State.StatePreCalcValue value = preCalcMap.getValueOfEvadorValMap(node);
        // System.out.println("Evaluated State: " + node.getPlayer().getLocation().toString() + " with:"+ value.getEvaderScore());
         node.incrementWin(value.getEvaderScore(),value.getPursuerScore(),value.getEvedorPossible(), value.getPursuerPossible(),to);
 

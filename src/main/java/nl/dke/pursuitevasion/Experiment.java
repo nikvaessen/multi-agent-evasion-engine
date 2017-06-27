@@ -42,6 +42,7 @@ public class Experiment
 
             if(c == CoordinatorEvaderKillKillKillEmAll.class){
                 CoordinatorEvaderKillKillKillEmAll a = new CoordinatorEvaderKillKillKillEmAll(simulationEngine, map, f, map.getEvaderSpawnLocation(), Direction.NORTH, EngineConstants.AGENT_RADIUS, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, agents, false);
+                agents.add(a.getRealAgent());
             }
             else if(c == DistanceAgent.class){
                 agents.add(new DistanceAgent(map, f, map.getEvaderSpawnLocation(), Direction.NORTH, EngineConstants.AGENT_RADIUS, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
