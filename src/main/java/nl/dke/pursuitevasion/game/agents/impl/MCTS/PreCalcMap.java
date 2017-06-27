@@ -6,6 +6,7 @@ import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
+import sun.management.Agent;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -24,6 +25,7 @@ public class PreCalcMap {
     private final Map map;
     private Sink sink;
     private HashMap<Point, Sink> sinks = new HashMap<Point, Sink>(EngineConstants.preCalcSize*EngineConstants.preCalcSize);
+    private HashMap<State.StateHandler, Move> MCTSMoves = new HashMap<State.StateHandler, Move>(EngineConstants.preCalcSize*EngineConstants.preCalcSize);
 
 
     public boolean[][] getIsLegal() {
@@ -62,6 +64,43 @@ public class PreCalcMap {
             }
         }
         prepareSinks();
+        prepareBestMoves();
+
+    }
+
+    private void prepareBestMoves() {
+        long i= 0;
+        for (int x0 = 0; x0 < EngineConstants.preCalcSize; x0+=5) {
+            for (int y0 = 0; y0 < EngineConstants.preCalcSize; y0+=5) {
+                //evaderPos;
+                for (int x1 = 0; x1 < EngineConstants.preCalcSize; x1+=10) {
+                    for (int y1 = 0; y1 < EngineConstants.preCalcSize; y1+=10) {
+
+                        for (int x2 = 0; x2 < EngineConstants.preCalcSize; x2+=10) {
+                            for (int y2 = 0; y2 < EngineConstants.preCalcSize; y2+=10) {
+
+                                for (int x3 = 0; x3 < EngineConstants.preCalcSize; x3+=10) {
+                                    for (int y3 = 0; y3 < EngineConstants.preCalcSize; y3+=10) {
+                                        i++;
+                                    }
+                                }
+
+
+                            }
+                        }
+
+
+
+
+                    }
+                }
+
+
+            }
+        }
+
+
+        System.out.println("MarkusPowerMap: " + i );
     }
 
     public Point ScreenPosToXY (Point s){
@@ -132,7 +171,39 @@ public class PreCalcMap {
         }
     }
 
-    private double getValueOfEvador(int x, int y, Collection<AbstractAgent> agents) {
+    public State.StatePreCalcValue getValueOfEvadorValMap(NodeTree_2 node) {
+        State s = node.getState();
+        AbstractAgent ev = s.evaders.get(0);
+        Point p = ScreenPosToXY(ev.getLocation());
+
+        double v = getValueOfEvador(p.x,p.y,s.pursuers);
+        v /= 900;
+       // Color c = new Color((float)(1-(v/900)),(float)(v/900),0.f);
+
+
+
+        State.StatePreCalcValue spcv = new State.StatePreCalcValue(1-v,v,1,1);
+        return spcv;
+    }
+    public State.StatePreCalcValue getValueOfEvadorValMap(State s) {
+
+        AbstractAgent ev = s.evaders.get(0);
+        Point p = ScreenPosToXY(ev.getLocation());
+
+        double v = getValueOfEvador(p.x,p.y,s.pursuers);
+        v /= 900;
+
+
+        // Color c = new Color((float)(1-(v/900)),(float)(v/900),0.f);
+
+
+
+        State.StatePreCalcValue spcv = new State.StatePreCalcValue(1-v,v,1,1);
+        return spcv;
+    }
+
+
+    public double getValueOfEvador(int x, int y, Collection<AbstractAgent> agents) {
         double minVal = 9999999;
      //   if (x==19&&y==19){
           //  System.out.println(x + " " + y );}
@@ -147,6 +218,26 @@ public class PreCalcMap {
   //      System.out.println(x + " " + y + " " +minVal);
         //double diagonal = 50;
        // int r = (int) (minVal/ diagonal) ;
+
+        return minVal;
+    }
+
+
+    public double getValueOfEvadorValMap(int x, int y, Collection<AbstractAgent> agents) {
+        double minVal = 9999999;
+        //   if (x==19&&y==19){
+        //  System.out.println(x + " " + y );}
+        for(AbstractAgent a:agents){
+            if (!a.isEvader()) {
+                Vector2D b = a.getLocation();
+                Point xy = ScreenPosToXY(b);
+                Sink s = getSink(xy);
+                if (s.val[x][y]<minVal) minVal = s.val[x][y];
+            }
+        }
+        //      System.out.println(x + " " + y + " " +minVal);
+        //double diagonal = 50;
+        // int r = (int) (minVal/ diagonal) ;
 
         return minVal;
     }
@@ -166,6 +257,8 @@ public class PreCalcMap {
         }
         return;
     }
+
+
 
     private class Sink {
         private final int centerX;

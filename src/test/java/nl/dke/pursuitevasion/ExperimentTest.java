@@ -3,6 +3,7 @@ package nl.dke.pursuitevasion;
 import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import jdk.nashorn.internal.codegen.CompilerConstants;
 import nl.dke.pursuitevasion.game.agents.impl.DistanceAgent;
+import nl.dke.pursuitevasion.game.agents.impl.MCTS.CoordinatorEvaderKillKillKillEmAll;
 import nl.dke.pursuitevasion.map.impl.Map;
 
 import java.io.FileWriter;
@@ -19,10 +20,12 @@ import java.util.concurrent.Future;
 public class ExperimentTest {
 
     public static void main(String[] args) {
-        int amount = 10;
+        int amount = 50;
         List<Callable<Map>>  mapFunctions =  new ArrayList<>(); //Experiment.getMapFunctions();
         mapFunctions.add(Experiment::getSmallMapFewHoles);
-        Class evaderClass = DistanceAgent.class;
+        mapFunctions.add(Experiment::getSmallMapAverageHoles);
+        mapFunctions.add(Experiment::getSmallMapManyHoles);
+        Class evaderClass = CoordinatorEvaderKillKillKillEmAll.class;
 
         List<ExperimentResult> results  = runExperiments(amount, mapFunctions, evaderClass);
 

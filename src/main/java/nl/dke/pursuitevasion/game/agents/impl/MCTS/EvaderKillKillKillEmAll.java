@@ -13,6 +13,8 @@ import nl.dke.pursuitevasion.map.impl.Map;
  * Created by Nibbla on 19.05.2017.
  */
 public class EvaderKillKillKillEmAll extends AbstractAgent{
+    private boolean killed;
+
     public static void setCoordinatorPursuer(CoordinatorEvaderKillKillKillEmAll coordinatorEvader2) {
         coordinatorEvader = coordinatorEvader2;
     }
@@ -60,6 +62,7 @@ public class EvaderKillKillKillEmAll extends AbstractAgent{
     protected void completeRequest(AgentRequest request) {
        // if (CoordinatorPursuer == null) CoordinatorPursuer = new CoordinatorPursuerKillKillKillEmAll();
        // System.out.println("Ask for move");
+        if (killed) return;
         AbstractAgentTask a =coordinatorEvader.getNextMove(this, EngineConstants.CALCULATION_TIME);
         AbstractAgentTask b = coordinatorEvader.getRotationTaks(this);
        // System.out.println("recieved as solution: "+ a);
@@ -76,5 +79,10 @@ public class EvaderKillKillKillEmAll extends AbstractAgent{
     @Override
     public boolean isEvader() {
         return true;
+    }
+
+    public void kill() {
+        this.killed = true;
+        coordinatorEvader.kill();
     }
 }

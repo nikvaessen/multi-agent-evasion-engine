@@ -2,6 +2,7 @@ package nl.dke.pursuitevasion.game;
 
 import jdk.nashorn.internal.codegen.CompilerConstants;
 import nl.dke.pursuitevasion.game.agents.*;
+import nl.dke.pursuitevasion.game.agents.impl.MCTS.EvaderKillKillKillEmAll;
 import nl.dke.pursuitevasion.game.agents.tasks.AbstractAgentTask;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
 import nl.dke.pursuitevasion.map.AbstractObject;
@@ -451,6 +452,10 @@ public class Engine
                         if(!EngineConstants.GOD_MODE){
                             agents.remove(evader);
                             evaders.remove(evader);
+                            if (evader instanceof EvaderKillKillKillEmAll){
+                                EvaderKillKillKillEmAll e = (EvaderKillKillKillEmAll) evader;
+                                e.kill();
+                            }
                         }
                     }
                 }

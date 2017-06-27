@@ -58,6 +58,7 @@ public class CoordinatorEvaderKillKillKillEmAll{
     private java.util.Map<Integer,Boolean> hasRequest = new HashMap<>(4);
     private boolean hasNewRequest = false;
     private AbstractAgent realAgent;
+    private boolean kill = false;
 
 
     public CoordinatorEvaderKillKillKillEmAll(Engine e, Map map, Floor startingFloor, Vector2D startLocation, Direction startsFacing, int radius,
@@ -135,6 +136,10 @@ public class CoordinatorEvaderKillKillKillEmAll{
         return rt;
     }
 
+    public void kill() {
+        this.kill = true;
+    }
+
     private class ThinkThread
             implements Runnable
     {
@@ -155,6 +160,7 @@ public class CoordinatorEvaderKillKillKillEmAll{
 
         @Override
         public void run() {
+            if (kill) return;
             long start = System.currentTimeMillis();
           //  System.out.println("Started one MCTS at: " + start + "ms");
             if (MCTS_2.getLastMCTS() == null) m = new MCTS_2(s,t,calculationTime, 10,false,preCalcMap);

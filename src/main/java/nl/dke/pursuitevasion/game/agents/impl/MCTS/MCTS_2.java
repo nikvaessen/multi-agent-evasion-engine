@@ -92,7 +92,7 @@ public class MCTS_2 implements Strategy{
             }
         }
         //printTree(root);
-       // System.out.println("Expansions: "+n_expansion);
+       System.out.println("Expansions: "+n_expansion);
         NodeTree_2 m = null;
         if (depthLevel==10){ m = getBestValue();}else
         {m = getBestMove();}
@@ -433,8 +433,9 @@ public class MCTS_2 implements Strategy{
         TurnOrder to = node.getTurn();
         //repeat until 4 seconds are full
         //node.getState().evaluate(to);
-        State.StatePreCalcValue value = Evaluator.calcValues(node.getState(),node.getState().getStateHandler());
-        //System.out.println("Evaluated State: " + node.getPlayer().getLocation().toString() + " with:"+ value.getEvaderScore());
+       // State.StatePreCalcValue value = Evaluator.calcValues(node.getState(),node.getState().getStateHandler());
+        State.StatePreCalcValue value = preCalcMap.getValueOfEvadorValMap(node);
+       // System.out.println("Evaluated State: " + node.getPlayer().getLocation().toString() + " with:"+ value.getEvaderScore());
         node.incrementWin(value.getEvaderScore(),value.getPursuerScore(),value.getEvedorPossible(), value.getPursuerPossible(),to);
 
         /*if(node.isEvader() == StatusCell.Blue)

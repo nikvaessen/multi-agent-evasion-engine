@@ -1,4 +1,4 @@
-package nl.dke.pursuitevasion.game.agents.impl.minimalPath;
+package nl.dke.pursuitevasion.game.agents.impl.MinimalPath;
 
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;

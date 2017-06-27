@@ -4,8 +4,9 @@ import nl.dke.pursuitevasion.game.EngineConstants;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.impl.MCTS.MCTS_2;
-import nl.dke.pursuitevasion.game.agents.impl.minimalPath.MinimalPathAgent;
-import nl.dke.pursuitevasion.game.agents.impl.minimalPath.MinimalPathOverseer;
+import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathOverseer;
+import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathAgent;
+import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathOverseer;
 import nl.dke.pursuitevasion.map.MapPolygon;
 import nl.dke.pursuitevasion.map.impl.Map;
 import org.slf4j.Logger;
@@ -272,8 +273,9 @@ public class MapViewPanel
         return new Dimension(maxX - minX + 1, maxY - minY + 1);
     }
 
-    public void setMinimalPathOverseer(MinimalPathOverseer minimalPathOverseer)
-    {
-        this.minimalPathOverseer = minimalPathOverseer;
+
+
+    public void setMinimalPathOverseer(MinimalPathOverseer overseer) {
+        this.minimalPathOverseer = overseer;
     }
 }

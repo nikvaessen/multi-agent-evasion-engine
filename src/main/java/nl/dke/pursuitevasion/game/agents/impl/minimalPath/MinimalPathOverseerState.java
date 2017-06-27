@@ -1,4 +1,4 @@
-package nl.dke.pursuitevasion.game.agents.impl.minimalPath;
+package nl.dke.pursuitevasion.game.agents.impl.MinimalPath;
 
 /**
  * Created by nik on 14/06/17.

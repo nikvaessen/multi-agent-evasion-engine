@@ -366,6 +366,8 @@ public abstract class AbstractAgent implements Cloneable
     }
 
 
+
+
     public class VisionArc {
 
         Angle lowerAngle;

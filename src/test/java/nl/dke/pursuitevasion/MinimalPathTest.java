@@ -9,7 +9,7 @@ import nl.dke.pursuitevasion.game.agents.impl.DistanceAgent;
 import nl.dke.pursuitevasion.game.agents.impl.MCTS.CoordinatorEvaderKillKillKillEmAll;
 import nl.dke.pursuitevasion.game.agents.impl.RandomAgent;
 import nl.dke.pursuitevasion.game.agents.impl.UserAgent;
-import nl.dke.pursuitevasion.game.agents.impl.minimalPath.MinimalPathOverseer;
+import nl.dke.pursuitevasion.game.agents.impl.MinimalPath.MinimalPathOverseer;
 import nl.dke.pursuitevasion.gui.KeyboardInputListener;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
 import nl.dke.pursuitevasion.map.impl.Floor;
