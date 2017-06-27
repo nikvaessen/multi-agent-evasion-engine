@@ -46,6 +46,9 @@ public class Experiment
             else if(c == DistanceAgent.class){
                 agents.add(new DistanceAgent(map, f, map.getEvaderSpawnLocation(), Direction.NORTH, EngineConstants.AGENT_RADIUS, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
             }
+            else if(c == RandomAgent.class){
+                agents.add(new RandomAgent(map, f, map.getEvaderSpawnLocation(), Direction.NORTH, EngineConstants.AGENT_RADIUS, EngineConstants.VISION_RANGE,EngineConstants.VISION_ANGLE, true));
+            }
             else{
                 throw new ClassNotFoundException("Class is not known");
             }
