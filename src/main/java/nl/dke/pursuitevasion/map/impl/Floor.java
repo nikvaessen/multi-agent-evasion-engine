@@ -850,7 +850,7 @@ public class Floor extends AbstractObject
         ArrayList<Point> toBeTriangulatedPolygon = new ArrayList<>(newSimplePolygon1);
 
         trianglesToDraw = getTriangles(toBeTriangulatedPolygon);
-        ArrayList<ArrayList<Polygon>> adjacentTriangles = getAdjacentTriangles(trianglesToDraw);
+        ArrayList<ArrayList<Point2D>> adjacentTriangles = getAdjacentTriangles(trianglesToDraw, getMidPoints(trianglesToDraw));
 
 
     /*    System.out.println();
@@ -1744,47 +1744,70 @@ public class Floor extends AbstractObject
         return midPoints;
     }
 
-    public ArrayList<ArrayList<Polygon>> getAdjacentTriangles(ArrayList<Polygon> triangles)
+    public ArrayList<ArrayList<Point2D>> getAdjacentTriangles(ArrayList<Polygon> triangles, ArrayList<Point2D> midpoints)
     {
-        ArrayList<ArrayList<Polygon>> adjacentTrianglesList = new ArrayList<>();
-        for(int i = 0; i< triangles.size(); i++)
+        ArrayList<ArrayList<Point2D>> adjacentTrianglesList = new ArrayList<>();
+        for(int i = 0; i<triangles.size(); i++)
         {
-            ArrayList<Polygon> adjacentTriangles = new ArrayList<>();
-            adjacentTriangles.add(triangles.get(i));
-            int equalCornerPoints = 0;
+            ArrayList<Point2D> adjacentTriangles = new ArrayList<>();
+            adjacentTriangles.add(midpoints.get(i));
             for(int k = 0; k<triangles.get(i).xpoints.length; k++) {
-                System.out.println("Triangle " + i + " " + triangles.get(i).xpoints[k] + "," + triangles.get(i).ypoints[k]);
+                System.out.println("Triangle " + triangles.get(i).xpoints[k] + "," + triangles.get(i).ypoints[k]);
             }
-            for(int j = 0; j<triangles.get(i).xpoints.length; j++)
-            {
 
-                for(int a = 0; a< triangles.size(); a++)
+            for (Polygon otherPoly: triangles) {
+                if(otherPoly.equals(triangles.get(i)))
                 {
-                    for(int k = 0; k<triangles.get(a).xpoints.length; k++)
+                    continue;
+                }
+                if(adjacentPolygons(triangles.get(i), otherPoly))
+                {
+                    for(int j = 0; j<otherPoly.xpoints.length; j++)
                     {
-                        System.out.println("Adjacent Triangles of triangle "+ i + " " + triangles.get(a).xpoints[k] + ", " + triangles.get(a).ypoints[k]);
-                    }
-                    for(int b = 0; b< triangles.get(a).xpoints.length; b++)
-                    {
-                        if(triangles.get(i).xpoints[j] == triangles.get(a).xpoints[b] && triangles.get(i).ypoints[j] == triangles.get(a).ypoints[b] && i!=a)
-                        {
-                            equalCornerPoints++;
-                            if(equalCornerPoints == 2)
-                            {
-                                adjacentTriangles.add(triangles.get(a));
-                            }
-                            adjacentTrianglesList.add(adjacentTriangles);
-                        }
+                        System.out.println("Adjacent Triangles " + otherPoly.xpoints[j] + ", " + otherPoly.ypoints[j]);
+                        adjacentTriangles.add(midpoints.get(j));
                     }
                     System.out.println();
                 }
-                System.out.println();
             }
-            System.out.println();
-
         }
         return adjacentTrianglesList;
     }
 
-}
+    public boolean adjacentPolygons(Polygon a, Polygon b)
+    {
+        int counter = 0;
+        for(int i= 0; i<a.xpoints.length; i++)
+        {
+            Point2D coordinatesA = new Point(a.xpoints[i], a.ypoints[i]);
 
+            for(int j = 0; j<b.xpoints.length; j++)
+            {
+                Point2D coordinatesB = new Point(b.xpoints[j], b.ypoints[j]);
+                if(coordinatesA.equals(coordinatesB))
+                {
+                    counter++;
+                    break;
+                }
+
+            }
+        }
+        return counter == 2;
+    }
+
+    public ArrayList<Line2D> connectMidPoints(ArrayList<ArrayList<Polygon>> adjacentTrianglesList)
+    {
+        ArrayList<Line2D> midPointConnections = new ArrayList<>();
+        for (ArrayList<Polygon> objects: adjacentTrianglesList)
+        {
+            objects.get(0);
+
+
+            for(Polygon poly: objects)
+            {
+
+            }
+        }
+        return midPointConnections;
+    }
+}
