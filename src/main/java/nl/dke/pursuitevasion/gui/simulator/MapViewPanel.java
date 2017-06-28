@@ -245,7 +245,8 @@ public class MapViewPanel
         g.setColor(Color.black);
         for(int i = 0; i<midPoints.size(); i++)
         {
-            g.drawLine((int)(midPoints.get(i).getX()), (int)(midPoints.get(i).getY()), (int)(midPoints.get(i).getX()), (int)(midPoints.get(i).getY()));
+            //g.drawLine((int)(midPoints.get(i).getX()), (int)(midPoints.get(i).getY()), (int)(midPoints.get(i).getX()), (int)(midPoints.get(i).getY()));
+            g.drawOval((int) (midPoints.get(i).getX()), (int)(midPoints.get(i).getY()), 3, 3);
         }
 
         g.setColor(Color.green);
@@ -257,6 +258,7 @@ public class MapViewPanel
                 g.drawLine((int)adjacent.get(i).get(0).getX(), (int)adjacent.get(i).get(0).getY(), (int)adjacent.get(i).get(j).getX(), (int)adjacent.get(i).get(j).getY());
             }
         }
+
 
 
 

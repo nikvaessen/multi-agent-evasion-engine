@@ -8,6 +8,7 @@ import nl.dke.pursuitevasion.game.agents.Direction;
 import nl.dke.pursuitevasion.game.agents.impl.MCTS.CoordinatorPursuerKillKillKillEmAll;
 import nl.dke.pursuitevasion.game.agents.impl.DistanceAgent;
 import nl.dke.pursuitevasion.game.agents.impl.SimpleAgent;
+import nl.dke.pursuitevasion.game.agents.impl.TriangulationEvader;
 import nl.dke.pursuitevasion.game.agents.impl.UserAgent;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
 import nl.dke.pursuitevasion.map.impl.Floor;
@@ -15,6 +16,7 @@ import nl.dke.pursuitevasion.map.impl.Map;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -39,9 +41,20 @@ public class MainFrame extends JFrame
             break;
         }
 
+        ArrayList<ArrayList<Point>> conns = floor.getTriangulation();
+        ArrayList<Polygon> triangles = floor.trianglesToDraw;
+        ArrayList<Point2D> midpoints = floor.midpoints;
+
         //agents.add(new SimpleAgent(new Point(5,5), Direction.SOUTH, 5));
-        agents.add(new UserAgent(map, floor, new Vector2D(200, 310), Direction.SOUTH, 5,
-                                 EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, keyboardInputListener,true));
+       // agents.add(new UserAgent(map, floor, new Vector2D(200, 310), Direction.SOUTH, 5,
+       //                          EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, keyboardInputListener,true));
+
+        //get random starting posistion
+        int randomStart = (int) Math.abs(Math.random()* ((floor.midpoints.size()-1) ));
+        Point2D start = midpoints.get(randomStart);
+        agents.add(new TriangulationEvader(map, floor, new Vector2D(start.getX(), start.getY()), Direction.SOUTH, 5,
+                        EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
+
         //CoordinatorPursuerKillKillKillEmAll hunter = new CoordinatorPursuerKillKillKillEmAll(engine,map, floor, new Vector2D(20, 20), Direction.SOUTH, 5,
           //      EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, agents);
         //agents.add(new DistanceAgent(map, floor, new Vector2D(20,20), Direction.SOUTH, 5, EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
