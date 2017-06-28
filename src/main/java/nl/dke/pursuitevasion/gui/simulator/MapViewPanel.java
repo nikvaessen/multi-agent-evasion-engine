@@ -199,16 +199,9 @@ public class MapViewPanel
         ArrayList<ArrayList<Point>> conns = floor.getTriangulation();
 
 
-/*
-            //draw second splitted polygon
-            ((Graphics2D) g).setStroke(new BasicStroke(2));
-            ArrayList<Point> polygonPoints2 = floor.newSimplePolygon2;
-            g.setColor(Color.MAGENTA);
-            for (int i=0; i<polygonPoints2.size()-1; i++){
-                g.drawLine(polygonPoints2.get(i).x, polygonPoints2.get(i).y,
-                        polygonPoints2.get(i+1).x, polygonPoints2.get(i+1).y);
-            }
-*/
+
+
+
 
         //draw triangles
         ((Graphics2D) g).setStroke(new BasicStroke(2));
@@ -229,6 +222,16 @@ public class MapViewPanel
         g.drawLine(polygonPoints1.get(polygonPoints1.size()-1).x, polygonPoints1.get(polygonPoints1.size()-1).y,
                 polygonPoints1.get(0).x, polygonPoints1.get(0).y);
 
+        //draw second splitted polygon
+        ((Graphics2D) g).setStroke(new BasicStroke(2));
+        ArrayList<Point> polygonPoints2 = floor.newSimplePolygon2;
+        g.setColor(Color.MAGENTA);
+        for (int i=0; i<polygonPoints2.size()-1; i++){
+            g.drawLine(polygonPoints2.get(i).x, polygonPoints2.get(i).y,
+                    polygonPoints2.get(i+1).x, polygonPoints2.get(i+1).y);
+        }
+        g.drawLine(polygonPoints2.get(polygonPoints2.size()-1).x, polygonPoints2.get(polygonPoints2.size()-1).y,
+                polygonPoints2.get(0).x, polygonPoints2.get(0).y);
 
         //draw connection of vertices
         ((Graphics2D) g).setStroke(new BasicStroke(1));

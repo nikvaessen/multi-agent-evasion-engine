@@ -245,9 +245,9 @@ public class Map implements Serializable
                     .makeFloor(mainFloor)
                     .addObstacle(obstacle0)
                     .addObstacle(obstacle1)
-                    .addObstacle(obstacle2)
-                    .addObstacle(obstacle3)
-                    .addObstacle(obstacle4)
+                   // .addObstacle(obstacle2)
+                   // .addObstacle(obstacle3)
+                   // .addObstacle(obstacle4)
                     .finish()
                     .build();
         }
