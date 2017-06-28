@@ -49,11 +49,10 @@ public class MainFrame extends JFrame
             agents.add(overseer.getAgent(i));
         }*/
 
-        ArrayList<ArrayList<Point>> conns = floor.getTriangulation();
         ArrayList<Point2D> midpoints = floor.midpoints;
 
         //agents.add(new SimpleAgent(new Point(5,5), Direction.SOUTH, 5));
-        agents.add(new UserAgent(map, floor, new Vector2D(200, 310), Direction.SOUTH, 5,
+        agents.add(new UserAgent(map, floor, new Vector2D(1100, 300), Direction.SOUTH, 5,
                                  EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, keyboardInputListener,false));
 
         //get random starting posistion

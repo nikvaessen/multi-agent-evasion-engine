@@ -102,6 +102,7 @@ public class Floor extends AbstractObject
         this.entryPursuer = Collections.unmodifiableCollection(entryPursuer == null ? new ArrayList<>(0) : entryPursuer);
         this.lines = this.constructLines();
         this.visibilityGraph = computeVisibilityGraph();
+        this.adjacent = getTriangulation();
     }
 
     /**
@@ -599,7 +600,7 @@ public class Floor extends AbstractObject
         return builder.toString();
     }
 
-    public ArrayList<ArrayList<Point>> getTriangulation(){
+    public ArrayList<ArrayList<Point2D>> getTriangulation(){
         ArrayList<Polygon> triangles = new ArrayList<>();
 
         ArrayList<Obstacle> ob = new ArrayList<>(this.obstacles);
@@ -818,7 +819,7 @@ public class Floor extends AbstractObject
 
         adjacent = new ArrayList<>(getAdjacentTriangles(trianglesToDraw, midpoints));
 
-        return conns;
+        return adjacent;
     }
 
     public ArrayList<Point> findFirstPartOfFloor(int startingIndex, Point[] floorVertices, ArrayList<ArrayList<Point>> conns, ArrayList<Point> newPolygon){
