@@ -10,6 +10,7 @@ import nl.dke.pursuitevasion.game.agents.impl.DistanceAgent;
 import nl.dke.pursuitevasion.game.agents.impl.SimpleAgent;
 import nl.dke.pursuitevasion.game.agents.impl.TriangulationEvader;
 import nl.dke.pursuitevasion.game.agents.impl.UserAgent;
+import nl.dke.pursuitevasion.game.agents.impl.minimalPath.MinimalPathOverseer;
 import nl.dke.pursuitevasion.gui.simulator.MapViewPanel;
 import nl.dke.pursuitevasion.map.impl.Floor;
 import nl.dke.pursuitevasion.map.impl.Map;
@@ -41,8 +42,14 @@ public class MainFrame extends JFrame
             break;
         }
 
+        MinimalPathOverseer overseer = new MinimalPathOverseer(map, new Vector2D(200, 200));
+        panel.setMinimalPathOverseer(overseer);
+        for(int i = 0 ; i < overseer.getAmountOfAgents(); i++)
+        {
+            agents.add(overseer.getAgent(i));
+        }
+
         ArrayList<ArrayList<Point>> conns = floor.getTriangulation();
-        ArrayList<Polygon> triangles = floor.trianglesToDraw;
         ArrayList<Point2D> midpoints = floor.midpoints;
 
         //agents.add(new SimpleAgent(new Point(5,5), Direction.SOUTH, 5));

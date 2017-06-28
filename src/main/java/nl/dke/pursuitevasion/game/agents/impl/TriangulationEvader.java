@@ -1,5 +1,6 @@
 package nl.dke.pursuitevasion.game.agents.impl;
 
+import nl.dke.pursuitevasion.game.MapInfo;
 import nl.dke.pursuitevasion.game.Vector2D;
 import nl.dke.pursuitevasion.game.agents.AbstractAgent;
 import nl.dke.pursuitevasion.game.agents.AgentRequest;
@@ -12,6 +13,7 @@ import nl.dke.pursuitevasion.map.impl.Map;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * Created by Carla on 28/06/2017.
@@ -41,23 +43,63 @@ public class TriangulationEvader extends AbstractAgent
     @Override
     protected void completeRequest(AgentRequest request)
     {
-        //int random = (int) Math.random()*floor.midpoints.size()-1;
+        //calculate closest pursuer like in distance agent
         Vector2D currentLocation = getLocation();
-        ArrayList<ArrayList<Point2D>> adjacent =floor.adjacent;
-        Point2D randomMidpoint = new Point((int) currentLocation.getX(), (int) currentLocation.getY());
-
-        for (int i=0; i<adjacent.size(); i++){
-            System.out.println("I'm so here");
-            if (adjacent.get(i).get(0).equals(new Point((int) currentLocation.getX(), (int) currentLocation.getY()))){
-                int random = (int) Math.abs(Math.random()* ((adjacent.get(i).size()-1) ));
-                System.out.println("random"+random);
-                randomMidpoint = adjacent.get(i).get(random);
-                newGoal = new Vector2D(randomMidpoint.getX(), randomMidpoint.getY());
-                finalGoal = new Vector2D(randomMidpoint.getX(), randomMidpoint.getY());
+        MapInfo info = super.mapInfo;
+        LinkedList<Vector2D> agentPoint = new LinkedList<>(info.getAgentPoints());
+        double shortestDistance = Double.MAX_VALUE;
+        int agentIndex=-1;
+        for (int i=0; i<agentPoint.size(); i++){
+            double distance = Math.abs(agentPoint.get(i).distance(currentLocation));
+            System.out.println("Distance: "+distance);
+            if (distance<shortestDistance){
+                shortestDistance = distance;
+                agentIndex = i;
             }
-                newGoal = finalGoal;
+        }
+
+        //get list of adjacent vertices of our current location
+        ArrayList<ArrayList<Point2D>> adjacent =floor.adjacent;
+        ArrayList<Point2D> adjacentToCurrentLocation = new ArrayList<>();
+        for (int i=0; i<adjacent.size(); i++) {
+            if (adjacent.get(i).get(0).equals(new Point((int) currentLocation.getX(), (int) currentLocation.getY()))) {
+                adjacentToCurrentLocation = adjacent.get(i);
+            }
+        }
+
+        //compare the location of that pursuer with the adjacent vertices of current own location
+        // take the one with biggest Distance
+        double longestDistance = Double.MIN_VALUE;
+        int chosenAdjacentVertexIndex = -1;
+        for (int i=0; i<adjacentToCurrentLocation.size(); i++){
+            Vector2D oneAdjacentVertex = new Vector2D(adjacentToCurrentLocation.get(i).getX(), adjacentToCurrentLocation.get(i).getY());
+            double distance = Math.abs(agentPoint.get(agentIndex).distance(oneAdjacentVertex));
+            if (distance>longestDistance){
+                longestDistance = distance;
+                chosenAdjacentVertexIndex = i;
+            }
+        }
+
+        //set the new walktotask to that point
+        for (int i=0; i<adjacent.size(); i++){
+            if (adjacent.get(i).get(0).equals(new Point((int) currentLocation.getX(), (int) currentLocation.getY()))){
+                newGoal = new Vector2D(adjacentToCurrentLocation.get(chosenAdjacentVertexIndex).getX(), adjacentToCurrentLocation.get(chosenAdjacentVertexIndex).getY());
+                finalGoal = new Vector2D(adjacentToCurrentLocation.get(chosenAdjacentVertexIndex).getX(), adjacentToCurrentLocation.get(chosenAdjacentVertexIndex).getY());
+            }
+            newGoal = finalGoal;
 
         }
+        //newGoal = new Vector2D(adjacentToCurrentLocation.get(chosenAdjacentVertexIndex).getX(), adjacentToCurrentLocation.get(chosenAdjacentVertexIndex).getY());
+
+        //maybe add some more code for the case when you are stuck at one vertex?
+        // hen break out of path and randomly walk around?
+
+        //int random = (int) Math.random()*floor.midpoints.size()-1;
+
+
+        //Point2D randomMidpoint = new Point((int) currentLocation.getX(), (int) currentLocation.getY());
+
+
     /*    if (!getLocation().equals(finalGoal)){
             request.add(new WalkToTask(newGoal));
         } else {

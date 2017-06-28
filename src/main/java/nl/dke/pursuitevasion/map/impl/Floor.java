@@ -638,9 +638,6 @@ public class Floor extends AbstractObject
                         newStartingObstacleIndex = h;
                         vertexNew = i;
                         visitedObstacles.add(newStartingObstacleIndex);
-////                            System.out.println("distance: " + smallestDistance);
-////                            System.out.println("obsCon: " + obsCon);
-////                            System.out.println("floorCon: " + floorCon);
                     }
                 }
             }
@@ -648,12 +645,8 @@ public class Floor extends AbstractObject
         conns.add(new ArrayList<>());
         conns.get(conns.size()-1).add(obsCon);
         conns.get(conns.size()-1).add(floorCon);
-//            System.out.println("conns" + conns.toString());
 
         ArrayList<Obstacle> obstacleCopy = new ArrayList<>(ob);
-
-        System.out.println();
-        System.out.println("Help - obstacle size: "+obstacleCopy.size());
 
         //done, dont change!
         if (obstacleCopy.size()>1) {
@@ -661,49 +654,19 @@ public class Floor extends AbstractObject
             smallestDistance = Integer.MAX_VALUE;
             Point floorCon1 = null;
             Point obsCon1 = null;
-
-
             //loop through obstaclelist
             //find closest connections between obstacles
-            System.out.println("k before loop: " + newStartingObstacleIndex);
-            System.out.println("obstacleCopy.size(): " + obstacleCopy.size());
-            for (int g = 0; g < obstacleCopy.size(); g++) {
-                System.out.println("g: " + g);
-                System.out.println(newStartingObstacleIndex);
-                System.out.println(oldStartingIndex);
-                System.out.println("OBSTACLECOPY.size(): " + obstacleCopy.size());
-                int k = newStartingObstacleIndex;
+           for (int g = 0; g < obstacleCopy.size(); g++) {
+               int k = newStartingObstacleIndex;
                 //int kminus =oldStartingIndex;
-                System.out.println("k in loop: " + k);
                 Point oneObsConn = null;
                 Point anotherObsConn = null;
                 //loops through points of each obstacle
                 for (int l = 0; l < obstacleCopy.get(k).getPolygon().xpoints.length; l++) {
-                    System.out.println("vertex no. l of k: " + l);
-
-
                     for (int x = 0; x < obstacleCopy.size(); x++) {
-                        System.out.println("x: " + x);
-                        //System.out.println("obstacleCopy.size(): "+obstacleCopy.size());
                         for (int y = 0; y < obstacleCopy.get(x).getPolygon().xpoints.length; y++) {
-                            System.out.println("y: " + y);
-                            // System.out.println("obstacleCopy.poly.length: "+obstacleCopy.get(x).getPolygon().xpoints.length);
-                            System.out.println("START: " + newStartingObstacleIndex);
-                            System.out.println("END: " + oldStartingIndex);
-                            System.out.println("x!=oldStartingIndex: " + (x != oldStartingIndex));
-                            System.out.println("!visitedObstacles.contains(x): " + !visitedObstacles.contains(x));
-                            System.out.println("x!=k " + (x!=k));
                             //added second constraint to if!
                             if (!visitedObstacles.contains(x) && x!=k) {
-                                System.out.println();
-                                System.out.println("old smallest distance: " + smallestDistance);
-                                System.out.println("local distance: " + computeDistance(
-                                        obstacleCopy.get(k).getPolygon().xpoints[l],
-                                        obstacleCopy.get(x).getPolygon().xpoints[y],
-                                        obstacleCopy.get(k).getPolygon().ypoints[l],
-                                        obstacleCopy.get(x).getPolygon().ypoints[y]
-                                ));
-                                System.out.println();
                                 if (computeDistance(
                                         obstacleCopy.get(k).getPolygon().xpoints[l],
                                         obstacleCopy.get(x).getPolygon().xpoints[y],
@@ -718,19 +681,10 @@ public class Floor extends AbstractObject
                                     newStartingObstacleIndex = x;
                                     vertexNew = y;
                                     visitedObstacles.add(oldStartingIndex);
-                                    System.out.println("new distance: " + smallestDistance);
-
-
                                 }
                             }
                         }
                     }
-
-                    System.out.println();
-                    System.out.println("smallestDistance: " + smallestDistance);
-                    System.out.println("oldStartingIndex: " + oldStartingIndex + " >> newStartingObstacleIndex: " + newStartingObstacleIndex);
-                    System.out.println("VertexOld: " + vertexOld + " >> VertexNew: " + vertexNew);
-                    System.out.println();
                 }
 
                 if (oneObsConn != null) {
@@ -739,21 +693,12 @@ public class Floor extends AbstractObject
                     conns.get(conns.size() - 1).add(anotherObsConn);
                     //obstacleCopy.remove(k);
                 }
-                System.out.println();
-                System.out.println("smallestDistance: " + smallestDistance);
-                System.out.println("oldStartingIndex: " + oldStartingIndex + " >> newStartingObstacleIndex: " + newStartingObstacleIndex);
-                System.out.println("VertexOld: " + vertexOld + " >> VertexNew: " + vertexNew);
-                System.out.println();
                 oneObsConn = null;
                 anotherObsConn = null;
                 smallestDistance = Integer.MAX_VALUE;
-                System.out.println();
-                System.out.println("SMALLEST DISTANCE RESET");
-                System.out.println();
             }
 
             // find last connection from last obstacle to outer polygon
-            System.out.println("last link with more obstacles");
             smallestDistance = Integer.MAX_VALUE;
             for (int i = 0; i < getPolygon().xpoints.length; i++) {
                 int k = newStartingObstacleIndex;
@@ -777,13 +722,10 @@ public class Floor extends AbstractObject
             //dont change!
 
             // find last connection from obstacle to outer polygon
-            System.out.println("last link with one obstacle");
             smallestDistance = Integer.MAX_VALUE;
             for (int i = 0; i < getPolygon().xpoints.length; i++) {
                 for (int j = 0; j < obstacleCopy.get(0).getPolygon().xpoints.length; j++) {
-                    System.out.println("j " +j);
-                    System.out.println("vertexNew " +vertexNew);
-                    if (vertexNew!=j) {
+                   if (vertexNew!=j) {
                         if (computeDistance(
                                 getPolygon().xpoints[i],
                                 obstacleCopy.get(0).getPolygon().xpoints[j],
@@ -802,14 +744,6 @@ public class Floor extends AbstractObject
         conns.add(new ArrayList<>());
         conns.get(conns.size()-1).add(obsCon);
         conns.get(conns.size()-1).add(floorCon);
-
-        System.out.println("CONNECTIONS");
-        for (int i=0; i<conns.size(); i++){
-            System.out.println();
-            for (int j=0; j<conns.get(i).size(); j++){
-                System.out.println(conns.get(i).get(j).x+","+conns.get(i).get(j).y);
-            }
-        }
 
         // find point on where to "cut" the connection in int[] x and y list, meaning, where to insert the new vertices in the list
         //  write method for this, used for other obstacles as well
@@ -838,8 +772,6 @@ public class Floor extends AbstractObject
         ArrayList<Point> finalPolygon2 = new ArrayList<>();
 
         //get order for first polygon
-        System.out.println();
-        System.out.println("Polygon 1");
         ArrayList<Point> polygon1 = findFirstPartOfFloor(0, floorVertices, conns, finalPolygon1);
         int index = polygon1.get(polygon1.size()-1).x;
         polygon1.remove(polygon1.size()-1);
@@ -853,12 +785,6 @@ public class Floor extends AbstractObject
         polygon1 = findLastPartOfFloor(floorVertices, firstConnection1, secondConnection1, conns, polygon1);
         polygon1 = removeDoubleVertices(polygon1);
 
-        System.out.println();
-        System.out.println("AFTER EVERYTHING");
-        for (int i = 0; i< polygon1.size(); i++)
-        {
-            System.out.println(polygon1.get(i).x + ", " + polygon1.get(i).y);
-        }
 
         newSimplePolygon1= new ArrayList<>(polygon1);
 
@@ -866,38 +792,6 @@ public class Floor extends AbstractObject
         ArrayList<Polygon> trianglesToDraw1 = getTriangles(toBeTriangulatedPolygon1);
         ArrayList<Point2D> midpoints1 = getMidPoints(trianglesToDraw1);
 
-
-    /*    System.out.println();
-        System.out.println("polygon1");
-        for (Point p: polygon1){
-            System.out.println(p.x+","+p.y);
-        }
-
-        System.out.println();
-        System.out.println("newSimplePolygon1");
-        for (Point p: newSimplePolygon1){
-            System.out.println(p.x+","+p.y);
-        }
-
-        System.out.println();
-        System.out.println("toBeTriangulatedPolygon");
-        for (Point p: toBeTriangulatedPolygon){
-            System.out.println(p.x+","+p.y);
-        }
-
-*/
-  /*      System.out.println();
-        System.out.println("TrianglesToDraw");
-        for (Polygon p: trianglesToDraw){
-            System.out.println("triangle:");
-            for (int i=0; i<p.xpoints.length; i++){
-                System.out.println(p.xpoints[i]);
-                System.out.println(p.ypoints[i]);
-            }
-        }*/
-
-        System.out.println();
-        System.out.println("Polygon 2");
         //get order for second polygon
         ArrayList<Point> polygon2 = findFirstPartOfFloor(1+1, floorVertices, conns, finalPolygon2);
         //since we don't need index anymore, last element can be deleted immediately
@@ -909,13 +803,6 @@ public class Floor extends AbstractObject
         //polygon2.remove(polygon2.size()-1);
         polygon2 = findLastPartOfFloor(floorVertices, firstConnection2, secondConnection2, conns, polygon2);
         polygon2 = removeDoubleVertices(polygon2);
-
-        System.out.println();
-        System.out.println("AFTER EVERYTHING");
-        for (int i = 0; i< polygon2.size(); i++)
-        {
-            System.out.println(polygon2.get(i).x + ", " + polygon2.get(i).y);
-        }
 
         newSimplePolygon2=polygon2;
 
@@ -930,30 +817,16 @@ public class Floor extends AbstractObject
         midpoints.addAll(midpoints2);
 
         adjacent = new ArrayList<>(getAdjacentTriangles(trianglesToDraw, midpoints));
-        System.out.println("Adjacent Midpoints");
-        for(int i = 0; i<adjacent.size(); i++)
-        {
-            for(int j = 0; j<adjacent.get(i).size(); j++)
-            {
-                System.out.println(adjacent.get(i).get(j).getX() + ", " + adjacent.get(i).get(j).getY());
-            }
-            System.out.println();
-        }
-
-
 
         return conns;
     }
 
     public ArrayList<Point> findFirstPartOfFloor(int startingIndex, Point[] floorVertices, ArrayList<ArrayList<Point>> conns, ArrayList<Point> newPolygon){
-        System.out.println("STARTING INDEX; "+ startingIndex);
         Point firstConnection = null;
         Point index=null;
         boolean firstConnectionFound = false;
         for (int h=startingIndex; h<floorVertices.length; h++) {
             //checks if the given floor point is equal to one of the floor points in the connections list
-            System.out.println("boolean: "+firstConnectionFound);
-            System.out.println("vertex: " + floorVertices[h]);
             if (!firstConnectionFound) {
                 if (checkForConn(floorVertices[h], conns)) {
                     index = new Point(h,h);
@@ -965,8 +838,6 @@ public class Floor extends AbstractObject
                 }
             }
         }
-        System.out.println("1st conn: "+firstConnection);
-        System.out.println(index);
         newPolygon.add(index);
         return newPolygon;
     }
@@ -985,42 +856,23 @@ public class Floor extends AbstractObject
         //maybe check later if this isnt the first obstacle, if it is, then its fine,
         //if its second or higher, then the missing first parts need to be covered as well in another loop
 
-        System.out.println();
-        for (int i=0; i<obstacleVertices.size(); i++){
-            System.out.println("Obstacle: "+i);
-            for (int j=0; j<obstacleVertices.get(i).size(); j++) {
-                System.out.println(obstacleVertices.get(i).get(j));
-            }
-        }
-        System.out.println();
-
         //working on it - currently debugging
         boolean found = false;
         int[] indexOfLastObstacleConnection = new int[2];
 
-        System.out.println();
-        System.out.println("obstacleVertices.size()-1: "+ (obstacleVertices.size()-1) );
         for (int h=0; h<obstacleVertices.size()-1; h++){
             int k=h;
             //for (int k = 0; k < otherObstacleConnections.length; k++) {
-            System.out.println("k: " + k);
             int i = indexOfObstaclePoint[0];
 
             int verticesInbetween = 0;
 
             //int j = indexOfObstaclePoint[1];
             for (int j = indexOfObstaclePoint[1]; j >= -1; j--) {
-                // System.out.println("j: " + j);
-                //System.out.println(obstacleVertices.get(i).get(j));
-                //newPolygon.add(obstacleVertices.get(i).get(j));
-                //verticesInbetween++;
-
                 if (j == indexOfObstaclePoint[1]) {
-                    System.out.println("first case");
                     newPolygon.add(obstacleVertices.get(i).get(j));
                     verticesInbetween++;
                 } else if (j!=-1){
-                    System.out.println("second case");
                     if (!found) {
                         if (otherObstacleConnections[k].equals(new Point(-1,-1))) {
                             newPolygon.add(obstacleVertices.get(i).get(j));
@@ -1030,7 +882,6 @@ public class Floor extends AbstractObject
 
                             otherObstacleConnections[k] = getConn(obstacleVertices.get(i).get(j), conns);
                             newPolygon.add(otherObstacleConnections[k]);
-                            System.out.println(otherObstacleConnections[k]);
                             indexOfObstaclePoint = getIndexOfObstacleConn(otherObstacleConnections[k], obstacleVertices);
                             // delete dubble vertex
                             //newPolygon.remove(newPolygon.size()-1);
@@ -1045,27 +896,20 @@ public class Floor extends AbstractObject
                     }
 
                 } else if (j==-1){
-                    System.out.println("third case");
                     //if you reached the first element, continue at the end of the list until the found first connection
                     for (int m = obstacleVertices.get(i).size() - 1; m >= indexOfObstaclePoint[1]; m--) {
-                        System.out.println("m: " + m);
                         if (m == obstacleVertices.get(i).size() - 1){
-                            System.out.println("third.one");
                             newPolygon.add(obstacleVertices.get(i).get(m));
                         }
                         else if (m!=indexOfObstaclePoint[1]) {
-                            System.out.println("third.second");
                             if (!found) {
-                                System.out.println("if of m");
                                 if (otherObstacleConnections[k].equals(new Point(-1,-1))) {
                                     verticesInbetween++;
                                     newPolygon.add(obstacleVertices.get(i).get(m));
-                                    System.out.println("what do i add: "+obstacleVertices.get(i).get(m));
                                 }
                                 if (checkForConn(obstacleVertices.get(i).get(m), conns)) {
                                     otherObstacleConnections[k] = getConn(obstacleVertices.get(i).get(m), conns);
                                     newPolygon.add(otherObstacleConnections[k]);
-                                    System.out.println(otherObstacleConnections[k]);
                                     indexOfObstaclePoint = getIndexOfObstacleConn(otherObstacleConnections[k], obstacleVertices);
                                     // delete dubble vertex
                                     //newPolygon.remove(newPolygon.size()-1);
@@ -1078,11 +922,7 @@ public class Floor extends AbstractObject
                                 }
                             }
                         } else {
-                            System.out.println("otherObstacleConnections[k]: " +otherObstacleConnections[k].x+","+otherObstacleConnections[k].y);
-                            System.out.println(otherObstacleConnections[k].x == -1);
-                            System.out.println("before fourth case");
                             if (otherObstacleConnections[k].x == -1 && otherObstacleConnections[k].y == -1) {
-                                System.out.println("fourth case");
                                 //get all the possible connections = 2
                                 //take the one which has not yet been used already
 
@@ -1091,26 +931,19 @@ public class Floor extends AbstractObject
                                 ArrayList<Point> allConnectionsOnThisPoint = new ArrayList<>();
                                 for (int a = 0; a < conns.size(); a++) {
                                     for (int b = 0; b < conns.get(a).size(); b++) {
-                                        System.out.println(conns.get(a).get(b));
-                                        System.out.println("conns.get(a).get(b).equals(obstacleVertices.get(i).get(m)) "+conns.get(a).get(b).equals(obstacleVertices.get(i).get(m)));
                                         if (conns.get(a).get(b).equals(otherObstacleConnections[k])) {
                                             Point counterPart = getConn(otherObstacleConnections[k], conns);
                                             allConnectionsOnThisPoint.add(counterPart);
-                                            System.out.println("counterpart: " + counterPart.x + "," + counterPart.y);
                                         }
-                                        System.out.println();
                                     }
-                                    System.out.println();
                                 }
                                 // check for these 2 points, if the already were used --> check if already in new vertexordering
                                 // if not, take this one next
                                 for (int a = 0; a < allConnectionsOnThisPoint.size(); a++) {
-                                    System.out.println("!newPolygon.contains(allConnectionsOnThisPoint.get(a)): " + !newPolygon.contains(allConnectionsOnThisPoint.get(a)));
                                     if (!newPolygon.contains(allConnectionsOnThisPoint.get(a))) {
 
                                         otherObstacleConnections[k] = allConnectionsOnThisPoint.get(a);
                                         newPolygon.add(otherObstacleConnections[k]);
-                                        System.out.println(otherObstacleConnections[k]);
                                         indexOfObstaclePoint = getIndexOfObstacleConn(otherObstacleConnections[k], obstacleVertices);
                                         // delete dubble vertex
                                         //newPolygon.remove(newPolygon.size()-1);
@@ -1131,31 +964,13 @@ public class Floor extends AbstractObject
                 if (!found && j != indexOfObstaclePoint[1] && j != -1){
 
                 }
-                System.out.println();
-                System.out.println("for each obstacle?:");
-                for (int ö=0; ö<newPolygon.size(); ö++){
-                    System.out.println(newPolygon.get(ö));
-                }
-                System.out.println();
-            }
-            // delete dubble vertex
-            // newPolygon.remove(newPolygon.size()-1);
-            System.out.println("verticesInbetween: " +verticesInbetween);
-            System.out.println("before doubla point if:");
-            for (int ö=0; ö<newPolygon.size(); ö++){
-                System.out.println(newPolygon.get(ö));
-            }
 
-            System.out.println("after if: "+otherObstacleConnections[k].x+","+otherObstacleConnections[k].y);
-            System.out.println(otherObstacleConnections[k].equals(new Point(-1,-1)));
+            }
             if (otherObstacleConnections[k].equals(new Point(-1,-1))){
 
-                System.out.println("v "+verticesInbetween);
                 for (int v = 0; v<verticesInbetween; v++){
                     newPolygon.remove(newPolygon.size()-1);
                 }
-
-                System.out.println("get Conn: "+getConn(obstacleVertices.get(i).get(indexOfObstaclePoint[1]), conns));
                 otherObstacleConnections[k] = getConn(obstacleVertices.get(i).get(indexOfObstaclePoint[1]), conns);
                 newPolygon.add(otherObstacleConnections[k]);
 
@@ -1167,35 +982,16 @@ public class Floor extends AbstractObject
             //}
         }
 
-        System.out.println(indexOfObstaclePoint[0]+","+indexOfObstaclePoint[1]);
-        System.out.println(indexOfLastObstacleConnection[0]+","+indexOfLastObstacleConnection[1]);
 
-        System.out.println(otherObstacleConnections.length-1);
-
-        System.out.println("getConn of: "+ otherObstacleConnections[otherObstacleConnections.length-1]);
-        //secondConnection=getConn(otherObstacleConnections[otherObstacleConnections.length-1], conns);
-
-        //indexOfObstaclePoint[1]
-        System.out.println("HALLIHALLO");
         secondConnection = searchForSecondConnectionForSimpleMethod(obstacleVertices, newPolygon, conns, indexOfObstaclePoint);
 
         newPolygon.add(secondConnection);
-
-        System.out.println("last conn: "+ secondConnection.getX());
-        System.out.println("last conn: "+ secondConnection.getY());
-
-        System.out.println();
-        for (int i=0; i<newPolygon.size(); i++){
-            System.out.println(newPolygon.get(i));
-        }
-        System.out.println();
         return  newPolygon;
     }
 
     public Point searchForSecondConnectionForSimpleMethod(ArrayList<ArrayList<Point>> obstacleVertices,
                                                           ArrayList<Point> newPolygon, ArrayList<ArrayList<Point>> conns,
                                                           int[] indexOfObstaclePoint){
-        System.out.println("SEARCH FOR 2nd CONN");
         Point secondConn = new Point(-1,-1);
 
         int lastObstacle = indexOfObstaclePoint[0];
@@ -1206,20 +1002,14 @@ public class Floor extends AbstractObject
         int verticesInbetween = 0;
 
         for (int j = lastObstacleVertex; j >= -1; j--) {
-            //System.out.println("j: " + j);
-            //System.out.println(obstacleVertices.get(lastObstacle).get(j));
-            //newPolygon.add(obstacleVertices.get(lastObstacle).get(j));
             if (j != -1 && j!= lastObstacleVertex && checkForConn(obstacleVertices.get(lastObstacle).get(j), conns)) {
                 newPolygon.add(obstacleVertices.get(lastObstacle).get(j));
-                System.out.println("here1");
                 if (!found) {
                     secondConn = getConn(obstacleVertices.get(lastObstacle).get(j), conns);
                     newPolygon.add(secondConn);
-                    System.out.println("secondConn0: " + secondConn);
                     found = true;
                 }
             } else if (j != -1) {
-                System.out.println("here2");
                 newPolygon.add(obstacleVertices.get(lastObstacle).get(j));
                 verticesInbetween++;
                 if (j!= lastObstacleVertex){
@@ -1228,50 +1018,34 @@ public class Floor extends AbstractObject
                         if (!found) {
                             secondConn = getConn(obstacleVertices.get(lastObstacle).get(j), conns);
                             newPolygon.add(secondConn);
-                            System.out.println("secondConn1: " + secondConn);
                             found = true;
                         }
                     }
                 }
             } else {
-                System.out.println("here3");
                 //if you reached the first element, continue at the end of the list until the found first connection
                 for (int m = obstacleVertices.get(lastObstacle).size() - 1; m > lastObstacleVertex; m--) {
-                    //System.out.println("m: " + m);
-                    //newPolygon.add(obstacleVertices.get(lastObstacle).get(m));
-                    //verticesInbetween++;
                     if (!found) {
-                        System.out.println(obstacleVertices.get(lastObstacle).get(m));
                         newPolygon.add(obstacleVertices.get(lastObstacle).get(m));
                         verticesInbetween++;
                         if (checkForConn(obstacleVertices.get(lastObstacle).get(m), conns)) {
                             secondConn = getConn(obstacleVertices.get(lastObstacle).get(m), conns);
-                            System.out.println("secondConn2: " + secondConn);
                             newPolygon.add(secondConn);
                             found = true;
                         }
                     }
                 }
             }
-            System.out.println("I want to sleep");
-            for (int ö=0; ö<newPolygon.size(); ö++){
-                System.out.println(newPolygon.get(ö));
-            }
         }
         //is this right? compare with method above
-        System.out.println("after if: ");
-        System.out.println("verticesInbetween: " +verticesInbetween);
         if (!found){
-            System.out.println("v "+verticesInbetween);
             for (int v = 0; v<verticesInbetween-1; v++){
                 newPolygon.remove(newPolygon.size()-1);
             }
-            System.out.println("get Conn: "+getConn(obstacleVertices.get(lastObstacle).get(lastObstacleVertex), conns));
             secondConn = getConn(obstacleVertices.get(lastObstacle).get(lastObstacleVertex), conns);
             found =true;
 
         }
-        System.out.println("SECOND CONN: "+secondConn);
         return secondConn;
     }
 
@@ -1280,7 +1054,6 @@ public class Floor extends AbstractObject
                                                     ArrayList<ArrayList<Point>> conns, int i, int j, int m){
 
         boolean found=false;
-        System.out.println(obstacleVertices.get(i).get(j));
         newPolygon.add(obstacleVertices.get(i).get(j));
         if (j != indexOfObstaclePoint && checkForConn(obstacleVertices.get(i).get(j), conns)) {
             otherObstacleConnections[m] = getConn(obstacleVertices.get(i).get(j), conns);
@@ -1306,23 +1079,16 @@ public class Floor extends AbstractObject
     public Point searchForSecondConnection(Point secondConnection, ArrayList<Point> newPolygon,
                                            ArrayList<ArrayList<Point>> obstacleVertices, int indexOfLastObstaclePoint,
                                            ArrayList<ArrayList<Point>> conns, int i, int j){
-        System.out.println("SEARCH FOR 2nd CONN");
         boolean found=false;
-        System.out.println(obstacleVertices.get(i).get(j));
         newPolygon.add(obstacleVertices.get(i).get(j));
         if (j != indexOfLastObstaclePoint && checkForConn(obstacleVertices.get(i).get(j), conns)) {
-            System.out.println("1?");
             secondConnection = getConn(obstacleVertices.get(i).get(j), conns);
             newPolygon.add(secondConnection);
             found = true;
         } else {
-            System.out.println("2?");
-            System.out.println(obstacleVertices.get(i).get(j));
             //if you reached the first element, continue at the end of the list until the found first connection
             for (int k = obstacleVertices.get(i).size() - 1; k > indexOfLastObstaclePoint; k--) {
                 if (!found) {
-                    System.out.println("3?");
-                    System.out.println(obstacleVertices.get(i).get(k));
                     newPolygon.add(obstacleVertices.get(i).get(k));
                     if (checkForConn(obstacleVertices.get(i).get(k), conns)) {
                         secondConnection = getConn(obstacleVertices.get(i).get(k), conns);
@@ -1332,63 +1098,38 @@ public class Floor extends AbstractObject
                 }
             }
         }
-        System.out.println();
         return secondConnection;
     }
 
     public ArrayList<Point> findLastPartOfFloor(Point[] floorVertices, Point firstConnection, Point secondConnection, ArrayList<ArrayList<Point>> conns, ArrayList<Point> newPolygon){
 
-        System.out.println("WTF");
-        System.out.println();
-        System.out.println("after everything");
-        for (int i=0; i<newPolygon.size(); i++){
-            System.out.println(newPolygon.get(i));
-        }
-        System.out.println("Last part of polygon still missing");
         int indexOfConnectionFromObstacle=-1;
         for (int i=0; i<floorVertices.length; i++){
-            System.out.println(secondConnection.x+","+secondConnection.y);
-            System.out.println(floorVertices[i].x+","+floorVertices[i].y);
-            System.out.println(secondConnection.equals(floorVertices[i]));
             if (secondConnection.equals(floorVertices[i])){
                 indexOfConnectionFromObstacle = i;
             }
         }
-        System.out.println();
-        System.out.println("adding last part");
-        System.out.println("floorVertices: "+ floorVertices.length);
         for (int i=indexOfConnectionFromObstacle; i<=floorVertices.length; i++){
-            //System.out.println("i: "+i);
             if (i!=floorVertices.length) {
                 //newPolygon.add(floorVertices[i]);
                 if ((floorVertices[i].equals(getConn(firstConnection, conns)))) {
                     newPolygon.add(floorVertices[i]);
-                    System.out.println(floorVertices[i]);
                     return newPolygon;
                 }
                 if (!(floorVertices[i].equals(getConn(firstConnection, conns)))) {
                     newPolygon.add(floorVertices[i]);
-                    System.out.println(floorVertices[i]);
                 }
             } else {
                 for (int j=0; j<indexOfConnectionFromObstacle; j++){
-                    System.out.println("j: "+j);
                     if ((floorVertices[j].equals(getConn(firstConnection, conns)))) {
                         newPolygon.add(floorVertices[j]);
-                        System.out.println(floorVertices[j]);
                         return newPolygon;
                     }
                     if (!(floorVertices[j].equals(getConn(firstConnection, conns)))) {
                         newPolygon.add(floorVertices[j]);
-                        System.out.println(floorVertices[j]);
                     }
                 }
             }
-        }
-        System.out.println();
-        System.out.println("after everything");
-        for (int i=0; i<newPolygon.size(); i++){
-            System.out.println(newPolygon.get(i));
         }
         return newPolygon;
     }
@@ -1478,8 +1219,6 @@ public class Floor extends AbstractObject
             double a2 = (y4-y3)/(x4-x3);
             double b2 = y3 - a2*x3;
 
-            System.out.println("a1: "+ Math.abs(a1));
-            System.out.println("a2: "+ Math.abs(a2));
             if (Math.abs(a1)==0 && Math.abs(a2)==0){
                 return null;
             }
@@ -1490,9 +1229,6 @@ public class Floor extends AbstractObject
             int xi = (int) (((x3-x4)*(x1*y2-y1*x2)-(x1-x2)*(x3*y4-y3*x4))/d);
             int yi = (int) (((y3-y4)*(x1*y2-y1*x2)-(y1-y2)*(x3*y4-y3*x4))/d);
 
-
-            System.out.println("Intersection point: "+ new Point(xi, yi));
-
             return new Point(xi, yi);
         }
         return null;
@@ -1502,7 +1238,6 @@ public class Floor extends AbstractObject
         int middlePointX = (int) ((foundDiagonal.getX1()+foundDiagonal.getX2())/2);
         int middlePointY = (int) ((foundDiagonal.getY1()+foundDiagonal.getY2())/2);
         Point middlePoint = new Point(middlePointX, middlePointY);
-        System.out.println("Middle point: " + middlePoint);
 
         int[] xpoints = new int[newPolygon.size()];
         int[] ypoints = new int[newPolygon.size()];
@@ -1532,9 +1267,7 @@ public class Floor extends AbstractObject
     public boolean liesCompletelyInside(Point viminus, Point vi, Point viplus, ArrayList<Point> polygon,
                                         ArrayList<Line2D> linesOfPolygon, ArrayList<Polygon> triangles){
         Line2D diagonal = new Line2D.Double(viminus, viplus);
-        System.out.println("Diagonal: " + diagonal.getP1() + "," + diagonal.getP2());
-        System.out.println("isMiddlePointInside: " + isMiddlePointInside(diagonal, polygon));
-        if (isMiddlePointInside(diagonal, polygon)){
+            if (isMiddlePointInside(diagonal, polygon)){
             //loop over the lines
             ArrayList<Point> intersectionPoints = new ArrayList<>();
             for(int j=0; j<linesOfPolygon.size(); j++) {
@@ -1544,13 +1277,7 @@ public class Floor extends AbstractObject
                 }
             }
 
-//check if each point is exactly twice in the list
-            //if(!isTwiceInList(intersectionPoints)) {
-            //    return false;
-            //}
-
             ArrayList<Boolean> allIntersectionsAreCornerpoints = new ArrayList<>();
-//            boolean allIntersectionsAreCornerpoints = false;
             for (int j=0; j< intersectionPoints.size(); j++){
                 for (int k=0; k<polygon.size(); k++){
 
@@ -1575,9 +1302,6 @@ public class Floor extends AbstractObject
         for(int i = 0; i< intersectionpoints.size(); i++)
         {
             int occurence = Collections.frequency(intersectionpoints, intersectionpoints.get(i));
-            System.out.println();
-            System.out.println("OCCURENCE: " + occurence);
-            System.out.println();
             if(occurence % 2 != 0)
             {
                 return false;
@@ -1589,11 +1313,6 @@ public class Floor extends AbstractObject
     public ArrayList<Polygon> getTriangles(ArrayList<Point> polygon){
         ArrayList<Polygon> triangles = new ArrayList<>();
 
-//        System.out.println("POLYGON");
-//        for (Point p: polygon) {
-//            System.out.println(p.x + "," + p.y);
-//        }
-
         Point viminus = new Point();
         Point vi = new Point();
         Point viplus = new Point();
@@ -1601,11 +1320,7 @@ public class Floor extends AbstractObject
         ArrayList<Line2D> linesOfPolygon = getPolygonLines(polygon);
 
         while (polygon.size()>3){
-            System.out.println(polygon.size());
-//        for(int h=polygon.size()-1; h>2; h--){
             for (int i=0; i<polygon.size()-1; i++){
-                System.out.println();
-                System.out.println("i: "+i);
                 if (i!=polygon.size() && i!=0){
                     viminus = new Point(polygon.get(i-1));
                     vi = new Point(polygon.get(i));
@@ -1614,25 +1329,9 @@ public class Floor extends AbstractObject
                     boolean liesInside = liesCompletelyInside(viminus, vi, viplus, polygon, linesOfPolygon, triangles);
                     if (liesInside) {
                         Polygon toBeAdded = createNewTriangle(viminus, vi, viplus);
-                        System.out.println("POLYGON toBeAdded");
-                        for(int l=0; l<toBeAdded.xpoints.length; l++){
-                            System.out.println(toBeAdded.xpoints[l]+","+toBeAdded.ypoints[l]);
-                        }
                         triangles.add(toBeAdded);
                         polygon.remove(i);
                     }
-
-
-
-                    //if line between viminus and viplus lies COMPLETELY inside polygon, add the triangle...
-                    System.out.println(polygon.size());
-                    System.out.println("BOOLEAN: " + liesInside);
-                    System.out.println("viminus: " + viminus.x + "," + viminus.y);
-                    System.out.println("vi: " + vi.x + "," + vi.y);
-                    System.out.println("viplus: " + viplus.x + "," + viplus.y);
-
-
-
                 } else if (i==polygon.size()-1){
 
                     viminus = new Point(polygon.get(i-1));
@@ -1644,15 +1343,6 @@ public class Floor extends AbstractObject
                         triangles.add(toBeAdded);
                         polygon.remove(i);
                     }
-
-                    //if line between viminus and viplus lies COMPLETELY inside polygon, add the triangle...
-                    System.out.println(polygon.size());
-                    System.out.println("BOOLEAN: " + liesInside);
-                    System.out.println("viminus: " + viminus.x + "," + viminus.y);
-                    System.out.println("vi: " + vi.x + "," + vi.y);
-                    System.out.println("viplus: " + viplus.x + "," + viplus.y);
-
-
                 } else {
                     viminus = new Point(polygon.get(polygon.size()-1));
                     vi = new Point(polygon.get(i));
@@ -1664,30 +1354,12 @@ public class Floor extends AbstractObject
                         triangles.add(toBeAdded);
                         polygon.remove(i);
                     }
-                    //if line between viminus and viplus lies COMPLETELY inside polygon, add the triangle...
-                    System.out.println(polygon.size());
-                    System.out.println("BOOLEAN: " + liesInside);
-                    System.out.println("viminus: " + viminus.x + "," + viminus.y);
-                    System.out.println("vi: " + vi.x + "," + vi.y);
-                    System.out.println("viplus: " + viplus.x + "," + viplus.y);
-
                 }
             }
         }
         Polygon remainingPolygon = createNewTriangle(polygon.get(0), polygon.get(1), polygon.get(2));
         triangles.add(remainingPolygon);
         polygon=null;
-        System.out.println("FINAL triangles");
-        for (int i=0; i<triangles.size(); i++){
-            System.out.println("triangle: "+ i);
-            Polygon p = triangles.get(i);
-            for (int j=0; j<triangles.get(i).xpoints.length; j++){
-                int x = p.xpoints[j];
-                int y = p.ypoints[j];
-                System.out.println(x+","+y);
-            }
-        }
-
 
         return triangles;
     }
@@ -1706,11 +1378,7 @@ public class Floor extends AbstractObject
             Polygon biggestEar = new Polygon();
             double biggestRatio =  Double.MIN_VALUE;
             int respectiveIndex = -1;
-
-            System.out.println();
-            System.out.println(polygon.size());
             for (int i=0; i<polygon.size()-1; i++){
-                System.out.println("i: "+i);
                 if (i!=polygon.size() && i!=0){
                     viminus = new Point(polygon.get(i-1));
                     vi = new Point(polygon.get(i));
@@ -1720,30 +1388,14 @@ public class Floor extends AbstractObject
                     if (liesInside) {
                         Polygon toBeAdded = createNewTriangle(viminus, vi, viplus);
                         Rectangle2D boundingBox = toBeAdded.getBounds2D();
-                        System.out.println("current biggestRatio: "+biggestRatio);
                         double ratio = boundingBox.getWidth()/boundingBox.getHeight();
-                        System.out.println("current triangleRatio: "+ ratio);
 
                         if (ratio>biggestRatio){
                             biggestEar=toBeAdded;
                             biggestRatio=ratio;
                             respectiveIndex = i;
-                            System.out.println("new biggestRatio: "+ biggestRatio);
-                            System.out.println("respectiveIndex: "+respectiveIndex);
                         }
                     }
-
-
-
-                    //if line between viminus and viplus lies COMPLETELY inside polygon, add the triangle...
-                    System.out.println(polygon.size());
-                    System.out.println("BOOLEAN: " + liesInside);
-                    System.out.println("viminus: " + viminus.x + "," + viminus.y);
-                    System.out.println("vi: " + vi.x + "," + vi.y);
-                    System.out.println("viplus: " + viplus.x + "," + viplus.y);
-
-
-
                 } else if (i==polygon.size()-1){
 
                     viminus = new Point(polygon.get(i-1));
@@ -1754,27 +1406,14 @@ public class Floor extends AbstractObject
                     if (liesInside) {
                         Polygon toBeAdded = createNewTriangle(viminus, vi, viplus);
                         Rectangle2D boundingBox = toBeAdded.getBounds2D();
-                        System.out.println("current biggestRatio: "+biggestRatio);
                         double ratio = boundingBox.getWidth()/boundingBox.getHeight();
-                        System.out.println("current triangleRatio: "+ ratio);
 
                         if (ratio>biggestRatio){
                             biggestEar=toBeAdded;
                             biggestRatio=ratio;
                             respectiveIndex = i;
-                            System.out.println("new biggestRatio: "+ biggestRatio);
-                            System.out.println("respectiveIndex: "+respectiveIndex);
                         }
                     }
-
-                    //if line between viminus and viplus lies COMPLETELY inside polygon, add the triangle...
-                    System.out.println(polygon.size());
-                    System.out.println("BOOLEAN: " + liesInside);
-                    System.out.println("viminus: " + viminus.x + "," + viminus.y);
-                    System.out.println("vi: " + vi.x + "," + vi.y);
-                    System.out.println("viplus: " + viplus.x + "," + viplus.y);
-
-
                 } else {
                     viminus = new Point(polygon.get(polygon.size()-1));
                     vi = new Point(polygon.get(i));
@@ -1784,50 +1423,22 @@ public class Floor extends AbstractObject
                     if (liesInside) {
                         Polygon toBeAdded = createNewTriangle(viminus, vi, viplus);
                         Rectangle2D boundingBox = toBeAdded.getBounds2D();
-                        System.out.println("current biggestRatio: "+biggestRatio);
                         double ratio = boundingBox.getWidth()/boundingBox.getHeight();
-                        System.out.println("current triangleRatio: "+ ratio);
 
                         if (ratio>biggestRatio){
                             biggestEar=toBeAdded;
                             biggestRatio=ratio;
                             respectiveIndex = i;
-                            System.out.println("new biggestRatio: "+ biggestRatio);
-                            System.out.println("respectiveIndex: "+respectiveIndex);
                         }
                     }
-                    //if line between viminus and viplus lies COMPLETELY inside polygon, add the triangle...
-                    System.out.println(polygon.size());
-                    System.out.println("BOOLEAN: " + liesInside);
-                    System.out.println("viminus: " + viminus.x + "," + viminus.y);
-                    System.out.println("vi: " + vi.x + "," + vi.y);
-                    System.out.println("viplus: " + viplus.x + "," + viplus.y);
-
                 }
             }
-            System.out.println();
-            System.out.println("Biggest Ear: ");
-            for (int i=0;i<biggestEar.xpoints.length; i++){
-                System.out.println(biggestEar.xpoints[i]+","+biggestEar.ypoints[i]);
-            }
-            System.out.println("index: "+respectiveIndex);
             triangles.add(biggestEar);
             polygon.remove(respectiveIndex);
         }
         Polygon remainingPolygon = createNewTriangle(polygon.get(0), polygon.get(1), polygon.get(2));
         triangles.add(remainingPolygon);
         polygon=null;
-        System.out.println("FINAL triangles");
-        for (int i=0; i<triangles.size(); i++){
-            System.out.println("triangle: "+ i);
-            Polygon p = triangles.get(i);
-            for (int j=0; j<triangles.get(i).xpoints.length; j++){
-                int x = p.xpoints[j];
-                int y = p.ypoints[j];
-                System.out.println(x+","+y);
-            }
-        }
-
 
         return triangles;
     }
@@ -1846,7 +1457,6 @@ public class Floor extends AbstractObject
             }
             int x = (int) sumX/3;
             int y = (int) sumY/3;
-            System.out.print("x: " + x + " y: " + y);
             midPoints.add(new Point(x, y));
         }
         return midPoints;
@@ -1856,23 +1466,17 @@ public class Floor extends AbstractObject
         ArrayList<ArrayList<Point2D>> adjacentTrianglesList = new ArrayList<>();
         for(int i = 0; i<triangles.size(); i++)
         {
-            System.out.println("i "+i);
             adjacentTrianglesList.add(new ArrayList<Point2D>());
             adjacentTrianglesList.get(i).add(midpoints.get(i));
-            //System.out.println(midpoints.get(i).getX() + ", " + midpoints.get(i).getY());
 
             for (int j = 0; j<triangles.size(); j++) {
-                System.out.println("j "+j);
                 if(triangles.get(j).equals(triangles.get(i)))
                 {
                     continue;
                 }
                 if(adjacentPolygons(triangles.get(i), triangles.get(j)))
                 {
-                    System.out.println("adding " +midpoints.get(j));
                         adjacentTrianglesList.get(i).add(midpoints.get(j));
-                        //System.out.println("Adjacent " + adjacentTrianglesList.get(i).get(j).getX() + ", "+ adjacentTrianglesList.get(i).get(j).getY());
-                        System.out.println();
                 }
             }
         }
@@ -1882,7 +1486,6 @@ public class Floor extends AbstractObject
     public boolean adjacentPolygons(Polygon a, Polygon b)
     {
         int counter = 0;
-        System.out.println("method find adjacency");
         for(int i= 0; i<a.xpoints.length; i++)
         {
             Point2D coordinatesA = new Point(a.xpoints[i], a.ypoints[i]);
@@ -1890,14 +1493,9 @@ public class Floor extends AbstractObject
             for(int j = 0; j<b.xpoints.length; j++)
             {
                 Point2D coordinatesB = new Point(b.xpoints[j], b.ypoints[j]);
-                System.out.println("A: " + coordinatesA.getX() + ", " + coordinatesA.getY());
-                System.out.println("B: " + coordinatesB.getX() + ", " + coordinatesB.getY());
-                System.out.println(coordinatesA.equals(coordinatesB));
                 if(coordinatesA.equals(coordinatesB))
                 {
                     counter++;
-                    System.out.println("Counter: " + counter);
-                    //break;
                 }
 
             }
