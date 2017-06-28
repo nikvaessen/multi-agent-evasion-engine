@@ -248,6 +248,16 @@ public class MapViewPanel
             g.drawLine((int)(midPoints.get(i).getX()), (int)(midPoints.get(i).getY()), (int)(midPoints.get(i).getX()), (int)(midPoints.get(i).getY()));
         }
 
+        g.setColor(Color.green);
+        ArrayList<ArrayList<Point2D>> adjacent = floor.adjacent;
+        for(int i = 0; i<adjacent.size(); i++)
+        {
+            for(int j = 0; j<adjacent.get(i).size(); j++)
+            {
+                g.drawLine((int)adjacent.get(i).get(0).getX(), (int)adjacent.get(i).get(0).getY(), (int)adjacent.get(i).get(j).getX(), (int)adjacent.get(i).get(j).getY());
+            }
+        }
+
 
 
     }
