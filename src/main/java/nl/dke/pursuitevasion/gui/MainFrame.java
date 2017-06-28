@@ -42,25 +42,26 @@ public class MainFrame extends JFrame
             break;
         }
 
-        MinimalPathOverseer overseer = new MinimalPathOverseer(map, new Vector2D(200, 200));
+      /*  MinimalPathOverseer overseer = new MinimalPathOverseer(map, new Vector2D(200, 200));
         panel.setMinimalPathOverseer(overseer);
         for(int i = 0 ; i < overseer.getAmountOfAgents(); i++)
         {
             agents.add(overseer.getAgent(i));
-        }
+        }*/
 
         ArrayList<ArrayList<Point>> conns = floor.getTriangulation();
         ArrayList<Point2D> midpoints = floor.midpoints;
 
         //agents.add(new SimpleAgent(new Point(5,5), Direction.SOUTH, 5));
-       // agents.add(new UserAgent(map, floor, new Vector2D(200, 310), Direction.SOUTH, 5,
-       //                          EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, keyboardInputListener,true));
+        agents.add(new UserAgent(map, floor, new Vector2D(200, 310), Direction.SOUTH, 5,
+                                 EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, keyboardInputListener,false));
 
         //get random starting posistion
         int randomStart = (int) Math.abs(Math.random()* ((floor.midpoints.size()-1) ));
         Point2D start = midpoints.get(randomStart);
         agents.add(new TriangulationEvader(map, floor, new Vector2D(start.getX(), start.getY()), Direction.SOUTH, 5,
                         EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE));
+
 
         //CoordinatorPursuerKillKillKillEmAll hunter = new CoordinatorPursuerKillKillKillEmAll(engine,map, floor, new Vector2D(20, 20), Direction.SOUTH, 5,
           //      EngineConstants.VISION_RANGE, EngineConstants.VISION_ANGLE, agents);
