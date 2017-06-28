@@ -206,14 +206,14 @@ public class Map implements Serializable
                     false
             );
 
-            MapPolygon obstacle = new MapPolygon(
+            MapPolygon obstacle1 = new MapPolygon(
                     new int[] {540, 660, 660, 540},
                     new int[] {240, 240, 360, 360},
                     4,
                     true
             );
 
-            MapPolygon obstacle1 = new MapPolygon(
+            MapPolygon obstacle0 = new MapPolygon(
                     new int[] {300, 350, 250},
                     new int[] {100, 300, 300},
                     3,
@@ -234,12 +234,20 @@ public class Map implements Serializable
                     true
             );
 
+            MapPolygon obstacle4 = new MapPolygon(
+                    new int[] {725, 950, 800},
+                    new int[] {450, 450, 500},
+                    3,
+                    true
+            );
+
             return MapBuilder.create()
                     .makeFloor(mainFloor)
+                    .addObstacle(obstacle0)
                     .addObstacle(obstacle1)
-                    .addObstacle(obstacle)
                     .addObstacle(obstacle2)
-                 //   .addObstacle(obstacle3)
+                    .addObstacle(obstacle3)
+                    .addObstacle(obstacle4)
                     .finish()
                     .build();
         }
