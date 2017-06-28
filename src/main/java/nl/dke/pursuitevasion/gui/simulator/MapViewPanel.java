@@ -195,26 +195,12 @@ public class MapViewPanel
             }
         }
 
-        //draw connection of vertices
-        ((Graphics2D) g).setStroke(new BasicStroke(1));
         Floor floor= (Floor) m.getFloors().toArray()[0];
         ArrayList<ArrayList<Point>> conns = floor.getTriangulation();
-        g.setColor(Color.green);
-        for (int i=0; i<conns.size(); i++){
-            g.drawLine(conns.get(i).get(0).x, conns.get(i).get(0).y,
-                    conns.get(i).get(1).x,conns.get(i).get(1).y);
-        }
 
 
 
-            //draw second splitted polygon
-            ((Graphics2D) g).setStroke(new BasicStroke(2));
-            ArrayList<Point> polygonPoints2 = floor.newSimplePolygon2;
-            g.setColor(Color.MAGENTA);
-            for (int i=0; i<polygonPoints2.size()-1; i++){
-                g.drawLine(polygonPoints2.get(i).x, polygonPoints2.get(i).y,
-                        polygonPoints2.get(i+1).x, polygonPoints2.get(i+1).y);
-            }
+
 
 
         //draw triangles
@@ -236,8 +222,26 @@ public class MapViewPanel
         g.drawLine(polygonPoints1.get(polygonPoints1.size()-1).x, polygonPoints1.get(polygonPoints1.size()-1).y,
                 polygonPoints1.get(0).x, polygonPoints1.get(0).y);
 
+        //draw second splitted polygon
+        ((Graphics2D) g).setStroke(new BasicStroke(2));
+        ArrayList<Point> polygonPoints2 = floor.newSimplePolygon2;
+        g.setColor(Color.MAGENTA);
+        for (int i=0; i<polygonPoints2.size()-1; i++){
+            g.drawLine(polygonPoints2.get(i).x, polygonPoints2.get(i).y,
+                    polygonPoints2.get(i+1).x, polygonPoints2.get(i+1).y);
+        }
+        g.drawLine(polygonPoints2.get(polygonPoints2.size()-1).x, polygonPoints2.get(polygonPoints2.size()-1).y,
+                polygonPoints2.get(0).x, polygonPoints2.get(0).y);
 
-        ArrayList<Point2D> midPoints = floor.getMidPoints(floor.getTriangles(polygonPoints1));
+        //draw connection of vertices
+        ((Graphics2D) g).setStroke(new BasicStroke(1));
+        g.setColor(Color.green);
+        for (int i=0; i<conns.size(); i++){
+            g.drawLine(conns.get(i).get(0).x, conns.get(i).get(0).y,
+                    conns.get(i).get(1).x,conns.get(i).get(1).y);
+        }
+
+        ArrayList<Point2D> midPoints = floor.midpoints;
         g.setColor(Color.black);
         for(int i = 0; i<midPoints.size(); i++)
         {
